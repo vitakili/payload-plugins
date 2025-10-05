@@ -62,12 +62,12 @@ export async function ServerThemeInjector({ siteSettings }: Readonly<ServerTheme
   let criticalCSS = await getThemeCriticalCSS(theme as ThemePreset)
   criticalCSS ??= createFallbackCriticalCSS(theme as ThemePreset)
 
-  const borderRadiusMap: Record<string, 'none' | 'small' | 'medium' | 'large' | 'xl'> = {
+  const borderRadiusMap: Record<string, 'none' | 'small' | 'medium' | 'large' | 'xl' | 'full'> = {
     none: 'none',
     small: 'small',
     medium: 'medium',
     large: 'large',
-    full: 'xl',
+    full: 'full',
     xl: 'xl',
   }
   const mappedBorderRadius = borderRadiusMap[borderRadius ?? 'medium'] || 'medium'

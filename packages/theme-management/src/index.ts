@@ -165,6 +165,7 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
 }
 
 export const ThemeConfigurationPlugin = themeConfigurationPlugin
+export const themeManagementPlugin = themeConfigurationPlugin
 
 export default themeConfigurationPlugin
 
@@ -177,3 +178,4 @@ export {
 } from './utils/resolveThemeConfiguration'
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils'
+export { ServerThemeInjector } from './components/ServerThemeInjector'

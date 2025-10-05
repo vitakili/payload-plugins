@@ -3,10 +3,13 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useMemo } from 'react'
+import type { BorderRadiusPreset } from '@/providers/Theme/types'
 import { borderRadiusPresets } from '@/providers/Theme/themeConfig'
 
+type RadiusPresetKey = Extract<keyof typeof borderRadiusPresets, string>
+
 interface RadiusOptionCard {
-  key: keyof typeof borderRadiusPresets
+  key: RadiusPresetKey
   label: string
   css: Record<string, string>
 }
@@ -16,22 +19,20 @@ export default function RadiusField({ field, ...props }: SelectFieldClientProps)
   const label = typeof field.label === 'string' ? field.label : ''
 
   const radiusOptions = useMemo<RadiusOptionCard[]>(() => {
-    return Object.entries(borderRadiusPresets).map(([key, preset]) => ({
-      key: key as keyof typeof borderRadiusPresets,
+    const entries = Object.entries(borderRadiusPresets) as Array<
+      [RadiusPresetKey, BorderRadiusPreset]
+    >
+    return entries.map(([key, preset]) => ({
+      key,
       label: preset.label,
-      css:
-        typeof preset.css === 'string'
-          ? { '--radius-default': preset.css }
-          : (preset.css as Record<string, string>),
+      css: preset.css,
     }))
   }, [])
 
-  const fallbackKey = (radiusOptions[2]?.key ??
-    radiusOptions[0]?.key ??
-    'medium') as keyof typeof borderRadiusPresets
+  const fallbackKey: RadiusPresetKey = radiusOptions[2]?.key ?? radiusOptions[0]?.key ?? 'medium'
   const currentKey =
     typeof value === 'string' && value in borderRadiusPresets
-      ? (value as keyof typeof borderRadiusPresets)
+      ? (value as RadiusPresetKey)
       : fallbackKey
 
   const description =
@@ -111,7 +112,7 @@ export default function RadiusField({ field, ...props }: SelectFieldClientProps)
                 }}
               >
                 <span>{option.label}</span>
-                <span style={{ fontSize: '11px', opacity: 0.7 }}>{option.key}</span>
+                  <span style={{ fontSize: '11px', opacity: 0.7 }}>{option.key}</span>
               </div>
 
               <div
@@ -165,7 +166,7 @@ export default function RadiusField({ field, ...props }: SelectFieldClientProps)
         })}
       </div>
 
-      <input type="hidden" id={props.path} value={currentKey} readOnly />
+  <input type="hidden" id={props.path} value={currentKey} readOnly />
     </div>
   )
 }

@@ -28,7 +28,7 @@ export function themeIsValid(theme: string): theme is ThemePreset {
 
 export interface BorderRadiusPreset {
   label: string;
-  css: string | Record<string, string>;
+  css: Record<string, string>;
 }
 
 export interface ThemeColors {

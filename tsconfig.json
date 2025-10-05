@@ -14,7 +14,15 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["packages/theme-management/src/*"]
+    }
   },
+  "files": [],
+  "references": [
+    { "path": "./packages/theme-management" }
+  ],
   "exclude": ["node_modules", "dist", "build"]
 }

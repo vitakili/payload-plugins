@@ -24,7 +24,7 @@ const SPACING_VALUES = ['compact', 'medium', 'spacious'] as const
 const ANIMATION_LEVEL_VALUES = ['none', 'reduced', 'medium', 'full'] as const
 const MODE_VALUES = ['auto', 'light', 'dark'] as const
 
-type BorderRadiusOption = 'none' | 'small' | 'medium' | 'large' | 'xl'
+type BorderRadiusOption = (typeof BORDER_RADIUS_VALUES)[number]
 type FontScaleOption = (typeof FONT_SCALE_VALUES)[number]
 type SpacingOption = (typeof SPACING_VALUES)[number]
 type AnimationLevelOption = (typeof ANIMATION_LEVEL_VALUES)[number]
@@ -67,16 +67,11 @@ export const DEFAULT_THEME_CONFIGURATION: ResolvedThemeConfiguration = {
 }
 
 function resolveBorderRadius(value: unknown): BorderRadiusOption {
-  if (value === 'full') {
-    return 'xl'
-  }
-
   if (
     typeof value === 'string' &&
     BORDER_RADIUS_VALUES.includes(value as (typeof BORDER_RADIUS_VALUES)[number])
   ) {
-    const candidate = value as BorderRadiusOption | 'full'
-    return candidate === 'full' ? 'xl' : (candidate as BorderRadiusOption)
+    return value as BorderRadiusOption
   }
 
   return DEFAULT_THEME_CONFIGURATION.borderRadius
