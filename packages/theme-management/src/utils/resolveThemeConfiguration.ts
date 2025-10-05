@@ -1,6 +1,6 @@
 import { FONT_VALUE_TO_CSS } from '@/constants/themeFonts'
 import type { SiteSetting } from '@/payload-types'
-import type { Mode, ThemePreset as ThemePresetKey } from '@/providers/Theme/types'
+import type { Mode, ThemeDefaults } from '@/providers/Theme/types'
 import { themeIsValid } from '@/providers/Theme/types'
 import type { ThemeTypographyPreset } from '../presets'
 import { defaultThemePresets } from '../presets'
@@ -18,10 +18,16 @@ type SiteThemeConfiguration = SiteSetting['themeConfiguration'] & {
   typography?: ThemeTypographyOverride | null
 }
 
-const BORDER_RADIUS_VALUES = ['none', 'small', 'medium', 'large', 'xl', 'full'] as const
+const BORDER_RADIUS_VALUES = ['none', 'small', 'medium', 'large', 'xl'] as const
+const LEGACY_BORDER_RADIUS_ALIASES: Record<string, (typeof BORDER_RADIUS_VALUES)[number]> = {
+  full: 'xl',
+}
 const FONT_SCALE_VALUES = ['small', 'medium', 'large'] as const
 const SPACING_VALUES = ['compact', 'medium', 'spacious'] as const
-const ANIMATION_LEVEL_VALUES = ['none', 'reduced', 'medium', 'full'] as const
+const ANIMATION_LEVEL_VALUES = ['none', 'reduced', 'medium', 'high'] as const
+const LEGACY_ANIMATION_ALIASES: Record<string, (typeof ANIMATION_LEVEL_VALUES)[number]> = {
+  full: 'high',
+}
 const MODE_VALUES = ['auto', 'light', 'dark'] as const
 
 type BorderRadiusOption = (typeof BORDER_RADIUS_VALUES)[number]
@@ -33,13 +39,13 @@ type ThemeModeOption = (typeof MODE_VALUES)[number]
 
 type ThemeColorConfiguration = NonNullable<SiteThemeConfiguration['lightMode']>
 
-const DEFAULT_THEME_NAME: ThemePresetKey = 'cool'
+const DEFAULT_THEME_NAME: ThemeDefaults = 'cool'
 const DEFAULT_THEME_PRESET = defaultThemePresets.find(
   (preset) => preset.name === DEFAULT_THEME_NAME,
 )
 
 export interface ResolvedThemeConfiguration {
-  theme: ThemePresetKey
+  theme: ThemeDefaults
   colorMode: Mode
   allowColorModeToggle: boolean
   borderRadius: BorderRadiusOption
@@ -67,11 +73,15 @@ export const DEFAULT_THEME_CONFIGURATION: ResolvedThemeConfiguration = {
 }
 
 function resolveBorderRadius(value: unknown): BorderRadiusOption {
-  if (
-    typeof value === 'string' &&
-    BORDER_RADIUS_VALUES.includes(value as (typeof BORDER_RADIUS_VALUES)[number])
-  ) {
-    return value as BorderRadiusOption
+  if (typeof value === 'string') {
+    if (BORDER_RADIUS_VALUES.includes(value as BorderRadiusOption)) {
+      return value as BorderRadiusOption
+    }
+
+    const legacyMatch = LEGACY_BORDER_RADIUS_ALIASES[value]
+    if (legacyMatch) {
+      return legacyMatch
+    }
   }
 
   return DEFAULT_THEME_CONFIGURATION.borderRadius
@@ -85,8 +95,19 @@ function isSpacing(value: unknown): value is SpacingOption {
   return typeof value === 'string' && SPACING_VALUES.includes(value as SpacingOption)
 }
 
-function isAnimationLevel(value: unknown): value is AnimationLevelOption {
-  return typeof value === 'string' && ANIMATION_LEVEL_VALUES.includes(value as AnimationLevelOption)
+function resolveAnimationLevel(value: unknown): AnimationLevelOption {
+  if (typeof value === 'string') {
+    if (ANIMATION_LEVEL_VALUES.includes(value as AnimationLevelOption)) {
+      return value as AnimationLevelOption
+    }
+
+    const legacyMatch = LEGACY_ANIMATION_ALIASES[value]
+    if (legacyMatch) {
+      return legacyMatch
+    }
+  }
+
+  return DEFAULT_THEME_CONFIGURATION.animationLevel
 }
 
 function isMode(value: unknown): value is ThemeModeOption {
@@ -116,7 +137,7 @@ export function resolveThemeConfiguration(
 
   const resolvedTheme =
     typeof theme === 'string' && themeIsValid(theme)
-      ? (theme as ThemePresetKey)
+      ? (theme as ThemeDefaults)
       : DEFAULT_THEME_CONFIGURATION.theme
   const resolvedMode = isMode(colorMode)
     ? (colorMode as Mode)
@@ -126,9 +147,7 @@ export function resolveThemeConfiguration(
     ? fontScale
     : DEFAULT_THEME_CONFIGURATION.fontScale
   const resolvedSpacing = isSpacing(spacing) ? spacing : DEFAULT_THEME_CONFIGURATION.spacing
-  const resolvedAnimationLevel = isAnimationLevel(animationLevel)
-    ? animationLevel
-    : DEFAULT_THEME_CONFIGURATION.animationLevel
+  const resolvedAnimationLevel = resolveAnimationLevel(animationLevel)
   const resolvedAllowToggle =
     typeof allowColorModeToggle === 'boolean'
       ? allowColorModeToggle

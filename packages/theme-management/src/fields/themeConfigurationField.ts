@@ -359,7 +359,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
           { label: { en: 'Reduced', cs: 'Snížené' }, value: 'reduced' },
           { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'Full', cs: 'Plné' }, value: 'full' },
+          { label: { en: 'High', cs: 'Vysoké' }, value: 'high' },
         ],
         admin: {
           description: {

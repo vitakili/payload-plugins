@@ -87,10 +87,10 @@ export interface SiteThemeConfiguration {
   darkMode?: ThemeColorOverride | null;
   colors?: ThemeColorOverride | null;
   typography?: ThemeTypographyOverride | null;
-  borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'xl' | 'full' | null;
+  borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'xl' | null;
   fontScale?: 'small' | 'medium' | 'large' | 'xl' | null;
   spacing?: 'compact' | 'medium' | 'spacious' | null;
-  animationLevel?: 'none' | 'reduced' | 'medium' | 'full' | null;
+  animationLevel?: 'none' | 'reduced' | 'medium' | 'high' | null;
   customCSS?: string | null;
   customization?: ThemeCustomization | null;
   radius?: string | null;

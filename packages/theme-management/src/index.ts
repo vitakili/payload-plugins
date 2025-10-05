@@ -179,3 +179,6 @@ export {
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils'
 export { ServerThemeInjector } from './components/ServerThemeInjector'
+
+export type {Mode, ThemeDefaults} from './providers/Theme/types'
+export { ThemeProvider } from './providers/Theme'

@@ -110,18 +110,13 @@ function applyBorderRadiusRule(rules: string[], config: ThemeConfiguration): voi
   const preset = borderRadiusPresets[config.borderRadius]
   if (!preset) return
 
-  const cssSource =
-    typeof preset.css === 'string'
-      ? { '--radius-default': preset.css }
-      : (preset.css as Record<string, string>)
-
-  const cssEntries = Object.entries(cssSource)
+  const cssEntries = Object.entries(preset.css)
   cssEntries.forEach(([property, value]) => {
     rules.push(`  ${property}: ${value};`)
   })
 
   const defaultRadius =
-  cssSource['--radius-default'] ?? cssSource['--radius-medium'] ?? cssSource['--radius-large']
+    preset.css['--radius-default'] ?? preset.css['--radius-medium'] ?? preset.css['--radius-large']
   if (defaultRadius) {
     rules.push(`  --radius: ${defaultRadius};`)
   }

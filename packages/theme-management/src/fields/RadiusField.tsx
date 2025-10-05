@@ -3,7 +3,6 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useMemo } from 'react'
-import type { BorderRadiusPreset } from '@/providers/Theme/types'
 import { borderRadiusPresets } from '@/providers/Theme/themeConfig'
 
 type RadiusPresetKey = Extract<keyof typeof borderRadiusPresets, string>
@@ -20,7 +19,7 @@ export default function RadiusField({ field, ...props }: SelectFieldClientProps)
 
   const radiusOptions = useMemo<RadiusOptionCard[]>(() => {
     const entries = Object.entries(borderRadiusPresets) as Array<
-      [RadiusPresetKey, BorderRadiusPreset]
+      [RadiusPresetKey, (typeof borderRadiusPresets)[RadiusPresetKey]]
     >
     return entries.map(([key, preset]) => ({
       key,
@@ -68,7 +67,7 @@ export default function RadiusField({ field, ...props }: SelectFieldClientProps)
           marginTop: '16px',
         }}
       >
-        {radiusOptions.map((option) => {
+  {radiusOptions.map((option) => {
           const isSelected = option.key === currentKey
           const cardRadius =
             option.css['--radius-large'] ??
