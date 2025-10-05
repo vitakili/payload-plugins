@@ -1,5 +1,5 @@
 {
-  "name": "@payloadcms-plugins/theme-management",
+  "name": "@kilivi/theme-management",
   "version": "0.1.0",
   "description": "Theme configuration plugin for Payload CMS v3",
   "type": "module",
