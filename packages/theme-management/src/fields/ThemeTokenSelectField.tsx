@@ -22,7 +22,7 @@ const FALLBACK_TOKENS: ThemeColorOption[] = [
   { value: 'primary', label: 'Primary surface', color: 'var(--primary)' },
 ]
 
-async function fetchThemeConfiguration(): Promise<any | null> {
+async function fetchThemeConfiguration(): Promise<Record<string, unknown> | null> {
   try {
     const response = await fetch('/api/site-settings')
     if (!response.ok) {
@@ -36,7 +36,7 @@ async function fetchThemeConfiguration(): Promise<any | null> {
   }
 }
 
-function buildOptionsFromConfiguration(configuration: any | null): ThemeColorOption[] {
+function buildOptionsFromConfiguration(configuration: Record<string, unknown> | null): ThemeColorOption[] {
   if (!configuration) {
     return FALLBACK_TOKENS
   }
