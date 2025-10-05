@@ -1,0 +1,69 @@
+{
+  "name": "@payloadcms-plugins/theme-management",
+  "version": "0.1.0",
+  "description": "Theme configuration plugin for Payload CMS v3",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./components/*": {
+      "import": "./dist/components/*.js",
+      "types": "./dist/components/*.d.ts"
+    },
+    "./fields/*": {
+      "import": "./dist/fields/*.js",
+      "types": "./dist/fields/*.d.ts"
+    },
+    "./utils/*": {
+      "import": "./dist/utils/*.js",
+      "types": "./dist/utils/*.d.ts"
+    },
+    "./constants/*": {
+      "import": "./dist/constants/*.js",
+      "types": "./dist/constants/*.d.ts"
+    },
+    "./providers/*": {
+      "import": "./dist/providers/*.js",
+      "types": "./dist/providers/*.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "payloadcms",
+    "payload",
+    "payload-plugin",
+    "theme",
+    "configuration"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "payload": "^3.0.0",
+    "react": "^18.3.0 || ^19.0.0-rc",
+    "react-dom": "^18.3.0 || ^19.0.0-rc"
+  },
+  "devDependencies": {
+    "@payloadcms/db-mongodb": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "@types/react": "^18.3.12",
+    "payload": "^3.58.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.5.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

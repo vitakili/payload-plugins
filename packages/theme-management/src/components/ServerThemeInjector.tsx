@@ -1,0 +1,117 @@
+import type { SiteSetting } from '@/payload-types'
+import { getBorderRadiusConfig } from '@/providers/Theme/themeConfig'
+import type { ThemePreset } from '@/providers/Theme/types'
+import type { ThemeTypographyPreset } from '../presets'
+import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration'
+import {
+  createFallbackCriticalCSS,
+  getThemeCriticalCSS,
+  getThemeCSSPath,
+} from '../utils/themeAssets'
+import { generateThemeColorsCss } from '../utils/themeColors'
+import { generateThemeCSS } from '../utils/themeUtils'
+
+interface ServerThemeInjectorProps {
+  siteSettings: SiteSetting | null
+}
+
+type RuntimeThemeConfiguration = Omit<NonNullable<SiteSetting['themeConfiguration']>, 'typography'> & {
+  typography?: ThemeTypographyPreset | null
+}
+
+/**
+ * Server-side theme CSS injector to prevent FOUC
+ * This component injects critical theme CSS directly into the HTML head during SSR
+ */
+export async function ServerThemeInjector({ siteSettings }: Readonly<ServerThemeInjectorProps>) {
+  const resolvedConfiguration = resolveThemeConfiguration(siteSettings?.themeConfiguration)
+  const {
+    theme,
+    borderRadius,
+    customCSS,
+    lightMode,
+    darkMode,
+    fontScale,
+    spacing,
+    animationLevel,
+    allowColorModeToggle,
+    colorMode,
+    typography,
+  } = resolvedConfiguration
+
+  const baseThemeConfiguration = { ...(siteSettings?.themeConfiguration ?? {}) }
+  if ('typography' in baseThemeConfiguration) {
+    delete (baseThemeConfiguration as Record<string, unknown>).typography
+  }
+
+  const normalizedThemeConfiguration: RuntimeThemeConfiguration = {
+    ...baseThemeConfiguration,
+    theme,
+    colorMode,
+    allowColorModeToggle,
+    borderRadius,
+    fontScale,
+    spacing,
+    animationLevel,
+    customCSS: customCSS ?? undefined,
+    lightMode,
+    darkMode,
+    typography: typography ?? undefined,
+  }
+
+  let criticalCSS = await getThemeCriticalCSS(theme as ThemePreset)
+  criticalCSS ??= createFallbackCriticalCSS(theme as ThemePreset)
+
+  const borderRadiusMap: Record<string, 'none' | 'small' | 'medium' | 'large' | 'xl'> = {
+    none: 'none',
+    small: 'small',
+    medium: 'medium',
+    large: 'large',
+    full: 'xl',
+    xl: 'xl',
+  }
+  const mappedBorderRadius = borderRadiusMap[borderRadius ?? 'medium'] || 'medium'
+  const borderRadiusConfig = getBorderRadiusConfig(mappedBorderRadius)
+  const cssRecord = typeof borderRadiusConfig?.css === 'string'
+    ? { '--radius-default': borderRadiusConfig.css }
+    : borderRadiusConfig?.css ?? {}
+
+  const borderRadiusCSS = Object.entries(cssRecord)
+    .map(([property, value]) => `  ${property}: ${value};`)
+    .join('\n')
+
+  const borderRadiusBlock = borderRadiusCSS
+    ? `:root {
+${borderRadiusCSS}
+}`
+    : ''
+
+  const themeConfigurationCSS = generateThemeCSS(normalizedThemeConfiguration)
+  const colorModesCSS = generateThemeColorsCss({ themeName: theme, lightMode, darkMode })
+  const customCSSBlock = typeof customCSS === 'string' ? customCSS.trim() : ''
+
+  const combinedCSS = [
+    criticalCSS,
+    borderRadiusBlock,
+    themeConfigurationCSS,
+    colorModesCSS,
+    customCSSBlock,
+  ]
+    .filter((block) => Boolean(block?.trim?.().length))
+    .join('\n\n')
+
+  const themeCSSPath = getThemeCSSPath(theme as ThemePreset)
+  console.log('<<< themeCSSPath >>>', themeCSSPath, '<<< combinedCSS', combinedCSS)
+  return (
+    <>
+      <style
+        id="theme-critical-css"
+        dangerouslySetInnerHTML={{
+          __html: combinedCSS,
+        }}
+      />
+      <link rel="preload" href={themeCSSPath} as="style" />
+      <link rel="stylesheet" href={themeCSSPath} />
+    </>
+  )
+}

@@ -1,0 +1,35 @@
+{
+  "name": "payload-plugins",
+  "version": "1.0.0",
+  "description": "A collection of PayloadCMS 3 plugins",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "clean": "pnpm -r clean",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "keywords": [
+    "payloadcms",
+    "payload",
+    "payload-plugin",
+    "plugins"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.4.0",
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.3"
+  }
+}
