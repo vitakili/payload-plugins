@@ -7,12 +7,16 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "allowJs": true,
+    "jsx": "preserve",
     "noEmit": false,
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "target": "ESNext",
+    "strict": false,
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
