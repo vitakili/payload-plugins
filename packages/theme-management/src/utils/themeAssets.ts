@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import type { ThemePreset } from '@/providers/Theme/types'
+import type { ThemeDefaults } from '@/providers/Theme/types'
 
 const themeCriticalFiles: Record<string, string> = {
   cool: 'cool-critical.css',
@@ -24,7 +24,7 @@ const themeFullFiles: Record<string, string> = {
   'real-estate-neutral': 'real-estate-neutral.css',
 }
 
-export async function getThemeCriticalCSS(theme: ThemePreset): Promise<string | null> {
+export async function getThemeCriticalCSS(theme: ThemeDefaults): Promise<string | null> {
   try {
     const filename = themeCriticalFiles[theme]
     if (!filename) {
@@ -42,17 +42,17 @@ export async function getThemeCriticalCSS(theme: ThemePreset): Promise<string | 
   }
 }
 
-export function getThemeCSSPath(theme: ThemePreset): string {
+export function getThemeCSSPath(theme: ThemeDefaults): string {
   const filename = themeFullFiles[theme]
   return `/themes/${filename}`
 }
 
-export function generateThemePreloadLinks(theme: ThemePreset): string {
+export function generateThemePreloadLinks(theme: ThemeDefaults): string {
   const cssPath = getThemeCSSPath(theme)
   return `<link rel="preload" href="${cssPath}" as="style" onload="this.onload=null;this.rel='stylesheet'">`
 }
 
-export function createFallbackCriticalCSS(theme: ThemePreset): string {
+export function createFallbackCriticalCSS(theme: ThemeDefaults): string {
   return `
 /* Fallback critical CSS for ${theme} theme */
 [data-theme="${theme}"] {
