@@ -3,7 +3,7 @@
 import { useField, useFormFields } from '@payloadcms/ui'
 import type { TextFieldClientComponent } from 'payload'
 import { useEffect, useMemo, useState } from 'react'
-import './ThemeColorPickerField.scss'
+import './ThemeColorPickerField.css'
 
 function resolveLocalizedValue(value: unknown, fallback: string) {
   if (typeof value === 'string') {
