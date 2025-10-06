@@ -3,7 +3,7 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useMemo } from 'react'
-import { borderRadiusPresets } from '@/providers/Theme/themeConfig'
+import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 
 type RadiusPresetKey = Extract<keyof typeof borderRadiusPresets, string>
 

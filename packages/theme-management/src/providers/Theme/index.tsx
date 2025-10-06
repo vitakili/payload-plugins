@@ -1,8 +1,8 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { defaultMode, modeLocalStorageKey } from './shared'
-import type { Mode, ThemeContextType, ThemeDefaults } from './types'
+import { defaultMode, modeLocalStorageKey } from './shared.js'
+import type { Mode, ThemeContextType, ThemeDefaults } from './types.js'
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 

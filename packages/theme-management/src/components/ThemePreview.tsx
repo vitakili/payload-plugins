@@ -2,8 +2,8 @@
 
 import { useField } from '@payloadcms/ui'
 import React, { useMemo } from 'react'
-import { themeIsValid } from '@/providers/Theme/types'
-import { defaultThemePresets } from '../presets'
+import { themeIsValid } from '../providers/Theme/types.js'
+import { defaultThemePresets } from '../presets.js'
 
 const DEFAULT_THEME_KEY = 'cool'
 const basePresetMap = defaultThemePresets.reduce<

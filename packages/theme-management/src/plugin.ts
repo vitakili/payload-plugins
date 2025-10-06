@@ -1,7 +1,1 @@
-export {
-  ThemeConfigurationPlugin,
-  themeConfigurationPlugin,
-  themeConfigurationPlugin as default,
-} from './index'
-
-export type { ThemeConfigurationPluginOptions } from './types'
+export type { ThemeManagementPluginOptions } from './types.js';

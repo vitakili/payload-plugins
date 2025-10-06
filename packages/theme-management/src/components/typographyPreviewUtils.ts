@@ -1,5 +1,5 @@
-import { BODY_FONT_OPTIONS, FONT_VALUE_TO_CSS, HEADING_FONT_OPTIONS } from '@/constants/themeFonts'
-import { defaultThemePresets } from '../presets'
+import { BODY_FONT_OPTIONS, FONT_VALUE_TO_CSS, HEADING_FONT_OPTIONS } from '../constants/themeFonts.js'
+import { defaultThemePresets } from '../presets.js'
 
 export interface TypographySelection {
   bodyFont?: string | null

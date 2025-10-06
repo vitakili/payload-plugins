@@ -1,6 +1,6 @@
-import type { SiteSetting } from '@/payload-types'
-import { borderRadiusPresets } from '@/providers/Theme/themeConfig'
-import type { ThemeTypographyPreset } from '../presets'
+import type { SiteSetting } from '../payload-types.js'
+import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
+import type { ThemeTypographyPreset } from '../presets.js'
 
 type ThemeTypographyConfiguration = {
   typography?: ThemeTypographyPreset | null

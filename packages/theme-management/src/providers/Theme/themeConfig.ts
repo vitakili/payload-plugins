@@ -1,4 +1,4 @@
-import type { ThemeConfig, ThemeDefaults } from './types'
+import type { ThemeConfig, ThemeDefaults } from './types.js'
 
 export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
   cool: {

@@ -1,9 +1,9 @@
-import { FONT_VALUE_TO_CSS } from '@/constants/themeFonts'
-import type { SiteSetting } from '@/payload-types'
-import type { Mode, ThemeDefaults } from '@/providers/Theme/types'
-import { themeIsValid } from '@/providers/Theme/types'
-import type { ThemeTypographyPreset } from '../presets'
-import { defaultThemePresets } from '../presets'
+import { FONT_VALUE_TO_CSS } from '../constants/themeFonts.js'
+import type { SiteSetting } from '../payload-types.js'
+import type { Mode, ThemeDefaults } from '../providers/Theme/types.js'
+import { themeIsValid } from '../providers/Theme/types.js'
+import type { ThemeTypographyPreset } from '../presets.js'
+import { defaultThemePresets } from '../presets.js'
 
 interface ThemeTypographyOverride {
   bodyFont?: string | null

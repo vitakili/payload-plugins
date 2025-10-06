@@ -10,12 +10,15 @@
     "allowJs": true,
     "jsx": "preserve",
     "noEmit": false,
+    "emitDeclarationOnly": true,
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"]
     },
     "target": "ESNext",
+    "module": "ES6",
+    "moduleResolution": "Bundler",
     "strict": false,
   },
   "include": ["src/**/*"],

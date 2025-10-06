@@ -1,12 +1,12 @@
 import type { CollectionConfig, Config, Field, Plugin } from 'payload'
-import { createThemeConfigurationField } from './fields/themeConfigurationField'
-import type { SiteThemeConfiguration } from './payload-types'
-import type { ThemePreset } from './presets'
-import { defaultThemePresets } from './presets'
+import { createThemeConfigurationField } from './fields/themeConfigurationField.js'
+import type { SiteThemeConfiguration } from './payload-types.js'
+import type { ThemePreset } from './presets.js'
+import { defaultThemePresets } from './presets.js'
 import type {
   FetchThemeConfigurationOptions,
-  ThemeConfigurationPluginOptions,
-} from './types'
+  ThemeManagementPluginOptions,
+} from './types.js'
 
 const THEME_FIELD_NAME = 'themeConfiguration'
 
@@ -24,7 +24,7 @@ const upsertThemeField = (
   const sanitized = removeExistingThemeField(fields ?? [])
 
   if (enableLogging) {
-    console.log('🎨 Theme Configuration Plugin: injecting theme configuration field')
+  console.log('🎨 Theme Management Plugin: injecting theme configuration field')
   }
 
   return [...sanitized, themeField]
@@ -33,7 +33,7 @@ const upsertThemeField = (
 const ensureCollectionsArray = (collections: Config['collections']): CollectionConfig[] =>
   Array.isArray(collections) ? collections : []
 
-export const themeConfigurationPlugin = (options: ThemeConfigurationPluginOptions = {}): Plugin => {
+export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}): Plugin => {
   return (config: Config): Config => {
     const {
       enabled = true,
@@ -49,7 +49,7 @@ export const themeConfigurationPlugin = (options: ThemeConfigurationPluginOption
 
     if (!enabled) {
       if (enableLogging) {
-        console.log('🎨 Theme Configuration Plugin: disabled via options, skipping.')
+  console.log('🎨 Theme Management Plugin: disabled via options, skipping.')
       }
       return config
     }
@@ -74,7 +74,7 @@ export const themeConfigurationPlugin = (options: ThemeConfigurationPluginOption
 
       if (enableLogging) {
         console.log(
-          `🎨 Theme Configuration Plugin: enhancing collection "${collection.slug}"`,
+          `🎨 Theme Management Plugin: enhancing collection "${collection.slug}"`,
         )
       }
 
@@ -91,7 +91,7 @@ export const themeConfigurationPlugin = (options: ThemeConfigurationPluginOption
     if (!collectionTouched) {
       if (enableLogging) {
         console.warn(
-          `🎨 Theme Configuration Plugin: collection "${targetCollection}" was not found, leaving config untouched.`,
+          `🎨 Theme Management Plugin: collection "${targetCollection}" was not found, leaving config untouched.`,
         )
       }
       return config
@@ -164,21 +164,24 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
   return defaultThemePresets
 }
 
-export const ThemeConfigurationPlugin = themeConfigurationPlugin
-export const themeManagementPlugin = themeConfigurationPlugin
 
-export default themeConfigurationPlugin
 
-export { defaultThemePresets } from './presets'
-export type { ThemePreset, ThemeTypographyPreset } from './presets'
-export type { ThemeConfigurationPluginOptions, FetchThemeConfigurationOptions } from './types'
+export { defaultThemePresets } from './presets.js'
+export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
+export type { ThemeManagementPluginOptions, FetchThemeConfigurationOptions } from './types.js'
 export {
   DEFAULT_THEME_CONFIGURATION,
   resolveThemeConfiguration,
-} from './utils/resolveThemeConfiguration'
-export { generateThemeColorsCss, hexToHsl } from './utils/themeColors'
-export { generateThemeCSS, getThemeStyles } from './utils/themeUtils'
-export { ServerThemeInjector } from './components/ServerThemeInjector'
+} from './utils/resolveThemeConfiguration.js'
+export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
+export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
+export { ServerThemeInjector } from './components/ServerThemeInjector.js'
 
-export type {Mode, ThemeDefaults} from './providers/Theme/types'
-export { ThemeProvider } from './providers/Theme'
+export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
+export { ThemeProvider } from './providers/Theme/index.js'
+
+export const ThemeManagementPlugin = themeManagementPlugin
+/** @deprecated use {@link themeManagementPlugin} */
+export const themeConfigurationPlugin = themeManagementPlugin
+
+export default themeManagementPlugin

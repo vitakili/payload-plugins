@@ -1,6 +1,6 @@
-import type { ThemePreset } from './presets'
+import type { ThemePreset } from './presets.js'
 
-export interface ThemeConfigurationPluginOptions {
+export interface ThemeManagementPluginOptions {
 	/** Whether the plugin should register itself */
 	enabled?: boolean
 	/** Collection slug that stores site-level settings (default: `site-settings`) */

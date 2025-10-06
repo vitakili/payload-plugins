@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import type { ThemeDefaults } from '@/providers/Theme/types'
+import type { ThemeDefaults } from '../providers/Theme/types.js'
 
 const themeCriticalFiles: Record<string, string> = {
   cool: 'cool-critical.css',

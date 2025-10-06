@@ -3,8 +3,8 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useState } from 'react'
-import { defaultThemePresets } from '../presets'
-import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration'
+import { defaultThemePresets } from '../presets.js'
+import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
 interface ThemeColorOption {
   value: string

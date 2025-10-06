@@ -1,8 +1,8 @@
-export { ServerThemeInjector } from './components/ServerThemeInjector'
+export { ServerThemeInjector } from './components/ServerThemeInjector.js'
 
 export {
   createFallbackCriticalCSS,
   generateThemePreloadLinks,
   getThemeCriticalCSS,
   getThemeCSSPath,
-} from './utils/themeAssets'
+} from './utils/themeAssets.js'

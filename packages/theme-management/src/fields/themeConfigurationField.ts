@@ -4,9 +4,9 @@ import {
   BODY_FONT_OPTIONS,
   HEADING_FONT_OPTIONS,
   LINE_HEIGHT_OPTIONS,
-} from '@/constants/themeFonts'
-import type { ThemePreset } from '../index'
-import { darkModeField, lightModeField } from './colorModeFields'
+} from '../constants/themeFonts.js'
+import type { ThemePreset } from '../index.js'
+import { darkModeField, lightModeField } from './colorModeFields.js'
 
 interface ThemeConfigurationFieldOptions {
   themePresets: ThemePreset[]

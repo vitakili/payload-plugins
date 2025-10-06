@@ -3,15 +3,15 @@
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react'
-import { borderRadiusPresets } from '@/providers/Theme/themeConfig'
+import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import type {
   ResolvedTypographyPreview,
   TypographySelection,
-} from '../components/typographyPreviewUtils'
-import { resolveTypographyPreview } from '../components/typographyPreviewUtils'
-import { defaultThemePresets } from '../index'
-import type { ThemeTypographyPreset } from '../presets'
-import { darkModeDefaults, lightModeDefaults } from './colorModeFields'
+} from '../components/typographyPreviewUtils.js'
+import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
+import { defaultThemePresets } from '../index.js'
+import type { ThemeTypographyPreset } from '../presets.js'
+import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
 interface ColorModeColors {
   background?: string

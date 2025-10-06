@@ -35,9 +35,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run clean && tsc && pnpm run copyfiles",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "pnpm run clean && pnpm run compile && pnpm run copyfiles",
+    "compile": "swc src -d dist --config-file .swcrc && tsc",
+    "dev": "swc src -d dist --config-file .swcrc --watch",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
@@ -65,7 +66,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.5.3",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "@swc/cli": "^0.1.65",
+    "@swc/core": "^1.6.3",
+    "rimraf": "^5.0.5"
   },
   "publishConfig": {
     "access": "public"

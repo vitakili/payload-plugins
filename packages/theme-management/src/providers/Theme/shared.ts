@@ -1,4 +1,4 @@
-import type { Mode, ThemeOption, ThemeDefaults } from './types'
+import type { Mode, ThemeOption, ThemeDefaults } from './types.js'
 
 export const themeLocalStorageKey = 'payload-theme'
 export const modeLocalStorageKey = 'payload-theme-mode'

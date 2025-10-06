@@ -1,15 +1,15 @@
-import type { SiteSetting } from '@/payload-types'
-import { getBorderRadiusConfig } from '@/providers/Theme/themeConfig'
-import type { BorderRadiusPreset, ThemeDefaults } from '@/providers/Theme/types'
-import type { ThemeTypographyPreset } from '../presets'
-import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration'
+import type { SiteSetting } from '../payload-types.js'
+import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
+import type { BorderRadiusPreset, ThemeDefaults } from '../providers/Theme/types.js'
+import type { ThemeTypographyPreset } from '../presets.js'
+import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import {
   createFallbackCriticalCSS,
   getThemeCriticalCSS,
   getThemeCSSPath,
-} from '../utils/themeAssets'
-import { generateThemeColorsCss } from '../utils/themeColors'
-import { generateThemeCSS } from '../utils/themeUtils'
+} from '../utils/themeAssets.js'
+import { generateThemeColorsCss } from '../utils/themeColors.js'
+import { generateThemeCSS } from '../utils/themeUtils.js'
 
 interface ServerThemeInjectorProps {
   siteSettings: SiteSetting | null
