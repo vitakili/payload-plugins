@@ -175,7 +175,6 @@ export {
 } from './utils/resolveThemeConfiguration.js'
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
-export { ServerThemeInjector } from './components/ServerThemeInjector.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
 export { ThemeProvider } from './providers/Theme/index.js'

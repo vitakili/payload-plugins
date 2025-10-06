@@ -1,3 +1,5 @@
+import 'server-only'
+
 export { ServerThemeInjector } from './components/ServerThemeInjector.js'
 
 export {

@@ -1,79 +1,334 @@
-# Theme Configuration Plugin for Payload CMS
+# Theme Management Plugin for Payload CMS v3
 
-A flexible theme configuration plugin for Payload CMS v3 that allows you to manage theme settings through the admin UI.
+A comprehensive theme management plugin for Payload CMS v3 that provides powerful theming capabilities with SSR support, preventing FOUC (Flash of Unstyled Content).
 
 ## Features
 
-- 🎨 **Theme Management** - Configure primary and secondary colors
-- 🔤 **Typography Control** - Set custom font families
-- 📐 **Layout Settings** - Adjust header height and other layout properties
-- 🌓 **Theme Switcher** - Optional theme switching capability (light/dark/auto)
-- ⚙️ **Configurable** - Exclude specific collections or globals as needed
+- 🎨 **Multiple Theme Presets** - Cool, Brutal, Neon, Solar, and more
+- 🎨 **Custom Color Palette** - Full HSL color customization
+- 🔤 **Typography Control** - Google Fonts integration for headings, body, and code
+- 📐 **Border Radius Presets** - Sharp, Rounded, or Pill styles
+- 🌓 **Dark Mode Support** - Built-in light/dark/system mode toggle
+- 🚀 **SSR Theme Injection** - Zero FOUC with server-side rendering
+- ⚡ **Performance Optimized** - Critical CSS inlining, preload links
+- 🎯 **Type Safe** - Full TypeScript support
+- 🔧 **Highly Configurable** - Flexible plugin options
 
 ## Installation
 
 ```bash
-npm install @payloadcms-plugins/theme-management
+pnpm add @kilivi/payloadcms-theme-management
 # or
-yarn add @payloadcms-plugins/theme-management
+npm install @kilivi/payloadcms-theme-management
 # or
-pnpm add @payloadcms-plugins/theme-management
+yarn add @kilivi/payloadcms-theme-management
 ```
 
-## Usage
+## Quick Start
 
-Add the plugin to your Payload config:
+### 1. Add Plugin to Payload Config
 
 ```typescript
-import { buildConfig } from 'payload';
-import { ThemeConfigurationPlugin } from '@payloadcms-plugins/theme-management';
+import { buildConfig } from 'payload'
+import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 
 export default buildConfig({
   // ... other config
+  
+  globals: [
+    {
+      slug: 'site-settings',
+      fields: [
+        {
+          name: 'siteName',
+          type: 'text',
+        },
+        // Theme configuration will be injected here
+      ],
+    },
+  ],
+  
   plugins: [
-    ThemeConfigurationPlugin({
-      enableThemeSwitcher: true,
-      defaultTheme: 'auto',
-      excludedCollections: [], // Collections to exclude
-      excludedGlobals: [], // Globals to exclude
+    themeManagementPlugin({
+      enabled: true,
+      targetCollection: 'site-settings',
+      defaultTheme: 'cool',
+      includeColorModeToggle: true,
+      enableLogging: true,
     }),
   ],
-});
+})
 ```
 
-## Configuration Options
+### 2. Add Server Theme Injection (Next.js)
 
-### `ThemeConfigurationPluginConfig`
+**⚠️ IMPORTANT:** Import from `/server` entry point!
+
+```tsx
+// app/layout.tsx
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const payload = await getPayload({ config: configPromise })
+  
+  const { docs } = await payload.find({
+    collection: 'site-settings',
+    limit: 1,
+  })
+
+  return (
+    <html lang="en">
+      <head>
+        <ServerThemeInjector siteSettings={docs[0]} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### 3. Use Theme Variables in Your CSS
+
+The plugin injects CSS custom properties you can use:
+
+```css
+.my-component {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+}
+```
+
+Or with Tailwind CSS:
+
+```tsx
+<div className="bg-primary text-primary-foreground rounded-lg">
+  Themed Content
+</div>
+```
+
+
+## Plugin Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `excludedCollections` | `string[]` | `[]` | Array of collection slugs to exclude |
-| `excludedGlobals` | `string[]` | `[]` | Array of global slugs to exclude |
-| `enableThemeSwitcher` | `boolean` | `true` | Enable theme switcher in admin UI |
-| `defaultTheme` | `'light' \| 'dark' \| 'auto'` | `'auto'` | Default theme |
+| `enabled` | `boolean` | `true` | Enable/disable the plugin |
+| `targetCollection` | `string` | `'site-settings'` | Global or collection slug to add theme field to |
+| `themePresets` | `ThemePreset[]` | Built-in presets | Custom theme presets |
+| `defaultTheme` | `string` | `'cool'` | Default theme preset name |
+| `includeColorModeToggle` | `boolean` | `true` | Show light/dark mode toggle |
+| `includeCustomCSS` | `boolean` | `true` | Allow custom CSS injection |
+| `includeBrandIdentity` | `boolean` | `false` | Show brand identity fields |
+| `enableAdvancedFeatures` | `boolean` | `true` | Enable advanced customization |
+| `enableLogging` | `boolean` | `false` | Log plugin actions to console |
 
-## Theme Configuration Fields
+## Available Theme Presets
 
-The plugin adds a global called `theme-management` with the following fields:
+- **Cool** - Professional blue theme
+- **Brutal** - High contrast, bold design
+- **Neon** - Vibrant, energetic colors
+- **Solar** - Warm, golden tones
+- **Dealership** - Automotive-inspired
+- **Real Estate** - Professional property theme (+ Gold, Neutral variants)
 
-- **Primary Color** - Main theme color (e.g., #3B82F6)
-- **Secondary Color** - Secondary theme color (e.g., #10B981)
-- **Font Family** - Primary font family for the site
-- **Header Height** - Height of the site header in pixels
+## API Reference
 
-## Accessing Theme Configuration
+### Main Entry Point
 
-You can access the theme configuration in your application:
+Import from `@kilivi/payloadcms-theme-management` for client-safe code:
 
 ```typescript
-const payload = await getPayloadClient();
+// Plugin
+import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 
-const themeConfig = await payload.findGlobal({
-  slug: 'theme-management',
-});
+// Client Components
+import { ThemeProvider } from '@kilivi/payloadcms-theme-management'
 
-console.log(themeConfig.primaryColor); // e.g., "#3B82F6"
+// Utilities
+import { 
+  generateThemeColorsCss,
+  generateThemeCSS,
+  getThemeStyles,
+  resolveThemeConfiguration,
+  fetchThemeConfiguration,
+} from '@kilivi/payloadcms-theme-management'
+
+// Types
+import type {
+  ThemePreset,
+  ThemeDefaults,
+  ThemeManagementPluginOptions,
+} from '@kilivi/payloadcms-theme-management'
 ```
+
+### Server Entry Point
+
+⚠️ **Import from `/server` for server components only:**
+
+```typescript
+import {
+  ServerThemeInjector,
+  getThemeCriticalCSS,
+  getThemeCSSPath,
+  generateThemePreloadLinks,
+} from '@kilivi/payloadcms-theme-management/server'
+```
+
+### Subpath Exports
+
+```typescript
+// Direct field imports
+import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
+import { ThemeTokenSelectField } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
+
+// Direct component imports
+import { ThemePreview } from '@kilivi/payloadcms-theme-management/components/ThemePreview'
+```
+
+## Integration Examples
+
+### With Tailwind CSS
+
+```typescript
+// tailwind.config.ts
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        // ... other color variables
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+      fontFamily: {
+        heading: ['var(--font-heading)', 'sans-serif'],
+        body: ['var(--font-body)', 'sans-serif'],
+      },
+    },
+  },
+}
+```
+
+### Fetching Theme Configuration
+
+```typescript
+import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+
+// Simple usage
+const theme = await fetchThemeConfiguration()
+
+// With options
+const theme = await fetchThemeConfiguration({
+  collectionSlug: 'site-settings',
+  depth: 2,
+  locale: 'en',
+})
+```
+
+### Custom Theme Preset
+
+```typescript
+import type { ThemePreset } from '@kilivi/payloadcms-theme-management'
+
+const myTheme: ThemePreset = {
+  name: 'my-custom-theme',
+  label: 'My Custom Theme',
+  colors: {
+    primary: { h: 220, s: 70, l: 50 },
+    secondary: { h: 180, s: 60, l: 45 },
+    // ... other colors
+  },
+  borderRadius: 'rounded',
+  typography: {
+    heading: 'Poppins',
+    body: 'Inter',
+    code: 'Fira Code',
+  },
+}
+
+// Use in plugin config
+themeManagementPlugin({
+  themePresets: [myTheme],
+  defaultTheme: 'my-custom-theme',
+})
+```
+
+## Migrating from Older Versions
+
+See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructions.
+
+### Key Changes in v0.1.9+
+
+- **Server components must import from `/server`**
+- Added `server-only` package to prevent client bundling errors
+- Removed `ServerThemeInjector` from main entry point
+
+```diff
+- import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management'
++ import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+```
+
+
+## Testing
+
+See [TEST_APP_GUIDE.md](./TEST_APP_GUIDE.md) for instructions on creating a test application.
+
+## Troubleshooting
+
+### `Module not found: Can't resolve 'fs/promises'`
+
+**Solution:** Make sure you're using v0.1.9+ and importing server components from `/server`:
+
+```typescript
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+```
+
+Then clear your cache:
+```bash
+rm -rf .next node_modules/.cache
+pnpm install
+```
+
+### Theme Not Applying
+
+1. Verify `ServerThemeInjector` is in your `<head>` tag
+2. Check that site settings exist with theme configuration
+3. Inspect page source - should see `<style>` tag with CSS variables
+4. Ensure Tailwind/CSS is configured to use the CSS variables
+
+### TypeScript Errors
+
+```bash
+# Regenerate Payload types
+pnpm payload generate:types
+
+# Restart TypeScript server
+# VS Code: Ctrl+Shift+P → "TypeScript: Restart TS Server"
+```
+
+## Documentation
+
+- [Migration Guide](./MIGRATION_GUIDE.md) - Upgrading from older versions
+- [Test App Guide](./TEST_APP_GUIDE.md) - Create a test application
+- [Server/Client Separation](./SERVER_CLIENT_SEPARATION.md) - Technical details
+- [Build Setup](./BUILD_SETUP.md) - Build configuration details
 
 ## Development
 
@@ -86,12 +341,47 @@ pnpm build
 
 # Watch mode for development
 pnpm dev
+
+# Clean build artifacts
+pnpm clean
 ```
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## License
 
 Apache-2.0
 
-## Contributing
+## Author
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Created for Payload CMS v3 applications.
+
+## Links
+
+- [NPM Package](https://www.npmjs.com/package/@kilivi/payloadcms-theme-management)
+- [GitHub Repository](https://github.com/vitakili/payload-plugins)
+- [Payload CMS](https://payloadcms.com)
+
+## Changelog
+
+### v0.1.9 (Latest)
+- ✅ **Fixed:** Server/client component separation
+- ✅ **Added:** `server-only` package to prevent bundling errors
+- ✅ **Changed:** `ServerThemeInjector` now exported from `/server` entry
+- ✅ **Added:** Comprehensive documentation
+
+### v0.1.7
+- ✅ **Fixed:** ESM import resolution with `.js` extensions
+- ✅ **Added:** SWC + TypeScript build pipeline
+
+### v0.1.5
+- Initial release with theme management features
+
