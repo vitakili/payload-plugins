@@ -1,10 +1,13 @@
 import { FONT_VALUE_TO_CSS } from '../constants/themeFonts.js'
-import type { SiteSetting } from '../payload-types.js'
 import type { Mode, ThemeDefaults } from '../providers/Theme/types.js'
 import { themeIsValid } from '../providers/Theme/types.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { defaultThemePresets } from '../presets.js'
 
+/**
+ * Generic theme configuration structure that matches Payload's generated types
+ * without depending on specific payload-types versions
+ */
 interface ThemeTypographyOverride {
   bodyFont?: string | null
   headingFont?: string | null
@@ -14,7 +17,39 @@ interface ThemeTypographyOverride {
   lineHeight?: string | null
 }
 
-type SiteThemeConfiguration = SiteSetting['themeConfiguration'] & {
+/**
+ * Generic theme configuration interface that accepts any compatible structure
+ * This avoids type conflicts between different versions of payload-types
+ */
+interface GenericThemeConfiguration {
+  theme?: string | null
+  colorMode?: string | null
+  allowColorModeToggle?: boolean | null
+  borderRadius?: string | null
+  fontScale?: string | null
+  spacing?: string | null
+  animationLevel?: string | null
+  customCSS?: string | null
+  lightMode?: {
+    primary?: string | null
+    secondary?: string | null
+    accent?: string | null
+    neutral?: string | null
+    success?: string | null
+    warning?: string | null
+    error?: string | null
+    info?: string | null
+  } | null
+  darkMode?: {
+    primary?: string | null
+    secondary?: string | null
+    accent?: string | null
+    neutral?: string | null
+    success?: string | null
+    warning?: string | null
+    error?: string | null
+    info?: string | null
+  } | null
   typography?: ThemeTypographyOverride | null
 }
 
@@ -37,7 +72,7 @@ type AnimationLevelOption = (typeof ANIMATION_LEVEL_VALUES)[number]
 
 type ThemeModeOption = (typeof MODE_VALUES)[number]
 
-type ThemeColorConfiguration = NonNullable<SiteThemeConfiguration['lightMode']>
+type ThemeColorConfiguration = NonNullable<GenericThemeConfiguration['lightMode']>
 
 const DEFAULT_THEME_NAME: ThemeDefaults = 'cool'
 const DEFAULT_THEME_PRESET = defaultThemePresets.find(
@@ -115,7 +150,7 @@ function isMode(value: unknown): value is ThemeModeOption {
 }
 
 export function resolveThemeConfiguration(
-  themeConfiguration?: SiteThemeConfiguration | null,
+  themeConfiguration?: GenericThemeConfiguration | null,
 ): ResolvedThemeConfiguration {
   if (!themeConfiguration) {
     return DEFAULT_THEME_CONFIGURATION
@@ -178,7 +213,7 @@ export function resolveThemeConfiguration(
 
 function mergeColorModes(
   base?: ThemeColorConfiguration,
-  overrides?: SiteThemeConfiguration['lightMode'],
+  overrides?: GenericThemeConfiguration['lightMode'],
 ): ThemeColorConfiguration | undefined {
   const merged: Record<string, string> = {}
 
