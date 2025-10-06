@@ -1,6 +1,6 @@
 {
   "name": "@kilivi/payloadcms-theme-management",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Theme configuration plugin for Payload CMS v3",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.js",
+      "types": "./dist/server.d.ts"
     },
     "./components/*": {
       "import": "./dist/components/*.js",
