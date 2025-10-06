@@ -21,13 +21,13 @@ pnpm add @kilivi/payloadcms-theme-management@0.1.9
 **BEFORE (❌ OLD - Will cause errors):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management'
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management';
 ```
 
 **AFTER (✅ NEW - Correct):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server';
 ```
 
 ### 3. Clear Next.js Cache
@@ -82,48 +82,44 @@ These continue to work as before:
 ### Server Component (layout.tsx)
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server';
+import configPromise from '@payload-config';
+import { getPayload } from 'payload';
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const payload = await getPayload({ config: configPromise })
-  
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const payload = await getPayload({ config: configPromise });
+
   const siteSettings = await payload.findGlobal({
     slug: 'site-settings',
     depth: 1,
-  })
+  });
 
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
-        <ServerThemeInjector siteSettings={siteSettings} />
+        <ServerThemeInjector themeConfiguration={siteSettings?.themeConfiguration} />
       </head>
       <body>{children}</body>
     </html>
-  )
+  );
 }
 ```
 
 ### Client Component
 
 ```tsx
-'use client'
+'use client';
 
-import { ThemeProvider } from '@kilivi/payloadcms-theme-management'
-import { generateThemeColorsCss } from '@kilivi/payloadcms-theme-management'
+import { ThemeProvider } from '@kilivi/payloadcms-theme-management';
+import { generateThemeColorsCss } from '@kilivi/payloadcms-theme-management';
 
 export function MyClientComponent() {
   const css = generateThemeColorsCss({
     primary: { h: 200, s: 70, l: 50 },
     // ... other colors
-  })
-  
-  return <div>...</div>
+  });
+
+  return <div>...</div>;
 }
 ```
 
@@ -152,16 +148,18 @@ By moving server-only code to a separate entry point (`/server`):
 ### Still seeing `fs/promises` error?
 
 1. Clear node_modules and reinstall:
+
    ```bash
    rm -rf node_modules .pnpm-store
    pnpm install
    ```
 
 2. Verify you're importing from `/server`:
+
    ```bash
    grep -r "from '@kilivi/payloadcms-theme-management'" src/
    # Should NOT see ServerThemeInjector in results
-   
+
    grep -r "from '@kilivi/payloadcms-theme-management/server'" src/
    # Should see ServerThemeInjector here
    ```

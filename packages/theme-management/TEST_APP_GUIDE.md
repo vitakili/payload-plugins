@@ -111,7 +111,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Inject critical theme CSS during SSR */}
-        <ServerThemeInjector siteSettings={siteSettings} />
+        <ServerThemeInjector themeConfiguration={siteSettings?.themeConfiguration} />
       </head>
       <body>
         <div className="min-h-screen bg-background text-foreground">

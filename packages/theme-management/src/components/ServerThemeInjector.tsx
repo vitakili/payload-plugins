@@ -1,8 +1,8 @@
-import type { SiteSetting } from '../payload-types.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import type { BorderRadiusPreset, ThemeDefaults } from '../providers/Theme/types.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
+import type { ResolvedThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import {
   createFallbackCriticalCSS,
   getThemeCriticalCSS,
@@ -12,10 +12,20 @@ import { generateThemeColorsCss } from '../utils/themeColors.js'
 import { generateThemeCSS } from '../utils/themeUtils.js'
 
 interface ServerThemeInjectorProps {
-  siteSettings: SiteSetting | null
+  /**
+   * Theme configuration object from your site settings.
+   * Pass the themeConfiguration field directly, not the entire site settings object.
+   * 
+   * @example
+   * ```tsx
+   * const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
+   * <ServerThemeInjector themeConfiguration={siteSettings.themeConfiguration} />
+   * ```
+   */
+  themeConfiguration?: unknown
 }
 
-type RuntimeThemeConfiguration = Omit<NonNullable<SiteSetting['themeConfiguration']>, 'typography'> & {
+type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> & {
   typography?: ThemeTypographyPreset | null
 }
 
@@ -23,8 +33,10 @@ type RuntimeThemeConfiguration = Omit<NonNullable<SiteSetting['themeConfiguratio
  * Server-side theme CSS injector to prevent FOUC
  * This component injects critical theme CSS directly into the HTML head during SSR
  */
-export async function ServerThemeInjector({ siteSettings }: Readonly<ServerThemeInjectorProps>) {
-  const resolvedConfiguration = resolveThemeConfiguration(siteSettings?.themeConfiguration)
+export async function ServerThemeInjector({ themeConfiguration }: Readonly<ServerThemeInjectorProps>) {
+  // Accept unknown type to avoid type conflicts between app's payload-types and plugin's payload-types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration as any)
   const {
     theme,
     borderRadius,
@@ -39,13 +51,8 @@ export async function ServerThemeInjector({ siteSettings }: Readonly<ServerTheme
     typography,
   } = resolvedConfiguration
 
-  const baseThemeConfiguration = { ...(siteSettings?.themeConfiguration ?? {}) }
-  if ('typography' in baseThemeConfiguration) {
-    delete (baseThemeConfiguration as Record<string, unknown>).typography
-  }
-
+  // Use resolved configuration directly
   const normalizedThemeConfiguration: RuntimeThemeConfiguration = {
-    ...baseThemeConfiguration,
     theme,
     colorMode,
     allowColorModeToggle,

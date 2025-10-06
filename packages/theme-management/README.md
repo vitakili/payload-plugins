@@ -85,7 +85,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <ServerThemeInjector siteSettings={docs[0]} />
+        <ServerThemeInjector themeConfiguration={docs[0]?.themeConfiguration} />
       </head>
       <body>{children}</body>
     </html>
