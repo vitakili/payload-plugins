@@ -35,9 +35,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm run clean && tsc && pnpm run copyfiles",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts,.tsx src",
@@ -64,7 +64,8 @@
     "payload": "^3.58.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "copyfiles": "^2.4.1"
   },
   "publishConfig": {
     "access": "public"
