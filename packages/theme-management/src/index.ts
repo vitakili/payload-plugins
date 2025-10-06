@@ -173,8 +173,10 @@ export {
   DEFAULT_THEME_CONFIGURATION,
   resolveThemeConfiguration,
 } from './utils/resolveThemeConfiguration.js'
+export type { ResolvedThemeConfiguration } from './utils/resolveThemeConfiguration.js'
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
+export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
 export { ThemeProvider } from './providers/Theme/index.js'

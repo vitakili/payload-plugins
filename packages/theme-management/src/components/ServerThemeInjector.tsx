@@ -10,6 +10,7 @@ import {
 } from '../utils/themeAssets.js'
 import { generateThemeColorsCss } from '../utils/themeColors.js'
 import { generateThemeCSS } from '../utils/themeUtils.js'
+import { InitTheme } from './InitTheme.js'
 
 interface ServerThemeInjectorProps {
   /**
@@ -110,6 +111,7 @@ ${borderRadiusCSS}
   const themeCSSPath = getThemeCSSPath(theme as ThemeDefaults)
   return (
     <>
+      <InitTheme />
       <style
         id="theme-critical-css"
         dangerouslySetInnerHTML={{

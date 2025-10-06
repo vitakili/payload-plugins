@@ -292,6 +292,20 @@ See [TEST_APP_GUIDE.md](./TEST_APP_GUIDE.md) for instructions on creating a test
 
 ## Troubleshooting
 
+### Type Conflicts: `Type 'SiteSetting' is not assignable to type 'SiteSetting'`
+
+**Problem:** You see errors about incompatible types even though you're passing the correct data structure.
+
+**Why This Happens:** Your app's generated `payload-types.ts` might have slightly different type definitions than the plugin's (e.g., different font options, field variations).
+
+**Solution:** Update to v0.1.11+ which uses generic types instead of strict payload-types:
+
+```bash
+pnpm update @kilivi/payloadcms-theme-management@latest
+```
+
+The plugin now accepts any compatible theme configuration structure, regardless of your Payload version or type variations. See [TYPE_INDEPENDENCE_GUIDE.md](./TYPE_INDEPENDENCE_GUIDE.md) for technical details.
+
 ### `Module not found: Can't resolve 'fs/promises'`
 
 **Solution:** Make sure you're using v0.1.9+ and importing server components from `/server`:
@@ -325,6 +339,7 @@ pnpm payload generate:types
 
 ## Documentation
 
+- [Type Independence Guide](./TYPE_INDEPENDENCE_GUIDE.md) - Understanding type safety without coupling
 - [Migration Guide](./MIGRATION_GUIDE.md) - Upgrading from older versions
 - [Test App Guide](./TEST_APP_GUIDE.md) - Create a test application
 - [Server/Client Separation](./SERVER_CLIENT_SEPARATION.md) - Technical details
