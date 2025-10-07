@@ -168,6 +168,19 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
 
 export { defaultThemePresets } from './presets.js'
 export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
+export { 
+  extendedThemePresets,
+  extendedThemeToCSSVariables,
+} from './extended-presets.js'
+export type { ExtendedThemePreset, ShadcnColorTokens } from './extended-presets.js'
+export {
+  applyExtendedTheme,
+  generateExtendedThemeCSS,
+  resetExtendedTheme,
+  getExtendedThemeTokens,
+  createUseExtendedTheme,
+  getTailwindVarReferences,
+} from './utils/extendedThemeHelpers.js'
 export type { ThemeManagementPluginOptions, FetchThemeConfigurationOptions } from './types.js'
 export {
   DEFAULT_THEME_CONFIGURATION,
