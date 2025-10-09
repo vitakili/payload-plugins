@@ -7,7 +7,7 @@
  */
 
 import { useFormFields } from '@payloadcms/ui'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './ThemeLivePreview.css'
 
 export const ThemeLivePreview = () => {
@@ -25,18 +25,6 @@ export const ThemeLivePreview = () => {
     | Record<string, string>
     | undefined
   const activeMode = previewMode === 'light' ? lightMode : darkMode
-
-  // Apply theme colors to preview
-  useEffect(() => {
-    if (!activeMode) return
-
-    const root = document.documentElement
-    Object.entries(activeMode).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        root.style.setProperty(`--preview-${key}`, value)
-      }
-    })
-  }, [activeMode])
 
   if (!themeConfig) {
     return (
@@ -184,3 +172,5 @@ export const ThemeLivePreview = () => {
 }
 
 export default ThemeLivePreview
+
+
