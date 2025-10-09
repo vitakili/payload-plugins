@@ -252,7 +252,7 @@ If you add custom field components (like `ThemePreviewField`), the import path s
   type: 'ui' as const,
   admin: {
     components: {
-      Field: '@payloadcms-plugins/theme-management/components/ThemePreviewField'
+      Field: '@payloadcms-plugins/theme-management/components/fields/ThemePreviewField'
     }
   }
 }
@@ -265,7 +265,7 @@ For this to work:
 1. Create the component file:
    ```bash
    mkdir -p packages/theme-management/src/components
-   touch packages/theme-management/src/components/ThemePreviewField.tsx
+   touch packages/theme-management/src/components/fields/ThemePreviewField.tsx
    ```
 
 2. Export it in package.json:

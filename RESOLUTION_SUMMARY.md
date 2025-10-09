@@ -265,7 +265,7 @@ import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 
 **A:** No change needed:
 ```typescript
-import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/ThemeColorPickerField'
+import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
 ```
 
 ## Git History
