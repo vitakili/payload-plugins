@@ -8,26 +8,88 @@ import type {
   ThemeManagementPluginOptions,
 } from './types.js'
 
-const THEME_FIELD_NAME = 'themeConfiguration'
+const THEME_TAB_NAME = 'themeConfiguration'
 
-const removeExistingThemeField = (fields: Field[] = []): Field[] =>
-  fields.filter((field) => {
-    const candidate = field as { name?: unknown }
-    return candidate?.name !== THEME_FIELD_NAME
-  })
+interface TabConfig {
+  name: string
+  label: { en: string; cs: string }
+  description?: { en: string; cs: string }
+  fields: Field[]
+}
 
-const upsertThemeField = (
+/**
+ * Remove existing theme tab from tabs field
+ */
+const removeExistingThemeTab = (tabs: TabConfig[]): TabConfig[] =>
+  tabs.filter((tab) => tab?.name !== THEME_TAB_NAME)
+
+/**
+ * Add theme configuration tab to existing tabs field or create fields array
+ */
+const upsertThemeTab = (
   fields: Field[] | undefined,
-  themeField: Field,
+  themeTabConfig: TabConfig,
   enableLogging: boolean,
 ): Field[] => {
-  const sanitized = removeExistingThemeField(fields ?? [])
+  const existingFields = fields ?? []
 
-  if (enableLogging) {
-  console.log('🎨 Theme Management Plugin: injecting theme configuration field')
+  // Find existing tabs field
+  const tabsFieldIndex = existingFields.findIndex(
+    (field) => 'type' in field && field.type === 'tabs',
+  )
+
+  if (tabsFieldIndex === -1) {
+    // No tabs field exists - add theme configuration as group field instead
+    if (enableLogging) {
+      console.log(
+        '🎨 Theme Management Plugin: No tabs field found, adding theme configuration as group field',
+      )
+    }
+
+    return [
+      ...existingFields,
+      {
+        name: THEME_TAB_NAME,
+        type: 'group',
+        label: themeTabConfig.label,
+        admin: {
+          description: themeTabConfig.description,
+        },
+        fields: themeTabConfig.fields,
+      },
+    ]
   }
 
-  return [...sanitized, themeField]
+  // Tabs field exists - inject our tab into it
+  if (enableLogging) {
+    console.log(
+      '🎨 Theme Management Plugin: Adding theme configuration tab to existing tabs',
+    )
+  }
+
+  const tabsField = existingFields[tabsFieldIndex]
+  
+  if (!('tabs' in tabsField)) {
+    console.warn('🎨 Theme Management Plugin: Found tabs field but it has no tabs property')
+    return existingFields
+  }
+
+  const existingTabs = (tabsField.tabs as TabConfig[]) || []
+
+  // Remove existing theme tab if present
+  const sanitizedTabs = removeExistingThemeTab(existingTabs)
+
+  // Create new tabs field with our tab added
+  const updatedTabsField = {
+    ...tabsField,
+    tabs: [...sanitizedTabs, themeTabConfig],
+  }
+
+  // Return fields array with updated tabs field
+  const newFields = [...existingFields]
+  newFields[tabsFieldIndex] = updatedTabsField
+
+  return newFields
 }
 
 const ensureCollectionsArray = (collections: Config['collections']): CollectionConfig[] =>
@@ -54,7 +116,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
-    const themeField = createThemeConfigurationField({
+    const themeTabConfig = createThemeConfigurationField({
       themePresets,
       defaultTheme,
       includeColorModeToggle,
@@ -80,7 +142,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
       const existingFields = Array.isArray(collection.fields) ? collection.fields : []
 
-      const fields = upsertThemeField(existingFields, themeField, enableLogging)
+      const fields = upsertThemeTab(existingFields, themeTabConfig, enableLogging)
 
       return {
         ...collection,

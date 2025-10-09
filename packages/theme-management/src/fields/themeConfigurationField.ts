@@ -24,10 +24,17 @@ interface ThemeConfigurationFieldOptions {
 }
 
 /**
- * Theme Configuration Field with Theme Selection as default value setter
- * Theme Selection populates lightMode/darkMode colors automatically
+ * Theme Configuration Tab Configuration
+ * Returns tab config that can be injected into existing tabs field
  */
-export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): Field {
+export function createThemeConfigurationField(
+  options: ThemeConfigurationFieldOptions,
+): {
+  name: string
+  label: { en: string; cs: string }
+  description: { en: string; cs: string }
+  fields: Field[]
+} {
   const {
     themePresets,
     defaultTheme,
@@ -435,21 +442,18 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     })
   }
 
+  // Return just the tab configuration, not the full tabs field
+  // The plugin will inject this into existing tabs or create a group field
   return {
-    type: 'tabs',
-    tabs: [
-      {
-        name: 'themeConfiguration',
-        label: {
-          en: '🎨 Appearance Settings',
-          cs: '🎨 Nastavení vzhledu',
-        },
-        description: {
-          en: 'Configure website appearance and styling',
-          cs: 'Nakonfigurujte vzhled a stylování webu',
-        },
-        fields,
-      },
-    ],
+    name: 'themeConfiguration',
+    label: {
+      en: '🎨 Appearance Settings',
+      cs: '🎨 Nastavení vzhledu',
+    },
+    description: {
+      en: 'Configure website appearance and styling',
+      cs: 'Nakonfigurujte vzhled a stylování webu',
+    },
+    fields,
   }
 }

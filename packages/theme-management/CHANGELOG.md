@@ -1,5 +1,64 @@
 # Changelog
 
+## [0.2.1] - 2025-10-09
+
+### 🔧 CRITICAL FIX: Proper Tabs Integration
+
+#### Fixed
+- **Plugin now correctly integrates with existing tabs field**
+  - When `tabs` field exists in collection, plugin adds "Nastavení vzhledu" (Appearance Settings) as a new tab
+  - When no `tabs` field exists, plugin creates a `group` field instead
+  - No more nested tabs or structural issues!
+
+#### How It Works Now
+
+**Scenario 1: Collection with existing tabs** (SiteSettings with General, SEO tabs)
+```typescript
+// Before plugin:
+fields: [
+  {
+    type: 'tabs',
+    tabs: [
+      { name: 'general', label: 'General', fields: [...] },
+      { name: 'seo', label: 'SEO', fields: [...] }
+    ]
+  }
+]
+
+// After plugin:
+fields: [
+  {
+    type: 'tabs',
+    tabs: [
+      { name: 'general', label: 'General', fields: [...] },
+      { name: 'seo', label: 'SEO', fields: [...] },
+      { name: 'themeConfiguration', label: '🎨 Nastavení vzhledu', fields: [...] }  // ✅ Added!
+    ]
+  }
+]
+```
+
+**Scenario 2: Collection without tabs**
+```typescript
+// Before plugin:
+fields: [
+  { name: 'title', type: 'text' }
+]
+
+// After plugin:
+fields: [
+  { name: 'title', type: 'text' },
+  { name: 'themeConfiguration', type: 'group', label: '🎨 Nastavení vzhledu', fields: [...] }  // ✅ Added as group!
+]
+```
+
+#### Testing
+- ✅ Test with existing tabs - PASSED
+- ✅ Test without tabs - PASSED
+- ✅ All validation tests - PASSED
+
+---
+
 ## [0.2.0] - 2025-10-09
 
 ### 🎨 MAJOR UPDATE: Tabs Structure & Extended Theme Support
