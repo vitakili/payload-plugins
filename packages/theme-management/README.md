@@ -2,13 +2,23 @@
 
 A comprehensive theme management plugin for Payload CMS v3 that provides powerful theming capabilities with SSR support, preventing FOUC (Flash of Unstyled Content).
 
+## 🎉 Version 0.2.0 - New Features!
+
+- **✅ Tabs Structure** - Plugin now creates a "Nastavení vzhledu" (Appearance Settings) tab
+- **✅ Extended Theme Support** - OKLCH color format with 19+ semantic tokens
+- **✅ shadcn/ui Compatible** - Works with https://ui.shadcn.com/themes
+- **✅ TweakCN Compatible** - Works with https://tweakcn.com/editor/theme
+- **✅ Chart Colors** - 5 customizable colors for data visualization
+
 ## Features
 
 - 🎨 **Multiple Theme Presets** - Cool, Brutal, Neon, Solar, and more
-- 🎨 **Custom Color Palette** - Full HSL color customization
+- 🎨 **Extended Themes** - OKLCH-based themes with full shadcn/ui token support
+- 🎨 **Custom Color Palette** - Full HSL color customization (19+ semantic tokens)
 - 🔤 **Typography Control** - Google Fonts integration for headings, body, and code
 - 📐 **Border Radius Presets** - Sharp, Rounded, or Pill styles
 - 🌓 **Dark Mode Support** - Built-in light/dark/system mode toggle
+- 📊 **Chart Colors** - Data visualization color palette
 - 🚀 **SSR Theme Injection** - Zero FOUC with server-side rendering
 - ⚡ **Performance Optimized** - Critical CSS inlining, preload links
 - 🎯 **Type Safe** - Full TypeScript support
@@ -370,6 +380,16 @@ Contributions are welcome! Please:
 3. Make your changes
 4. Add tests if applicable
 5. Submit a pull request
+
+## Troubleshooting
+
+### Common Issues
+
+**Error: "right-hand side of 'in' should be an object, got undefined"**
+
+This is a known Payload CMS issue related to user preferences. See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for solutions.
+
+**Quick Fix:** Go to `/admin/account` and click "Reset Preferences" at the bottom of the page.
 
 ## License
 

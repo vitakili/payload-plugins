@@ -7,6 +7,12 @@ import {
 } from '../constants/themeFonts.js'
 import type { ThemePreset } from '../index.js'
 import { darkModeField, lightModeField } from './colorModeFields.js'
+import {
+  extendedThemeSelectionField,
+  extendedLightModeField,
+  extendedDarkModeField,
+  chartColorsField,
+} from './extendedThemeFields.js'
 
 interface ThemeConfigurationFieldOptions {
   themePresets: ThemePreset[]
@@ -60,7 +66,31 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
       },
     },
+    extendedThemeSelectionField,
   ]
+
+  // Extended Theme Configuration (OKLCH colors, shadcn/ui compatible)
+  if (enableAdvancedFeatures) {
+    fields.push({
+      type: 'collapsible',
+      label: {
+        en: '🎨 Extended Theme Configuration',
+        cs: '🎨 Rozšířená konfigurace tématu',
+      },
+      admin: {
+        initCollapsed: true,
+        description: {
+          en: 'Advanced color configuration using OKLCH format. Compatible with shadcn/ui and TweakCN.',
+          cs: 'Pokročilá konfigurace barev pomocí formátu OKLCH. Kompatibilní s shadcn/ui a TweakCN.',
+        },
+      },
+      fields: [
+        extendedLightModeField,
+        extendedDarkModeField,
+        chartColorsField,
+      ],
+    })
+  }
 
   // Color Mode Settings
   if (includeColorModeToggle) {
@@ -406,15 +436,20 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   }
 
   return {
-    name: 'themeConfiguration',
-    type: 'group',
-    label: false,
-    admin: {
-      description: {
-        en: 'Configure website appearance and styling',
-        cs: 'Nakonfigurujte vzhled a stylování webu',
+    type: 'tabs',
+    tabs: [
+      {
+        name: 'themeConfiguration',
+        label: {
+          en: '🎨 Appearance Settings',
+          cs: '🎨 Nastavení vzhledu',
+        },
+        description: {
+          en: 'Configure website appearance and styling',
+          cs: 'Nakonfigurujte vzhled a stylování webu',
+        },
+        fields,
       },
-    },
-    fields,
+    ],
   }
 }
