@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { payload } from './vitest.setup.js'
+import { getPayloadInstance } from './vitest.setup.js'
 
 describe('Theme Management Plugin - Integration Tests', () => {
   describe('Plugin Loading', () => {
     it('should initialize Payload without errors', () => {
+      const payload = getPayloadInstance()
       expect(payload).toBeDefined()
       expect(payload.config).toBeDefined()
     })
 
     it('should have theme management plugin registered', () => {
+      const payload = getPayloadInstance()
       const hasThemePlugin = payload.config.plugins.some(
         (plugin) => plugin.name === 'theme-management-plugin',
       )
@@ -18,6 +20,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
 
   describe('Collection Configuration', () => {
     it('should add theme tab to pages collection', () => {
+      const payload = getPayloadInstance()
       const pagesCollection = payload.config.collections.find(
         (col) => col.slug === 'pages',
       )
@@ -41,6 +44,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     })
 
     it('should have theme configuration field in theme tab', () => {
+      const payload = getPayloadInstance()
       const pagesCollection = payload.config.collections.find(
         (col) => col.slug === 'pages',
       )
@@ -69,6 +73,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     let createdPageId: string
 
     it('should create a page with theme configuration', async () => {
+      const payload = getPayloadInstance()
       const result = await payload.create({
         collection: 'pages',
         data: {
@@ -90,6 +95,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     })
 
     it('should read page with theme configuration', async () => {
+      const payload = getPayloadInstance()
       const result = await payload.findByID({
         collection: 'pages',
         id: createdPageId,
@@ -101,6 +107,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     })
 
     it('should update page theme configuration', async () => {
+      const payload = getPayloadInstance()
       const result = await payload.update({
         collection: 'pages',
         id: createdPageId,
@@ -118,6 +125,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     })
 
     it('should delete page with theme configuration', async () => {
+      const payload = getPayloadInstance()
       const result = await payload.delete({
         collection: 'pages',
         id: createdPageId,
@@ -130,6 +138,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
 
   describe('Theme Presets', () => {
     it('should have default theme presets available', () => {
+      const payload = getPayloadInstance()
       const pagesCollection = payload.config.collections.find(
         (col) => col.slug === 'pages',
       )
@@ -157,6 +166,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
 
   describe('Advanced Features', () => {
     it('should include color mode toggle when enabled', () => {
+      const payload = getPayloadInstance()
       const pagesCollection = payload.config.collections.find(
         (col) => col.slug === 'pages',
       )
@@ -166,6 +176,7 @@ describe('Theme Management Plugin - Integration Tests', () => {
     })
 
     it('should include custom CSS field when enabled', async () => {
+      const payload = getPayloadInstance()
       const result = await payload.create({
         collection: 'pages',
         data: {

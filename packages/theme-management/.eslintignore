@@ -1,0 +1,8 @@
+dist
+node_modules
+*.d.ts
+dev
+tests
+scripts
+vitest.config.ts
+.swc

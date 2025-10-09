@@ -6,8 +6,11 @@
     "lib": ["ESNext"],
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "types": ["vitest/globals", "@types/node"]
+    "types": ["vitest/globals", "@types/node"],
+    "noEmit": true,
+    "rootDir": "..",
+    "baseUrl": "."
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["./**/*.ts", "./**/*.tsx", "../src/**/*.ts"],
   "exclude": ["node_modules"]
 }

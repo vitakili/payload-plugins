@@ -3,16 +3,16 @@ import { getPayload } from 'payload'
 import { afterAll, beforeAll } from 'vitest'
 import configPromise from './payload.config.js'
 
-let payload: Payload
+let _payload: Payload
 
 beforeAll(async () => {
-  payload = await getPayload({ config: await configPromise })
+  _payload = await getPayload({ config: await configPromise })
 })
 
 afterAll(async () => {
-  if (typeof payload.db.destroy === 'function') {
-    await payload.db.destroy()
+  if (typeof _payload?.db?.destroy === 'function') {
+    await _payload.db.destroy()
   }
 })
 
-export { payload }
+export const getPayloadInstance = (): Payload => _payload
