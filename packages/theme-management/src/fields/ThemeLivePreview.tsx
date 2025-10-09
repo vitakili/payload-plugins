@@ -14,11 +14,16 @@ export const ThemeLivePreview = () => {
   const allFields = useFormFields(([fields]) => fields)
   const [previewMode, setPreviewMode] = useState<'light' | 'dark'>('light')
 
-  const themeConfig = allFields?.themeConfiguration?.value as Record<string, any> | undefined
+  const themeConfig = allFields?.themeConfiguration?.value as Record<string, unknown> | undefined
 
   // Extract colors from theme configuration
-  const lightMode = themeConfig?.lightMode
-  const darkMode = themeConfig?.darkMode
+  // Support both basic (lightMode/darkMode) and extended (extendedLightMode/extendedDarkMode)
+  const lightMode = (themeConfig?.extendedLightMode || themeConfig?.lightMode) as
+    | Record<string, string>
+    | undefined
+  const darkMode = (themeConfig?.extendedDarkMode || themeConfig?.darkMode) as
+    | Record<string, string>
+    | undefined
   const activeMode = previewMode === 'light' ? lightMode : darkMode
 
   // Apply theme colors to preview

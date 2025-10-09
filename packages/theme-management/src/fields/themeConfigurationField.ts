@@ -103,8 +103,8 @@ export function createThemeConfigurationField(
     })
   }
 
-  // Color Mode Settings
-  if (includeColorModeToggle) {
+  // Color Mode Settings (only when NOT using extended theme configuration)
+  if (includeColorModeToggle && !enableAdvancedFeatures) {
     fields.push({
       type: 'collapsible',
       label: {
@@ -179,20 +179,22 @@ export function createThemeConfigurationField(
     })
   }
 
-  fields.push({
-    type: 'collapsible',
-    label: {
-      en: '🅰️ Typography',
-      cs: '🅰️ Typografie',
-    },
-    admin: {
-      initCollapsed: true,
-      description: {
-        en: 'Choose font families and base typography settings. Leave fields on "Use preset" to inherit the theme defaults.',
-        cs: 'Zvolte rodiny písem a základní typografické nastavení. Hodnota "Použít výchozí" zachová nastavení motivu.',
+  // Typography (only when NOT using extended theme configuration)
+  if (!enableAdvancedFeatures) {
+    fields.push({
+      type: 'collapsible',
+      label: {
+        en: '🅰️ Typography',
+        cs: '🅰️ Typografie',
       },
-    },
-    fields: [
+      admin: {
+        initCollapsed: true,
+        description: {
+          en: 'Choose font families and base typography settings. Leave fields on "Use preset" to inherit the theme defaults.',
+          cs: 'Zvolte rodiny písem a základní typografické nastavení. Hodnota "Použít výchozí" zachová nastavení motivu.',
+        },
+      },
+      fields: [
       {
         name: 'typography',
         type: 'group',
@@ -313,10 +315,12 @@ export function createThemeConfigurationField(
         ],
       },
     ],
-  })
+    })
+  }
 
-  // Design Customization
-  fields.push({
+  // Design Customization (only when NOT using extended theme configuration)
+  if (!enableAdvancedFeatures) {
+    fields.push({
     type: 'collapsible',
     label: {
       en: '✨ Design Customization',
@@ -384,8 +388,9 @@ export function createThemeConfigurationField(
       },
     ],
   })
+  } // End of !enableAdvancedFeatures block
 
-  // Advanced Settings
+  // Advanced Settings (when using extended theme configuration)
   if (enableAdvancedFeatures) {
     const advancedFields: Field[] = [
       {

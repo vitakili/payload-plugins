@@ -338,7 +338,7 @@ export const lightModeColorsField: Field = {
   },
   fields: [
     {
-      name: 'lightMode',
+      name: 'extendedLightMode',
       type: 'group',
       fields: [...baseColorFields, ...chartColorFields],
     },
@@ -363,7 +363,7 @@ export const darkModeColorsField: Field = {
   },
   fields: [
     {
-      name: 'darkMode',
+      name: 'extendedDarkMode',
       type: 'group',
       fields: [...baseColorFields, ...chartColorFields],
     },

@@ -49,6 +49,7 @@
     "dev": "swc src -d dist --config-file .swcrc --watch",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
+    "validate": "node validate-fields.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
