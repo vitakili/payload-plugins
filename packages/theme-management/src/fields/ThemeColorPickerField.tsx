@@ -2,7 +2,8 @@
 
 import { useField, useFormFields } from '@payloadcms/ui'
 import type { TextFieldClientComponent } from 'payload'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { HexColorPicker, HexColorInput } from 'react-colorful'
 import './ThemeColorPickerField.css'
 
 function resolveLocalizedValue(value: unknown, fallback: string) {
@@ -21,9 +22,83 @@ function resolveLocalizedValue(value: unknown, fallback: string) {
   return fallback
 }
 
+/**
+ * Convert various color formats to HEX for the color picker
+ */
+function toHex(color: string): string {
+  if (!color) return '#000000'
+  
+  // Already hex
+  if (color.startsWith('#')) return color
+  
+  // OKLCH format - extract hue and convert to approximate hex
+  if (color.startsWith('oklch')) {
+    // For now, return a default - proper conversion requires color-conversion library
+    return '#3b82f6' // blue-500 as default
+  }
+  
+  // HSL format
+  if (color.startsWith('hsl')) {
+    const regex = /hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/
+    const match = regex.exec(color)
+    if (match) {
+      const [, h, s, l] = match.map(Number)
+      return hslToHex(h, s, l)
+    }
+  }
+  
+  return '#000000'
+}
+
+/**
+ * Convert HSL to HEX
+ */
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100
+  l /= 100
+  
+  const c = (1 - Math.abs(2 * l - 1)) * s
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
+  const m = l - c / 2
+  
+  let r = 0
+  let g = 0
+  let b = 0
+  
+  if (h >= 0 && h < 60) {
+    r = c
+    g = x
+  } else if (h >= 60 && h < 120) {
+    r = x
+    g = c
+  } else if (h >= 120 && h < 180) {
+    g = c
+    b = x
+  } else if (h >= 180 && h < 240) {
+    g = x
+    b = c
+  } else if (h >= 240 && h < 300) {
+    r = x
+    b = c
+  } else if (h >= 300 && h < 360) {
+    r = c
+    b = x
+  }
+  
+  const toHex = (n: number) => {
+    const hex = Math.round((n + m) * 255).toString(16)
+    return hex.length === 1 ? '0' + hex : hex
+  }
+  
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
+
 const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
   const [localValue, setLocalValue] = useState(value || '')
+  const [showPicker, setShowPicker] = useState(false)
+  const [hexValue, setHexValue] = useState(toHex(value || ''))
+  const pickerRef = useRef<HTMLDivElement>(null)
   const allFields = useFormFields(([fields]) => fields)
 
   const mode = path.includes('lightMode') ? 'lightMode' : 'darkMode'
@@ -31,7 +106,22 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
 
   useEffect(() => {
     setLocalValue(value || '')
+    setHexValue(toHex(value || ''))
   }, [value])
+
+  // Close picker when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setShowPicker(false)
+      }
+    }
+    
+    if (showPicker) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showPicker])
 
   const colorValues = useMemo(() => {
     if (!allFields) {
@@ -68,10 +158,17 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
     }, {})
   }, [allFields, modePrefix])
 
-  function handleChange(nextValue: string) {
+  const handleHexChange = useCallback((hex: string) => {
+    setHexValue(hex)
+    setLocalValue(hex)
+    setValue(hex)
+  }, [setValue])
+
+  const handleTextChange = useCallback((nextValue: string) => {
     setLocalValue(nextValue)
     setValue(nextValue)
-  }
+    setHexValue(toHex(nextValue))
+  }, [setValue])
 
   const fieldName = path.split('.').pop() || ''
   const label = resolveLocalizedValue(field.label, fieldName)
@@ -86,23 +183,46 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
 
       <div className="color-picker-container">
         <div className="color-input-wrapper">
-          <input
-            type="color"
-            value={localValue || '#000000'}
-            onChange={(event) => handleChange(event.target.value)}
-            className="color-input"
+          <button
+            type="button"
+            className="color-swatch"
+            style={{ backgroundColor: hexValue }}
+            onClick={() => setShowPicker(!showPicker)}
+            aria-label="Open color picker"
           />
           <input
             type="text"
             value={localValue || ''}
-            onChange={(event) => handleChange(event.target.value)}
-            placeholder="#000000"
+            onChange={(event) => handleTextChange(event.target.value)}
+            placeholder="oklch(...) or #hex"
             className="text-input"
-            pattern="^#[0-9A-Fa-f]{6}$"
           />
         </div>
 
-        <div className="color-preview" style={{ backgroundColor: localValue || '#000000' }}>
+        {/* Professional Color Picker Popover */}
+        {showPicker && (
+          <div className="color-picker-popover" ref={pickerRef}>
+            <HexColorPicker color={hexValue} onChange={handleHexChange} />
+            <div className="picker-footer">
+              <HexColorInput
+                color={hexValue}
+                onChange={handleHexChange}
+                prefixed
+                placeholder="#000000"
+                className="hex-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPicker(false)}
+                className="close-button"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="color-preview" style={{ backgroundColor: hexValue }}>
           <span className="preview-label">{localValue || 'Not set'}</span>
         </div>
       </div>

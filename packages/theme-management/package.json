@@ -23,6 +23,10 @@
       "import": "./dist/fields/*.js",
       "types": "./dist/fields/*.d.ts"
     },
+    "./views/*": {
+      "import": "./dist/views/*.js",
+      "types": "./dist/views/*.d.ts"
+    },
     "./utils/*": {
       "import": "./dist/utils/*.js",
       "types": "./dist/utils/*.d.ts"
@@ -88,6 +92,7 @@
     "access": "public"
   },
   "dependencies": {
+    "react-colorful": "^5.6.1",
     "server-only": "^0.0.1"
   }
 }

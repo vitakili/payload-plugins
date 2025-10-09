@@ -2,10 +2,13 @@
 
 A comprehensive theme management plugin for Payload CMS v3 that provides powerful theming capabilities with SSR support, preventing FOUC (Flash of Unstyled Content).
 
-## 🎉 Version 0.2.0 - New Features!
+## 🎉 Version 0.2.1 - New Features!
 
-- **✅ Tabs Structure** - Plugin now creates a "Nastavení vzhledu" (Appearance Settings) tab
-- **✅ Extended Theme Support** - OKLCH color format with 19+ semantic tokens
+- **✅ Live Theme Preview** - Real-time theme preview in admin panel at `/admin/theme-preview`
+- **✅ Professional Color Picker** - Enhanced color picker with react-colorful library
+- **✅ Streamlined Tokens** - Optimized to 24 essential color tokens
+- **✅ Tabs Structure** - Plugin creates a "Nastavení vzhledu" (Appearance Settings) tab
+- **✅ Extended Theme Support** - OKLCH color format with semantic tokens
 - **✅ shadcn/ui Compatible** - Works with https://ui.shadcn.com/themes
 - **✅ TweakCN Compatible** - Works with https://tweakcn.com/editor/theme
 - **✅ Chart Colors** - 5 customizable colors for data visualization
@@ -13,8 +16,9 @@ A comprehensive theme management plugin for Payload CMS v3 that provides powerfu
 ## Features
 
 - 🎨 **Multiple Theme Presets** - Cool, Brutal, Neon, Solar, and more
+- 🖼️ **Live Theme Preview** - Real-time preview in admin panel (no configuration needed!)
 - 🎨 **Extended Themes** - OKLCH-based themes with full shadcn/ui token support
-- 🎨 **Custom Color Palette** - Full HSL color customization (19+ semantic tokens)
+- 🎨 **Custom Color Palette** - Full HSL color customization (24 semantic tokens)
 - 🔤 **Typography Control** - Google Fonts integration for headings, body, and code
 - 📐 **Border Radius Presets** - Sharp, Rounded, or Pill styles
 - 🌓 **Dark Mode Support** - Built-in light/dark/system mode toggle
@@ -147,6 +151,24 @@ Or with Tailwind CSS:
 - **Solar** - Warm, golden tones
 - **Dealership** - Automotive-inspired
 - **Real Estate** - Professional property theme (+ Gold, Neutral variants)
+
+## Live Theme Preview
+
+The plugin automatically adds a **Live Preview** page to your admin panel at `/admin/theme-preview`.
+
+### Features:
+- ✅ **Zero Configuration** - Works automatically when plugin is installed
+- ✅ **Real-time Updates** - See changes instantly as you edit theme settings
+- ✅ **Light/Dark Toggle** - Preview both modes side-by-side
+- ✅ **Component Showcase** - View cards, buttons, inputs, badges, and more
+- ✅ **Professional UI** - Clean, modern preview interface
+
+### How to Access:
+1. Install the plugin (see Quick Start above)
+2. Navigate to `/admin/theme-preview` in your Payload admin panel
+3. Open theme settings in another tab and see changes update live!
+
+The preview automatically watches your `themeConfiguration` field and displays real-time updates without any additional setup.
 
 ## API Reference
 

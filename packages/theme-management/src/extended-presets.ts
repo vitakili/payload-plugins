@@ -10,6 +10,8 @@
  * - CSS variable generation for Tailwind integration
  */
 
+import { tweakcnThemePresets } from './tweakcn-presets.js'
+
 export interface ShadcnColorTokens {
   // Base colors
   background: string
@@ -55,12 +57,25 @@ export interface ShadcnColorTokens {
   'chart-4': string
   'chart-5': string
   
-  // Border radius (optional)
-  radius?: string
+  // Shadow controls (TweakCN)
+  'shadow-color'?: string
+  'shadow-opacity'?: string
+  'shadow-blur'?: string
+  'shadow-spread'?: string
+  'shadow-offset-x'?: string
+  'shadow-offset-y'?: string
   
-  // Font families (optional)
+  // Font families (TweakCN)
   'font-sans'?: string
+  'font-serif'?: string
   'font-mono'?: string
+  
+  // Advanced typography (TweakCN)
+  'letter-spacing'?: string
+  spacing?: string
+  
+  // Border radius
+  radius?: string
 }
 
 export interface ExtendedThemePreset {
@@ -259,6 +274,14 @@ export const extendedThemePresets: Record<string, ExtendedThemePreset> = {
       },
     },
   },
+}
+
+/**
+ * All available extended theme presets (original + TweakCN)
+ */
+export const allExtendedThemePresets = {
+  ...extendedThemePresets,
+  ...tweakcnThemePresets,
 }
 
 /**

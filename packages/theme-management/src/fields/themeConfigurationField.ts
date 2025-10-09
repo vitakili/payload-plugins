@@ -9,9 +9,11 @@ import type { ThemePreset } from '../index.js'
 import { darkModeField, lightModeField } from './colorModeFields.js'
 import {
   extendedThemeSelectionField,
-  extendedLightModeField,
-  extendedDarkModeField,
-  chartColorsField,
+  lightModeColorsField,
+  darkModeColorsField,
+  shadowConfigField,
+  typographyConfigField,
+  designSystemConfigField,
 } from './extendedThemeFields.js'
 
 interface ThemeConfigurationFieldOptions {
@@ -87,14 +89,16 @@ export function createThemeConfigurationField(
       admin: {
         initCollapsed: true,
         description: {
-          en: 'Advanced color configuration using OKLCH format. Compatible with shadcn/ui and TweakCN.',
-          cs: 'Pokročilá konfigurace barev pomocí formátu OKLCH. Kompatibilní s shadcn/ui a TweakCN.',
+          en: 'Professional theme system with TweakCN compatibility. Full OKLCH color support, shadows, typography, and more.',
+          cs: 'Profesionální systém témat s kompatibilitou TweakCN. Plná podpora OKLCH barev, stíny, typografie a další.',
         },
       },
       fields: [
-        extendedLightModeField,
-        extendedDarkModeField,
-        chartColorsField,
+        lightModeColorsField,
+        darkModeColorsField,
+        shadowConfigField,
+        typographyConfigField,
+        designSystemConfigField,
       ],
     })
   }

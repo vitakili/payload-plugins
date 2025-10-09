@@ -159,9 +159,30 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
+    // Add custom admin view for theme preview
+    const admin = {
+      ...config.admin,
+      components: {
+        ...config.admin?.components,
+        views: {
+          ...config.admin?.components?.views,
+          themePreview: {
+            Component: '@kilivi/payloadcms-theme-management/views/ThemePreviewView#default',
+            path: '/theme-preview' as `/${string}`,
+            exact: true,
+            meta: {
+              title: 'Theme Preview',
+              description: 'Real-time preview of your theme configuration',
+            },
+          },
+        },
+      },
+    }
+
     return {
       ...config,
       collections,
+      admin,
     }
   }
 }
@@ -232,6 +253,7 @@ export { defaultThemePresets } from './presets.js'
 export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
 export { 
   extendedThemePresets,
+  allExtendedThemePresets,
   extendedThemeToCSSVariables,
 } from './extended-presets.js'
 export type { ExtendedThemePreset, ShadcnColorTokens } from './extended-presets.js'
@@ -255,6 +277,9 @@ export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
 export { ThemeProvider } from './providers/Theme/index.js'
+
+// Components
+export { ThemeLivePreview } from './fields/ThemeLivePreview.js'
 
 export const ThemeManagementPlugin = themeManagementPlugin
 /** @deprecated use {@link themeManagementPlugin} */
