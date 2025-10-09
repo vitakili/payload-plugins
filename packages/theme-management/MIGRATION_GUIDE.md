@@ -72,7 +72,7 @@ These remain available from `@kilivi/payloadcms-theme-management`:
 
 These continue to work as before:
 
-- `@kilivi/payloadcms-theme-management/fields/*`
+- `@kilivi/payloadcms-theme-management/*`
 - `@kilivi/payloadcms-theme-management/components/*`
 - `@kilivi/payloadcms-theme-management/utils/*`
 - `@kilivi/payloadcms-theme-management/providers/*`

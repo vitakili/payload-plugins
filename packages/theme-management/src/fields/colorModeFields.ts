@@ -1,6 +1,6 @@
 import type { Field } from 'payload'
 
-const themeColorPickerComponentPath = '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
+const themeColorPickerComponentPath = '@kilivi/payloadcms-theme-management/ThemeColorPickerField'
 
 type LocalizedText = Record<string, string>
 

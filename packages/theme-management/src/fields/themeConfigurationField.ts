@@ -56,7 +56,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           cs: 'Vyberte téma pro automatické předvyplnění barev. Po výběru můžete barvy upravit.',
         },
         components: {
-          Field: '@kilivi/payloadcms-theme-management/fields/ThemePreviewField',
+          Field: '@kilivi/payloadcms-theme-management/ThemePreviewField',
         },
       },
     },
@@ -302,7 +302,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         ],
         admin: {
           components: {
-            Field: '@kilivi/payloadcms-theme-management/fields/RadiusField',
+            Field: '@kilivi/payloadcms-theme-management/RadiusField',
           },
           width: '33%',
         },

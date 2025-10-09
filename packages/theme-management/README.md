@@ -185,8 +185,8 @@ import {
 
 ```typescript
 // Direct field imports
-import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
-import { ThemeTokenSelectField } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
+import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/ThemeColorPickerField'
+import { ThemeTokenSelectField } from '@kilivi/payloadcms-theme-management/ThemeTokenSelectField'
 
 // Direct component imports
 import { ThemePreview } from '@kilivi/payloadcms-theme-management/components/ThemePreview'
