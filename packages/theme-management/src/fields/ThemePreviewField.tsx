@@ -2,7 +2,7 @@
 
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
-import { useCallback, useEffect, useMemo, useRef, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import type {
   ResolvedTypographyPreview,
@@ -60,6 +60,14 @@ const themePresets = defaultThemePresets.reduce<Record<string, ThemePresetDefini
 )
 
 const colorKeys = Object.keys(lightModeDefaults) as (keyof ColorModeColors)[]
+
+const highlightSwatches: Array<{ key: keyof ColorModeColors; label: string }> = [
+  { key: 'primary', label: 'Primary' },
+  { key: 'secondary', label: 'Secondary' },
+  { key: 'accent', label: 'Accent' },
+  { key: 'background', label: 'Background' },
+  { key: 'foreground', label: 'Foreground' },
+]
 
 interface ModePreviewProps {
   icon: string
@@ -296,9 +304,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
     [dispatchFields],
   )
 
-  const handleThemeChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const value = event.target.value
+  const handleThemeSelect = useCallback(
+    (value: string) => {
       setValue(value)
 
       if (!value) {
@@ -467,27 +474,84 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             gap: '12px',
           }}
         >
-          <select
-            value={selectedTheme || ''}
-            onChange={handleThemeChange}
+          <div
             style={{
-              width: '100%',
-              padding: '12px 14px',
-              fontSize: '14px',
-              borderRadius: '8px',
-              border: '1px solid var(--theme-elevation-250)',
-              backgroundColor: 'var(--theme-input-bg)',
-              color: 'var(--theme-elevation-800)',
-              cursor: 'pointer',
+              display: 'grid',
+              gap: '10px',
             }}
           >
-            <option value="">Select a theme…</option>
-            {Object.entries(themePresets).map(([key, preset]) => (
-              <option key={key} value={key}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
+            {Object.entries(themePresets).map(([key, preset]) => {
+              const isSelected = key === selectedTheme
+              const swatches = highlightSwatches
+                .map(({ key: colorKey }) => preset.lightMode[colorKey])
+                .filter((color): color is string => Boolean(color))
+
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleThemeSelect(key)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 14px',
+                    borderRadius: '10px',
+                    border: isSelected
+                      ? '2px solid var(--theme-elevation-500)'
+                      : '1px solid var(--theme-elevation-200)',
+                    backgroundColor: isSelected
+                      ? 'var(--theme-elevation-50)'
+                      : 'var(--theme-input-bg)',
+                    color: 'var(--theme-elevation-800)',
+                    cursor: 'pointer',
+                    transition: 'border-color 120ms ease, background-color 120ms ease',
+                    boxShadow: isSelected
+                      ? '0 4px 12px rgba(15, 23, 42, 0.08)'
+                      : '0 1px 3px rgba(15, 23, 42, 0.04)',
+                    gap: '16px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: '4px',
+                    }}
+                  >
+                    <span style={{ fontWeight: 600, fontSize: '13px' }}>{preset.label}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--theme-elevation-500)' }}>
+                      {key}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridAutoFlow: 'column',
+                      gap: '8px',
+                      alignItems: 'center',
+                    }}
+                    aria-hidden="true"
+                  >
+                    {swatches.map((color, index) => (
+                      <span
+                        key={`${key}-swatch-${color}-${index}`}
+                        style={{
+                          width: '26px',
+                          height: '26px',
+                          borderRadius: '999px',
+                          border: '1px solid rgba(15, 23, 42, 0.12)',
+                          backgroundColor: color,
+                          boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.08)',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
 
           {activePreset && (
             <div
@@ -497,7 +561,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                 border: '1px solid var(--theme-elevation-200)',
                 backgroundColor: 'var(--theme-elevation-50)',
                 display: 'grid',
-                gap: '6px',
+                gap: '8px',
                 fontSize: '12px',
                 color: 'var(--theme-elevation-600)',
               }}
@@ -507,6 +571,49 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
               </div>
               <div>Primary color: {activePreset.lightMode.primary}</div>
               <div>Accent color: {activePreset.lightMode.accent}</div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  marginTop: '4px',
+                }}
+              >
+                {highlightSwatches.map(({ key, label }) => {
+                  const swatchValue = activePreset.lightMode[key]
+
+                  if (!swatchValue) {
+                    return null
+                  }
+
+                  return (
+                    <div
+                      key={key}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        minWidth: 'fit-content',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '22px',
+                          height: '22px',
+                          borderRadius: '999px',
+                          border: '1px solid rgba(15, 23, 42, 0.12)',
+                          backgroundColor: swatchValue,
+                          boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.08)',
+                        }}
+                        aria-hidden="true"
+                      />
+                      <span style={{ fontSize: '11px', color: 'var(--theme-elevation-700)' }}>
+                        {label}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
 

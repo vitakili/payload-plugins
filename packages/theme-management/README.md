@@ -304,7 +304,7 @@ themeManagementPlugin({
 
 ## Migrating from Older Versions
 
-See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructions.
+See [MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for detailed migration instructions.
 
 ### Key Changes in v0.1.9+
 
@@ -320,7 +320,7 @@ See [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) for detailed migration instructio
 
 ## Testing
 
-See [TEST_APP_GUIDE.md](./TEST_APP_GUIDE.md) for instructions on creating a test application.
+See [TEST_APP_GUIDE.md](./docs/TEST_APP_GUIDE.md) for instructions on creating a test application.
 
 ## Troubleshooting
 
@@ -336,7 +336,7 @@ See [TEST_APP_GUIDE.md](./TEST_APP_GUIDE.md) for instructions on creating a test
 pnpm update @kilivi/payloadcms-theme-management@latest
 ```
 
-The plugin now accepts any compatible theme configuration structure, regardless of your Payload version or type variations. See [TYPE_INDEPENDENCE_GUIDE.md](./TYPE_INDEPENDENCE_GUIDE.md) for technical details.
+The plugin now accepts any compatible theme configuration structure, regardless of your Payload version or type variations. See [TYPE_INDEPENDENCE_GUIDE.md](./docs/TYPE_INDEPENDENCE_GUIDE.md) for technical details.
 
 ### `Module not found: Can't resolve 'fs/promises'`
 
@@ -371,11 +371,11 @@ pnpm payload generate:types
 
 ## Documentation
 
-- [Type Independence Guide](./TYPE_INDEPENDENCE_GUIDE.md) - Understanding type safety without coupling
-- [Migration Guide](./MIGRATION_GUIDE.md) - Upgrading from older versions
-- [Test App Guide](./TEST_APP_GUIDE.md) - Create a test application
-- [Server/Client Separation](./SERVER_CLIENT_SEPARATION.md) - Technical details
-- [Build Setup](./BUILD_SETUP.md) - Build configuration details
+- [Type Independence Guide](./docs/TYPE_INDEPENDENCE_GUIDE.md) - Understanding type safety without coupling
+- [Migration Guide](./docs/MIGRATION_GUIDE.md) - Upgrading from older versions
+- [Test App Guide](./docs/TEST_APP_GUIDE.md) - Create a test application
+- [Server/Client Separation](./docs/SERVER_CLIENT_SEPARATION.md) - Technical details
+- [Build Setup](./docs/BUILD_SETUP.md) - Build configuration details
 
 ## Development
 
@@ -409,7 +409,7 @@ Contributions are welcome! Please:
 
 **Error: "right-hand side of 'in' should be an object, got undefined"**
 
-This is a known Payload CMS issue related to user preferences. See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for solutions.
+This is a known Payload CMS issue related to user preferences. See [TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) for solutions.
 
 **Quick Fix:** Go to `/admin/account` and click "Reset Preferences" at the bottom of the page.
 
