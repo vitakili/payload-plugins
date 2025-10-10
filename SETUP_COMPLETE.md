@@ -36,6 +36,7 @@ payload-plugins/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js: ^18.20.2 or >=20.9.0
 - pnpm: 9.x
 
@@ -88,8 +89,8 @@ The theme-management plugin has been created with:
 ### Using the Plugin
 
 ```typescript
-import { buildConfig } from 'payload';
-import { ThemeConfigurationPlugin } from '@payloadcms-plugins/theme-management';
+import { ThemeConfigurationPlugin } from '@payloadcms-plugins/theme-management'
+import { buildConfig } from 'payload'
 
 export default buildConfig({
   plugins: [
@@ -98,7 +99,7 @@ export default buildConfig({
       defaultTheme: 'auto',
     }),
   ],
-});
+})
 ```
 
 ## 🛠️ Available Scripts
@@ -117,12 +118,14 @@ From the **root** directory:
 To create a new plugin:
 
 1. **Create a new package directory:**
+
    ```bash
    mkdir -p packages/your-plugin-name
    cd packages/your-plugin-name
    ```
 
 2. **Initialize package.json:**
+
    ```json
    {
      "name": "@payloadcms-plugins/your-plugin-name",
@@ -166,12 +169,14 @@ The repository includes a GitHub Actions workflow for publishing packages to NPM
 5. Click "Run workflow"
 
 **Requirements:**
+
 - Add `NPM_TOKEN` secret to your GitHub repository
 - Ensure you have the rights to publish to `@payloadcms-plugins` scope on npm
 
 ## 🧪 Continuous Integration
 
 The CI workflow automatically:
+
 - Runs on every push to main and PRs
 - Installs dependencies
 - Lints code
@@ -181,9 +186,28 @@ The CI workflow automatically:
 ## 📚 References
 
 This repository structure is inspired by:
-- [shefing/payload-tools](https://github.com/shefing/payload-tools) - Similar PayloadCMS plugin monorepo
+
+- [shefing/payload-tools](https://github.com/shefing/payload-tools) - Similar PayloadCMS plugin monorepo with proven patterns for CSS handling
 - [PayloadCMS Documentation](https://payloadcms.com/) - Official Payload docs
 - [pnpm Workspaces](https://pnpm.io/workspaces) - Workspace documentation
+
+### Important Notes
+
+**CSS Import Handling in Client Components:**
+To avoid `ERR_UNKNOWN_FILE_EXTENSION` errors when running `payload generate:importmap`, CSS files are dynamically imported only in browser environments:
+
+```typescript
+// Import CSS only in browser environment
+// This prevents Node.js from trying to import CSS directly
+if (typeof window !== 'undefined') {
+  // @ts-expect-error - Dynamic import of CSS is not recognized by TypeScript
+  import('./YourComponent.css').catch((err) => {
+    console.warn('Failed to load CSS file:', err)
+  })
+}
+```
+
+This pattern is used throughout the theme-management plugin and is based on the proven approach from the payload-tools repository.
 
 ## 🤝 Contributing
 

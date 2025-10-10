@@ -5,10 +5,18 @@
  * Real-time preview of theme configuration
  * Inspired by Payload CMS 3 Live Preview
  */
-
 import { useFormFields } from '@payloadcms/ui'
 import { useState } from 'react'
-import './ThemeLivePreview.css'
+
+// Import CSS only in browser environment
+// This prevents Node.js from trying to import CSS directly
+// which causes ERR_UNKNOWN_FILE_EXTENSION error
+if (typeof window !== 'undefined') {
+  // @ts-expect-error - Dynamic import of CSS is not recognized by TypeScript
+  import('./ThemeLivePreview.css').catch((err) => {
+    console.warn('Failed to load CSS file:', err)
+  })
+}
 
 export const ThemeLivePreview = () => {
   const allFields = useFormFields(([fields]) => fields)
@@ -84,9 +92,7 @@ export const ThemeLivePreview = () => {
             }}
           >
             <h3>Featured Content</h3>
-            <p style={{ color: activeMode?.mutedForeground }}>
-              Card component with theme colors
-            </p>
+            <p style={{ color: activeMode?.mutedForeground }}>Card component with theme colors</p>
             <button
               className="preview-btn-primary"
               style={{
@@ -172,5 +178,3 @@ export const ThemeLivePreview = () => {
 }
 
 export default ThemeLivePreview
-
-

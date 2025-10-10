@@ -2,9 +2,18 @@
 
 import { useField, useFormFields } from '@payloadcms/ui'
 import type { TextFieldClientComponent } from 'payload'
-import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { HexColorPicker, HexColorInput } from 'react-colorful'
-import './ThemeColorPickerField.css'
+import { HexColorInput, HexColorPicker } from 'react-colorful'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+// Import CSS only in browser environment
+// This prevents Node.js from trying to import CSS directly
+// which causes ERR_UNKNOWN_FILE_EXTENSION error
+if (typeof window !== 'undefined') {
+  // @ts-expect-error - Dynamic import of CSS is not recognized by TypeScript
+  import('./ThemeColorPickerField.css').catch((err) => {
+    console.warn('Failed to load CSS file:', err)
+  })
+}
 
 function resolveLocalizedValue(value: unknown, fallback: string) {
   if (typeof value === 'string') {
@@ -27,16 +36,16 @@ function resolveLocalizedValue(value: unknown, fallback: string) {
  */
 function toHex(color: string): string {
   if (!color) return '#000000'
-  
+
   // Already hex
   if (color.startsWith('#')) return color
-  
+
   // OKLCH format - extract hue and convert to approximate hex
   if (color.startsWith('oklch')) {
     // For now, return a default - proper conversion requires color-conversion library
     return '#3b82f6' // blue-500 as default
   }
-  
+
   // HSL format
   if (color.startsWith('hsl')) {
     const regex = /hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/
@@ -46,7 +55,7 @@ function toHex(color: string): string {
       return hslToHex(h, s, l)
     }
   }
-  
+
   return '#000000'
 }
 
@@ -56,15 +65,15 @@ function toHex(color: string): string {
 function hslToHex(h: number, s: number, l: number): string {
   s /= 100
   l /= 100
-  
+
   const c = (1 - Math.abs(2 * l - 1)) * s
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
   const m = l - c / 2
-  
+
   let r = 0
   let g = 0
   let b = 0
-  
+
   if (h >= 0 && h < 60) {
     r = c
     g = x
@@ -84,12 +93,12 @@ function hslToHex(h: number, s: number, l: number): string {
     r = c
     b = x
   }
-  
+
   const toHex = (n: number) => {
     const hex = Math.round((n + m) * 255).toString(16)
     return hex.length === 1 ? '0' + hex : hex
   }
-  
+
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 
@@ -116,7 +125,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
         setShowPicker(false)
       }
     }
-    
+
     if (showPicker) {
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -158,17 +167,23 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
     }, {})
   }, [allFields, modePrefix])
 
-  const handleHexChange = useCallback((hex: string) => {
-    setHexValue(hex)
-    setLocalValue(hex)
-    setValue(hex)
-  }, [setValue])
+  const handleHexChange = useCallback(
+    (hex: string) => {
+      setHexValue(hex)
+      setLocalValue(hex)
+      setValue(hex)
+    },
+    [setValue],
+  )
 
-  const handleTextChange = useCallback((nextValue: string) => {
-    setLocalValue(nextValue)
-    setValue(nextValue)
-    setHexValue(toHex(nextValue))
-  }, [setValue])
+  const handleTextChange = useCallback(
+    (nextValue: string) => {
+      setLocalValue(nextValue)
+      setValue(nextValue)
+      setHexValue(toHex(nextValue))
+    },
+    [setValue],
+  )
 
   const fieldName = path.split('.').pop() || ''
   const label = resolveLocalizedValue(field.label, fieldName)
@@ -211,11 +226,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
                 placeholder="#000000"
                 className="hex-input"
               />
-              <button
-                type="button"
-                onClick={() => setShowPicker(false)}
-                className="close-button"
-              >
+              <button type="button" onClick={() => setShowPicker(false)} className="close-button">
                 Done
               </button>
             </div>
