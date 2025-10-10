@@ -10,4 +10,13 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
   },
+  ignorePatterns: [
+    'node_modules/',
+    'dist/',
+    '*.js',
+    '*.cjs',
+    '*.mjs',
+    'test-field.ts',
+    'validate-fields.js',
+  ],
 };
