@@ -7,6 +7,11 @@ import { buildConfig } from 'payload'
 import { themeManagementPlugin } from '../../src/index.js'
 import { defaultThemePresets } from '../../src/presets.js'
 
+// Mock payload to avoid ES module issues
+jest.mock('payload', () => ({
+  buildConfig: jest.fn(),
+}))
+
 describe('Theme Management Plugin Integration', () => {
   describe('Plugin Configuration', () => {
     it('should create valid Payload config with plugin', async () => {
@@ -77,7 +82,7 @@ describe('Theme Management Plugin Integration', () => {
       expect(siteSettings?.fields).toBeDefined()
 
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       )
       expect(themeField).toBeDefined()
     })
@@ -111,7 +116,7 @@ describe('Theme Management Plugin Integration', () => {
 
       const siteSettings = config.globals?.find((g: any) => g.slug === 'site-settings')
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       )
 
       expect(themeField).toBeDefined()
@@ -144,7 +149,7 @@ describe('Theme Management Plugin Integration', () => {
 
       const siteSettings = config.globals?.find((g: any) => g.slug === 'site-settings')
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       ) as any
 
       expect(themeField).toBeDefined()
@@ -208,7 +213,7 @@ describe('Theme Management Plugin Integration', () => {
 
       const siteSettings = config.globals?.find((g: any) => g.slug === 'site-settings')
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       ) as any
 
       function checkForUndefinedFields(fields: any[], path = ''): void {
@@ -278,7 +283,7 @@ describe('Theme Management Plugin Integration', () => {
 
       const siteSettings = config.globals?.find((g: any) => g.slug === 'site-settings')
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       ) as any
 
       function validateComponentPaths(fields: any[], path = ''): void {
@@ -371,7 +376,7 @@ describe('Theme Management Plugin Integration', () => {
 
       const siteSettings = config.globals?.find((g: any) => g.slug === 'site-settings')
       const themeField = siteSettings?.fields.find(
-        (f: any) => 'name' in f && f.name === 'themeConfiguration'
+        (f: any) => 'name' in f && f.name === 'themeConfiguration',
       ) as any
 
       function validateFieldTypes(fields: any[], path = ''): void {

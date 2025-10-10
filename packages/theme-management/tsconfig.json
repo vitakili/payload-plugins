@@ -22,5 +22,5 @@
     "strict": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "test-field.ts", "validate-fields.js"]
+  "exclude": ["node_modules", "dist", "tests", "test-field.ts", "validate-fields.js", "scripts"]
 }

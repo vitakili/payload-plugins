@@ -14,16 +14,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx",
-    "baseUrl": ".",
-    "types": ["@testing-library/jest-dom"],
-    "paths": {
-      "@/*": ["packages/**/src/*"]
-    }
+    "jsx": "react-jsx"
   },
-  "files": [],
-  "references": [
-    { "path": "./packages/**" }
-  ],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": ["node_modules", "**/dist/**", "**/build/**", "**/scripts/**"]
 }

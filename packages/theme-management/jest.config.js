@@ -9,15 +9,12 @@ export default {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: {
-          jsx: 'react',
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-          moduleResolution: 'node',
-        },
+        tsconfig: 'tsconfig.test.json',
+        useESM: true,
       },
     ],
   },
+  transformIgnorePatterns: ['node_modules/(?!(payload|@payloadcms)/)'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
@@ -26,4 +23,4 @@ export default {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-};
+}

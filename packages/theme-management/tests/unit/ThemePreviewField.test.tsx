@@ -1,8 +1,8 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ThemePreviewField from '../../src/fields/ThemePreviewField.js'
 import type { SelectFieldClientProps } from 'payload'
+import React from 'react'
+import ThemePreviewField from '../../src/fields/ThemePreviewField.js'
 
 const mockSetValue = jest.fn()
 const mockDispatchFields = jest.fn()
@@ -70,17 +70,19 @@ describe('ThemePreviewField', () => {
     field: {
       name: 'themeConfiguration',
       label: 'Theme Configuration',
-      type: 'select',
-      admin: {},
+      type: 'select' as const,
+      admin: {
+        isSortable: false,
+        placeholder: '',
+        isClearable: false,
+      },
       options: [],
     },
     path: 'themeConfiguration.theme',
   } satisfies Partial<SelectFieldClientProps>
 
   it('renders theme options with color swatches', () => {
-    render(
-      <ThemePreviewField {...(baseProps as SelectFieldClientProps)} />,
-    )
+    render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
 
     const coolButton = screen.getByRole('button', { name: /Cool & Professional/i })
     const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
@@ -93,9 +95,7 @@ describe('ThemePreviewField', () => {
   })
 
   it('updates value and dispatches preset when a theme is selected', async () => {
-    render(
-      <ThemePreviewField {...(baseProps as SelectFieldClientProps)} />,
-    )
+    render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
 
     const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
     const user = userEvent.setup()

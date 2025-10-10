@@ -1,6 +1,6 @@
+import type { ThemeTypographyPreset } from '../presets.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import type { BorderRadiusPreset, ThemeDefaults } from '../providers/Theme/types.js'
-import type { ThemeTypographyPreset } from '../presets.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import type { ResolvedThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import {
@@ -16,7 +16,7 @@ interface ServerThemeInjectorProps {
   /**
    * Theme configuration object from your site settings.
    * Pass the themeConfiguration field directly, not the entire site settings object.
-   * 
+   *
    * @example
    * ```tsx
    * const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
@@ -34,7 +34,9 @@ type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> 
  * Server-side theme CSS injector to prevent FOUC
  * This component injects critical theme CSS directly into the HTML head during SSR
  */
-export async function ServerThemeInjector({ themeConfiguration }: Readonly<ServerThemeInjectorProps>) {
+export async function ServerThemeInjector({
+  themeConfiguration,
+}: Readonly<ServerThemeInjectorProps>) {
   // Accept unknown type to avoid type conflicts between app's payload-types and plugin's payload-types
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration as any)
@@ -61,7 +63,7 @@ export async function ServerThemeInjector({ themeConfiguration }: Readonly<Serve
     fontScale,
     spacing,
     animationLevel,
-    customCSS: customCSS ?? undefined,
+    customCSS: customCSS ?? null,
     lightMode,
     darkMode,
     typography: typography ?? undefined,
@@ -80,9 +82,10 @@ export async function ServerThemeInjector({ themeConfiguration }: Readonly<Serve
   }
   const mappedBorderRadius = borderRadiusMap[borderRadius ?? 'medium'] ?? 'medium'
   const borderRadiusConfig = getBorderRadiusConfig(mappedBorderRadius)
-  const cssRecord = typeof borderRadiusConfig?.css === 'string'
-    ? { '--radius-default': borderRadiusConfig.css }
-    : borderRadiusConfig?.css ?? {}
+  const cssRecord =
+    typeof borderRadiusConfig?.css === 'string'
+      ? { '--radius-default': borderRadiusConfig.css }
+      : (borderRadiusConfig?.css ?? {})
 
   const borderRadiusCSS = Object.entries(cssRecord)
     .map(([property, value]) => `  ${property}: ${value};`)
