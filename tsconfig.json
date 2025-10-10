@@ -16,13 +16,14 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "types": ["@testing-library/jest-dom"],
     "paths": {
-      "@/*": ["packages/theme-management/src/*"]
+      "@/*": ["packages/**/src/*"]
     }
   },
   "files": [],
   "references": [
-    { "path": "./packages/theme-management" }
+    { "path": "./packages/**" }
   ],
   "exclude": ["node_modules", "dist", "build"]
 }
