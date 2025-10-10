@@ -19,8 +19,8 @@
     "target": "ESNext",
     "module": "ES6",
     "moduleResolution": "Bundler",
-    "strict": false,
+    "strict": false
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist", "test-field.ts", "validate-fields.js"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests", "test-field.ts", "validate-fields.js"]
 }

@@ -9,7 +9,9 @@
     "dev": "pnpm -r dev",
     "clean": "pnpm -r clean",
     "lint": "eslint .",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky",
+    "precommit": "pnpm run lint && pnpm run build"
   },
   "keywords": [
     "payloadcms",
@@ -32,7 +34,18 @@
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.57.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
     "prettier": "^3.3.2",
     "typescript": "^5.5.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,md}": [
+      "prettier --write"
+    ]
   }
 }

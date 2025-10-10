@@ -35,6 +35,10 @@ Thumbs.db
 
 # Testing
 coverage/
+*.test.d.ts
+*.test.d.ts.map
+tests/**/*.d.ts
+tests/**/*.d.ts.map
 
 # Misc
 .temp/
