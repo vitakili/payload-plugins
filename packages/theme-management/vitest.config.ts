@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
 import path from 'path'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [react()],
@@ -16,16 +16,7 @@ export default defineConfig({
     setupFiles: ['./dev/vitest.setup.ts'],
     testTimeout: 60000,
     hookTimeout: 60000,
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      'tests/**',
-    ],
-    server: {
-      deps: {
-        external: ['react-image-crop', /\.css$/],
-      },
-    },
+    exclude: ['**/node_modules/**', '**/dist/**', 'tests/**'],
   },
   resolve: {
     alias: {
