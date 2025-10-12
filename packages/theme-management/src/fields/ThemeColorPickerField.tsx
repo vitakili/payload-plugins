@@ -1,9 +1,9 @@
 'use client'
 
-import { Drawer, useField, useFormFields, useModal } from '@payloadcms/ui'
+import { useField, useFormFields } from '@payloadcms/ui'
 import type { TextFieldClientComponent } from 'payload'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 // Import CSS only in browser environment
 // This prevents Node.js from trying to import CSS directly
@@ -105,20 +105,32 @@ function hslToHex(h: number, s: number, l: number): string {
 const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
   const [localValue, setLocalValue] = useState(value || '')
-  const { openModal, closeModal } = useModal()
+  const [showPicker, setShowPicker] = useState(false)
   const [hexValue, setHexValue] = useState(toHex(value || ''))
+  const pickerRef = useRef<HTMLDivElement>(null)
   const allFields = useFormFields(([fields]) => fields)
 
   const mode = path.includes('lightMode') ? 'lightMode' : 'darkMode'
   const modePrefix = `themeConfiguration.${mode}`
 
-  // Generate unique drawer slug for this color picker instance
-  const drawerSlug = `color-picker-${path.replace(/\./g, '-')}`
-
   useEffect(() => {
     setLocalValue(value || '')
     setHexValue(toHex(value || ''))
   }, [value])
+
+  // Close picker when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setShowPicker(false)
+      }
+    }
+
+    if (showPicker) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showPicker])
 
   const colorValues = useMemo(() => {
     if (!allFields) {
@@ -184,13 +196,13 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
         {description && <div className="field-description">{description}</div>}
       </div>
 
-      <div className="color-picker-container">
+      <div className="color-picker-container" style={{ position: 'relative' }}>
         <div className="color-input-wrapper">
           <button
             type="button"
             className="color-swatch"
             style={{ backgroundColor: hexValue }}
-            onClick={() => openModal(drawerSlug)}
+            onClick={() => setShowPicker(!showPicker)}
             aria-label="Open color picker"
           />
           <input
@@ -202,15 +214,31 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
           />
         </div>
 
-        {/* Color Picker Modal Drawer */}
-        <Drawer slug={drawerSlug} title={`Choose ${label}`}>
-          <div style={{ padding: '20px' }}>
+        {/* Compact Color Picker Popover */}
+        {showPicker && (
+          <div
+            ref={pickerRef}
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              marginTop: '8px',
+              padding: '16px',
+              backgroundColor: 'var(--theme-elevation-0)',
+              border: '1px solid var(--theme-elevation-200)',
+              borderRadius: '8px',
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+              zIndex: 1000,
+              width: '280px',
+            }}
+          >
             <HexColorPicker
               color={hexValue}
               onChange={handleHexChange}
-              style={{ width: '100%', height: '220px' }}
+              style={{ width: '100%', height: '160px' }}
             />
-            <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+
+            <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
               <HexColorInput
                 color={hexValue}
                 onChange={handleHexChange}
@@ -218,43 +246,44 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
                 placeholder="#000000"
                 style={{
                   flex: 1,
-                  padding: '10px',
-                  borderRadius: '6px',
+                  padding: '8px',
+                  borderRadius: '4px',
                   border: '1px solid var(--theme-elevation-150)',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontFamily: 'monospace',
                 }}
               />
               <button
                 type="button"
-                onClick={() => closeModal(drawerSlug)}
+                onClick={() => setShowPicker(false)}
                 style={{
-                  padding: '10px 20px',
-                  borderRadius: '6px',
+                  padding: '8px 14px',
+                  borderRadius: '4px',
                   border: 'none',
                   backgroundColor: 'var(--theme-elevation-500)',
                   color: 'var(--theme-elevation-0)',
                   cursor: 'pointer',
+                  fontSize: '12px',
                   fontWeight: 600,
                 }}
               >
-                Done
+                OK
               </button>
             </div>
 
             {/* Quick Color Swatches */}
-            <div style={{ marginTop: '16px' }}>
+            <div style={{ marginTop: '12px' }}>
               <div
                 style={{
-                  fontSize: '12px',
+                  fontSize: '11px',
                   fontWeight: 600,
-                  marginBottom: '8px',
+                  marginBottom: '6px',
                   color: 'var(--theme-elevation-500)',
                 }}
               >
-                Quick Colors
+                Rychlé barvy
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '6px' }}>
                 {[
                   '#ef4444',
                   '#f97316',
@@ -275,7 +304,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
                     onClick={() => handleHexChange(color)}
                     style={{
                       width: '100%',
-                      height: '32px',
+                      height: '28px',
                       borderRadius: '4px',
                       border:
                         hexValue.toLowerCase() === color.toLowerCase()
@@ -290,7 +319,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
               </div>
             </div>
           </div>
-        </Drawer>
+        )}
 
         <div className="color-preview" style={{ backgroundColor: hexValue }}>
           <span className="preview-label">{localValue || 'Not set'}</span>

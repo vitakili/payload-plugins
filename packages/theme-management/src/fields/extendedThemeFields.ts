@@ -14,7 +14,7 @@ import { allExtendedThemePresets } from '../extended-presets.js'
 const extendedThemeOptions = Object.values(allExtendedThemePresets).map((preset) => {
   const primaryColor = preset.styles.light.primary
   const bgColor = preset.styles.light.background
-  
+
   return {
     label: preset.label,
     value: preset.value,
@@ -212,36 +212,26 @@ export const shadowFields: Field[] = [
     { en: 'Shadow Color', cs: 'Barva stínu' },
     { en: 'Base shadow color', cs: 'Základní barva stínu' },
   ),
-  createTextField(
-    'shadowOpacity',
-    { en: 'Shadow Opacity', cs: 'Průhlednost stínu' },
-    '0.18',
-    { en: 'Shadow opacity (0-1)', cs: 'Průhlednost stínu (0-1)' },
-  ),
-  createTextField(
-    'shadowBlur',
-    { en: 'Shadow Blur', cs: 'Rozmazání stínu' },
-    '2px',
-    { en: 'Blur radius', cs: 'Poloměr rozmazání' },
-  ),
-  createTextField(
-    'shadowSpread',
-    { en: 'Shadow Spread', cs: 'Rozprostření stínu' },
-    '0px',
-    { en: 'Spread radius', cs: 'Poloměr rozprostření' },
-  ),
-  createTextField(
-    'shadowOffsetX',
-    { en: 'Shadow Offset X', cs: 'Posun stínu X' },
-    '0px',
-    { en: 'Horizontal offset', cs: 'Horizontální posun' },
-  ),
-  createTextField(
-    'shadowOffsetY',
-    { en: 'Shadow Offset Y', cs: 'Posun stínu Y' },
-    '1px',
-    { en: 'Vertical offset', cs: 'Vertikální posun' },
-  ),
+  createTextField('shadowOpacity', { en: 'Shadow Opacity', cs: 'Průhlednost stínu' }, '0.18', {
+    en: 'Shadow opacity (0-1)',
+    cs: 'Průhlednost stínu (0-1)',
+  }),
+  createTextField('shadowBlur', { en: 'Shadow Blur', cs: 'Rozmazání stínu' }, '2px', {
+    en: 'Blur radius',
+    cs: 'Poloměr rozmazání',
+  }),
+  createTextField('shadowSpread', { en: 'Shadow Spread', cs: 'Rozprostření stínu' }, '0px', {
+    en: 'Spread radius',
+    cs: 'Poloměr rozprostření',
+  }),
+  createTextField('shadowOffsetX', { en: 'Shadow Offset X', cs: 'Posun stínu X' }, '0px', {
+    en: 'Horizontal offset',
+    cs: 'Horizontální posun',
+  }),
+  createTextField('shadowOffsetY', { en: 'Shadow Offset Y', cs: 'Posun stínu Y' }, '1px', {
+    en: 'Vertical offset',
+    cs: 'Vertikální posun',
+  }),
 ]
 
 /**
@@ -255,12 +245,10 @@ export const fontFamilyFields: Field[] = [
     'Inter, system-ui, sans-serif',
     { en: 'Primary sans-serif font stack', cs: 'Primární bezpatkové písmo' },
   ),
-  createTextField(
-    'fontSerif',
-    { en: 'Serif Font', cs: 'Patkové písmo' },
-    'Georgia, serif',
-    { en: 'Serif font stack', cs: 'Patkové písmo' },
-  ),
+  createTextField('fontSerif', { en: 'Serif Font', cs: 'Patkové písmo' }, 'Georgia, serif', {
+    en: 'Serif font stack',
+    cs: 'Patkové písmo',
+  }),
   createTextField(
     'fontMono',
     { en: 'Monospace Font', cs: 'Monospace písmo' },
@@ -273,30 +261,24 @@ export const fontFamilyFields: Field[] = [
  * Advanced Typography (2 properties)
  */
 export const advancedTypographyFields: Field[] = [
-  createTextField(
-    'letterSpacing',
-    { en: 'Letter Spacing', cs: 'Rozestup písmen' },
-    '0em',
-    { en: 'Global letter spacing', cs: 'Globální rozestup písmen' },
-  ),
-  createTextField(
-    'spacing',
-    { en: 'Spacing Scale', cs: 'Škála rozestupů' },
-    '0.25rem',
-    { en: 'Base spacing unit', cs: 'Základní jednotka rozestupu' },
-  ),
+  createTextField('letterSpacing', { en: 'Letter Spacing', cs: 'Rozestup písmen' }, '0em', {
+    en: 'Global letter spacing',
+    cs: 'Globální rozestup písmen',
+  }),
+  createTextField('spacing', { en: 'Spacing Scale', cs: 'Škála rozestupů' }, '0.25rem', {
+    en: 'Base spacing unit',
+    cs: 'Základní jednotka rozestupu',
+  }),
 ]
 
 /**
  * Border Radius Configuration
  */
 export const designSystemFields: Field[] = [
-  createTextField(
-    'radius',
-    { en: 'Border Radius', cs: 'Zaoblení rohů' },
-    '0.5rem',
-    { en: 'Default border radius', cs: 'Výchozí zaoblení rohů' },
-  ),
+  createTextField('radius', { en: 'Border Radius', cs: 'Zaoblení rohů' }, '0.5rem', {
+    en: 'Default border radius',
+    cs: 'Výchozí zaoblení rohů',
+  }),
 ]
 
 /**
@@ -315,6 +297,9 @@ export const extendedThemeSelectionField: Field = {
     description: {
       en: 'Select a professional theme with full OKLCH color support (TweakCN compatible)',
       cs: 'Vyberte profesionální téma s plnou podporou OKLCH barev (kompatibilní s TweakCN)',
+    },
+    components: {
+      Field: '@/fields/ThemePresetSelectField#default',
     },
   },
 }
