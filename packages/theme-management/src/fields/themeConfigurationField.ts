@@ -8,12 +8,12 @@ import {
 import type { ThemePreset } from '../index.js'
 import { darkModeField, lightModeField } from './colorModeFields.js'
 import {
+  darkModeColorsField,
+  designSystemConfigField,
   extendedThemeSelectionField,
   lightModeColorsField,
-  darkModeColorsField,
   shadowConfigField,
   typographyConfigField,
-  designSystemConfigField,
 } from './extendedThemeFields.js'
 
 interface ThemeConfigurationFieldOptions {
@@ -29,9 +29,7 @@ interface ThemeConfigurationFieldOptions {
  * Theme Configuration Tab Configuration
  * Returns tab config that can be injected into existing tabs field
  */
-export function createThemeConfigurationField(
-  options: ThemeConfigurationFieldOptions,
-): {
+export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): {
   name: string
   label: { en: string; cs: string }
   description: { en: string; cs: string }
@@ -195,199 +193,205 @@ export function createThemeConfigurationField(
         },
       },
       fields: [
-      {
-        name: 'typography',
-        type: 'group',
-        fields: [
-          {
-            type: 'row',
-            fields: [
-              {
-                name: 'bodyFont',
-                type: 'select',
-                label: {
-                  en: 'Body font',
-                  cs: 'Písmo pro text',
-                },
-                defaultValue: 'preset',
-                options: BODY_FONT_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
-                admin: {
-                  width: '50%',
-                },
-              },
-              {
-                name: 'headingFont',
-                type: 'select',
-                label: {
-                  en: 'Heading font',
-                  cs: 'Písmo pro nadpisy',
-                },
-                defaultValue: 'preset',
-                options: HEADING_FONT_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
-                admin: {
-                  width: '50%',
-                },
-              },
-            ],
-          },
-          {
-            type: 'row',
-            fields: [
-              {
-                name: 'bodyFontCustom',
-                type: 'text',
-                label: {
-                  en: 'Custom body font stack',
-                  cs: 'Vlastní písmo pro text',
-                },
-                admin: {
-                  width: '50%',
-                  placeholder: '"IBM Plex Sans", sans-serif',
-                  description: {
-                    en: 'Provide full CSS font-family stack when using a custom font.',
-                    cs: 'Při volbě vlastního písma zadejte celý CSS zápis font-family.',
+        {
+          name: 'typography',
+          type: 'group',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'bodyFont',
+                  type: 'select',
+                  label: {
+                    en: 'Body font',
+                    cs: 'Písmo pro text',
                   },
-                  condition: (_, siblingData) => siblingData?.bodyFont === 'custom',
-                },
-              },
-              {
-                name: 'headingFontCustom',
-                type: 'text',
-                label: {
-                  en: 'Custom heading font stack',
-                  cs: 'Vlastní písmo pro nadpisy',
-                },
-                admin: {
-                  width: '50%',
-                  placeholder: '"Cormorant Garamond", serif',
-                  description: {
-                    en: 'Provide full CSS font-family stack when using a custom heading font.',
-                    cs: 'Při volbě vlastního nadpisového písma zadejte celý CSS zápis font-family.',
+                  defaultValue: 'preset',
+                  options: BODY_FONT_OPTIONS.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  })),
+                  admin: {
+                    width: '50%',
+                    components: {
+                      Field: '@/fields/FontSelectField#default',
+                    },
                   },
-                  condition: (_, siblingData) => siblingData?.headingFont === 'custom',
                 },
-              },
-            ],
-          },
-          {
-            type: 'row',
-            fields: [
-              {
-                name: 'baseFontSize',
-                type: 'select',
-                label: {
-                  en: 'Base font size',
-                  cs: 'Základní velikost písma',
+                {
+                  name: 'headingFont',
+                  type: 'select',
+                  label: {
+                    en: 'Heading font',
+                    cs: 'Písmo pro nadpisy',
+                  },
+                  defaultValue: 'preset',
+                  options: HEADING_FONT_OPTIONS.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  })),
+                  admin: {
+                    width: '50%',
+                    components: {
+                      Field: '@/fields/FontSelectField#default',
+                    },
+                  },
                 },
-                defaultValue: 'preset',
-                options: BASE_FONT_SIZE_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
-                admin: {
-                  width: '50%',
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'bodyFontCustom',
+                  type: 'text',
+                  label: {
+                    en: 'Custom body font stack',
+                    cs: 'Vlastní písmo pro text',
+                  },
+                  admin: {
+                    width: '50%',
+                    placeholder: '"IBM Plex Sans", sans-serif',
+                    description: {
+                      en: 'Provide full CSS font-family stack when using a custom font.',
+                      cs: 'Při volbě vlastního písma zadejte celý CSS zápis font-family.',
+                    },
+                    condition: (_, siblingData) => siblingData?.bodyFont === 'custom',
+                  },
                 },
-              },
-              {
-                name: 'lineHeight',
-                type: 'select',
-                label: {
-                  en: 'Line height',
-                  cs: 'Řádkování',
+                {
+                  name: 'headingFontCustom',
+                  type: 'text',
+                  label: {
+                    en: 'Custom heading font stack',
+                    cs: 'Vlastní písmo pro nadpisy',
+                  },
+                  admin: {
+                    width: '50%',
+                    placeholder: '"Cormorant Garamond", serif',
+                    description: {
+                      en: 'Provide full CSS font-family stack when using a custom heading font.',
+                      cs: 'Při volbě vlastního nadpisového písma zadejte celý CSS zápis font-family.',
+                    },
+                    condition: (_, siblingData) => siblingData?.headingFont === 'custom',
+                  },
                 },
-                defaultValue: 'preset',
-                options: LINE_HEIGHT_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
-                admin: {
-                  width: '50%',
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'baseFontSize',
+                  type: 'select',
+                  label: {
+                    en: 'Base font size',
+                    cs: 'Základní velikost písma',
+                  },
+                  defaultValue: 'preset',
+                  options: BASE_FONT_SIZE_OPTIONS.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  })),
+                  admin: {
+                    width: '50%',
+                  },
                 },
-              },
-            ],
-          },
-        ],
-      },
-    ],
+                {
+                  name: 'lineHeight',
+                  type: 'select',
+                  label: {
+                    en: 'Line height',
+                    cs: 'Řádkování',
+                  },
+                  defaultValue: 'preset',
+                  options: LINE_HEIGHT_OPTIONS.map((option) => ({
+                    label: option.label,
+                    value: option.value,
+                  })),
+                  admin: {
+                    width: '50%',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
     })
   }
 
   // Design Customization (only when NOT using extended theme configuration)
   if (!enableAdvancedFeatures) {
     fields.push({
-    type: 'collapsible',
-    label: {
-      en: '✨ Design Customization',
-      cs: '✨ Přizpůsobení designu',
-    },
-    admin: {
-      initCollapsed: true,
-    },
-    fields: [
-      {
-        name: 'borderRadius',
-        type: 'select',
-        label: {
-          en: 'Border Radius',
-          cs: 'Zaoblení rohů',
-        },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
-          { label: { en: 'Small', cs: 'Malé' }, value: 'small' },
-          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'Large', cs: 'Velké' }, value: 'large' },
-          { label: { en: 'Full', cs: 'Plné' }, value: 'xl' },
-        ],
-        admin: {
-          components: {
-            Field: '@kilivi/payloadcms-theme-management/fields/RadiusField',
+      type: 'collapsible',
+      label: {
+        en: '✨ Design Customization',
+        cs: '✨ Přizpůsobení designu',
+      },
+      admin: {
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: 'borderRadius',
+          type: 'select',
+          label: {
+            en: 'Border Radius',
+            cs: 'Zaoblení rohů',
           },
-          width: '33%',
+          defaultValue: 'medium',
+          options: [
+            { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
+            { label: { en: 'Small', cs: 'Malé' }, value: 'small' },
+            { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+            { label: { en: 'Large', cs: 'Velké' }, value: 'large' },
+            { label: { en: 'Full', cs: 'Plné' }, value: 'xl' },
+          ],
+          admin: {
+            components: {
+              Field: '@kilivi/payloadcms-theme-management/fields/RadiusField',
+            },
+            width: '33%',
+          },
         },
-      },
-      {
-        name: 'fontScale',
-        type: 'select',
-        label: {
-          en: 'Font Scale',
-          cs: 'Velikost písma',
+        {
+          name: 'fontScale',
+          type: 'select',
+          label: {
+            en: 'Font Scale',
+            cs: 'Velikost písma',
+          },
+          defaultValue: 'medium',
+          options: [
+            { label: { en: 'Small', cs: 'Malé' }, value: 'small' },
+            { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+            { label: { en: 'Large', cs: 'Velké' }, value: 'large' },
+          ],
+          admin: {
+            width: '33%',
+          },
         },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'Small', cs: 'Malé' }, value: 'small' },
-          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'Large', cs: 'Velké' }, value: 'large' },
-        ],
-        admin: {
-          width: '33%',
+        {
+          name: 'spacing',
+          type: 'select',
+          label: {
+            en: 'Spacing',
+            cs: 'Mezery',
+          },
+          defaultValue: 'medium',
+          options: [
+            { label: { en: 'Compact', cs: 'Kompaktní' }, value: 'compact' },
+            { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+            { label: { en: 'Spacious', cs: 'Prostorné' }, value: 'spacious' },
+          ],
+          admin: {
+            width: '34%',
+          },
         },
-      },
-      {
-        name: 'spacing',
-        type: 'select',
-        label: {
-          en: 'Spacing',
-          cs: 'Mezery',
-        },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'Compact', cs: 'Kompaktní' }, value: 'compact' },
-          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'Spacious', cs: 'Prostorné' }, value: 'spacious' },
-        ],
-        admin: {
-          width: '34%',
-        },
-      },
-    ],
-  })
+      ],
+    })
   } // End of !enableAdvancedFeatures block
 
   // Advanced Settings (when using extended theme configuration)
