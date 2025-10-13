@@ -5,86 +5,26 @@ import type { ThemePreset } from './presets.js'
 import { defaultThemePresets } from './presets.js'
 import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } from './types.js'
 
-const THEME_TAB_NAME = 'themeConfiguration'
+const THEME_FIELD_NAME = 'themeConfiguration'
 
-interface TabConfig {
-  name: string
-  label: { en: string; cs: string }
-  description?: { en: string; cs: string }
-  fields: Field[]
-}
+const removeExistingThemeField = (fields: Field[] = []): Field[] =>
+  fields.filter((field) => {
+    const candidate = field as { name?: unknown }
+    return candidate?.name !== THEME_FIELD_NAME
+  })
 
-/**
- * Remove existing theme tab from tabs field
- */
-const removeExistingThemeTab = (tabs: TabConfig[]): TabConfig[] =>
-  tabs.filter((tab) => tab?.name !== THEME_TAB_NAME)
-
-/**
- * Add theme configuration tab to existing tabs field or create fields array
- */
-const upsertThemeTab = (
+const upsertThemeField = (
   fields: Field[] | undefined,
-  themeTabConfig: TabConfig,
+  themeField: Field,
   enableLogging: boolean,
 ): Field[] => {
-  const existingFields = fields ?? []
+  const sanitized = removeExistingThemeField(fields ?? [])
 
-  // Find existing tabs field
-  const tabsFieldIndex = existingFields.findIndex(
-    (field) => 'type' in field && field.type === 'tabs',
-  )
-
-  if (tabsFieldIndex === -1) {
-    // No tabs field exists - add theme configuration as group field instead
-    if (enableLogging) {
-      console.log(
-        '🎨 Theme Management Plugin: No tabs field found, adding theme configuration as group field',
-      )
-    }
-
-    return [
-      ...existingFields,
-      {
-        name: THEME_TAB_NAME,
-        type: 'group',
-        label: themeTabConfig.label,
-        admin: {
-          description: themeTabConfig.description,
-        },
-        fields: themeTabConfig.fields,
-      },
-    ]
-  }
-
-  // Tabs field exists - inject our tab into it
   if (enableLogging) {
-    console.log('🎨 Theme Management Plugin: Adding theme configuration tab to existing tabs')
+    console.log('🎨 Theme Management Plugin: injecting theme configuration field')
   }
 
-  const tabsField = existingFields[tabsFieldIndex]
-
-  if (!('tabs' in tabsField)) {
-    console.warn('🎨 Theme Management Plugin: Found tabs field but it has no tabs property')
-    return existingFields
-  }
-
-  const existingTabs = (tabsField.tabs as TabConfig[]) || []
-
-  // Remove existing theme tab if present
-  const sanitizedTabs = removeExistingThemeTab(existingTabs)
-
-  // Create new tabs field with our tab added
-  const updatedTabsField = {
-    ...tabsField,
-    tabs: [...sanitizedTabs, themeTabConfig],
-  }
-
-  // Return fields array with updated tabs field
-  const newFields = [...existingFields]
-  newFields[tabsFieldIndex] = updatedTabsField
-
-  return newFields
+  return [...sanitized, themeField]
 }
 
 const ensureCollectionsArray = (collections: Config['collections']): CollectionConfig[] =>
@@ -111,7 +51,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
-    const themeTabConfig = createThemeConfigurationField({
+    const themeField = createThemeConfigurationField({
       themePresets,
       defaultTheme,
       includeColorModeToggle,
@@ -135,7 +75,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
       const existingFields = Array.isArray(collection.fields) ? collection.fields : []
 
-      const fields = upsertThemeTab(existingFields, themeTabConfig, enableLogging)
+      const fields = upsertThemeField(existingFields, themeField, enableLogging)
 
       return {
         ...collection,
@@ -152,31 +92,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
-    // Add custom admin view for theme preview
-    // Uses ThemePreviewLoader to avoid CSS import issues during generate:importmap
-    const admin = {
-      ...config.admin,
-      components: {
-        ...config.admin?.components,
-        views: {
-          ...config.admin?.components?.views,
-          themePreview: {
-            Component: '@kilivi/payloadcms-theme-management/views/ThemePreviewView#default',
-            path: '/theme-preview' as `/${string}`,
-            exact: true,
-            meta: {
-              title: 'Theme Preview',
-              description: 'Real-time preview of your theme configuration',
-            },
-          },
-        },
-      },
-    }
-
     return {
       ...config,
       collections,
-      admin,
     }
   }
 }

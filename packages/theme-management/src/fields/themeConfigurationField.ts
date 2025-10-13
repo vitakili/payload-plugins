@@ -7,14 +7,6 @@ import {
 } from '../constants/themeFonts.js'
 import type { ThemePreset } from '../index.js'
 import { darkModeField, lightModeField } from './colorModeFields.js'
-import {
-  darkModeColorsField,
-  designSystemConfigField,
-  extendedThemeSelectionField,
-  lightModeColorsField,
-  shadowConfigField,
-  typographyConfigField,
-} from './extendedThemeFields.js'
 
 interface ThemeConfigurationFieldOptions {
   themePresets: ThemePreset[]
@@ -26,15 +18,10 @@ interface ThemeConfigurationFieldOptions {
 }
 
 /**
- * Theme Configuration Tab Configuration
- * Returns tab config that can be injected into existing tabs field
+ * Theme Configuration Field with Theme Selection as default value setter
+ * Theme Selection populates lightMode/darkMode colors automatically
  */
-export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): {
-  name: string
-  label: { en: string; cs: string }
-  description: { en: string; cs: string }
-  fields: Field[]
-} {
+export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): Field {
   const {
     themePresets,
     defaultTheme,
@@ -73,36 +60,10 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
       },
     },
-    extendedThemeSelectionField,
   ]
 
-  // Extended Theme Configuration (OKLCH colors, shadcn/ui compatible)
-  if (enableAdvancedFeatures) {
-    fields.push({
-      type: 'collapsible',
-      label: {
-        en: '🎨 Extended Theme Configuration',
-        cs: '🎨 Rozšířená konfigurace tématu',
-      },
-      admin: {
-        initCollapsed: true,
-        description: {
-          en: 'Professional theme system with TweakCN compatibility. Full OKLCH color support, shadows, typography, and more.',
-          cs: 'Profesionální systém témat s kompatibilitou TweakCN. Plná podpora OKLCH barev, stíny, typografie a další.',
-        },
-      },
-      fields: [
-        lightModeColorsField,
-        darkModeColorsField,
-        shadowConfigField,
-        typographyConfigField,
-        designSystemConfigField,
-      ],
-    })
-  }
-
-  // Color Mode Settings (only when NOT using extended theme configuration)
-  if (includeColorModeToggle && !enableAdvancedFeatures) {
+  // Color Mode Settings
+  if (includeColorModeToggle) {
     fields.push({
       type: 'collapsible',
       label: {
@@ -452,16 +413,19 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   }
 
   // Return just the tab configuration, not the full tabs field
-  // The plugin will inject this into existing tabs or create a group field
+  // Return as group field with all theme configuration
   return {
     name: 'themeConfiguration',
+    type: 'group',
     label: {
       en: '🎨 Appearance Settings',
       cs: '🎨 Nastavení vzhledu',
     },
-    description: {
-      en: 'Configure website appearance and styling',
-      cs: 'Nakonfigurujte vzhled a stylování webu',
+    admin: {
+      description: {
+        en: 'Configure website appearance and styling',
+        cs: 'Nakonfigurujte vzhled a stylování webu',
+      },
     },
     fields,
   }
