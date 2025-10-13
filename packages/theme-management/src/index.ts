@@ -153,6 +153,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     }
 
     // Add custom admin view for theme preview
+    // Uses ThemePreviewLoader to avoid CSS import issues during generate:importmap
     const admin = {
       ...config.admin,
       components: {

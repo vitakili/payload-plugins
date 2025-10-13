@@ -1,11 +1,14 @@
 /**
  * Theme Preview View - Server Component
  * Custom admin view for live theme preview
+ *
+ * Uses ThemePreviewLoader which dynamically imports client components
+ * This prevents CSS imports from breaking generate:importmap
  */
 
 import { Gutter } from '@payloadcms/ui'
 import React from 'react'
-import { ThemeLivePreviewClient } from './ThemePreviewViewClient.js'
+import { ThemePreviewLoader } from './ThemePreviewLoader.js'
 
 export default async function ThemePreviewView() {
   return (
@@ -18,7 +21,7 @@ export default async function ThemePreviewView() {
             edit theme settings.
           </p>
         </div>
-        <ThemeLivePreviewClient />
+        <ThemePreviewLoader />
       </Gutter>
     </div>
   )
