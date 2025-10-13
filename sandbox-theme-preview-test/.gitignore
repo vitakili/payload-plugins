@@ -1,0 +1,109 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+
+
+# dependencies# dependencies
+
+/node_modules/node_modules
+
+/.pnp/.pnp
+
+.pnp.js.pnp.js
+
+.yarn/install-state.gz.yarn/install-state.gz
+
+
+
+/.idea/*/.idea/*
+
+!/.idea/runConfigurations!/.idea/runConfigurations
+
+
+
+# testing# testing
+
+/coverage/coverage
+
+
+
+# next.js# next.js
+
+/.next//.next/
+
+/out//out/
+
+
+
+# production# production
+
+/build/build
+
+
+
+# misc# misc
+
+.DS_Store.DS_Store
+
+*.pem*.pem
+
+
+
+# debug# debug
+
+npm-debug.log*npm-debug.log*
+
+yarn-debug.log*yarn-debug.log*
+
+yarn-error.log*yarn-error.log*
+
+
+
+# local env files# local env files
+
+.env*.local.env*.local
+
+
+
+# vercel# vercel
+
+.vercel.vercel
+
+
+
+# typescript# typescript
+
+*.tsbuildinfo*.tsbuildinfo
+
+next-env.d.tsnext-env.d.ts
+
+
+
+.env.env
+
+
+
+/media/media
+
+
+
+# Playwright# Playwright
+
+node_modules/node_modules/
+
+/test-results//test-results/
+
+/playwright-report//playwright-report/
+
+/blob-report//blob-report/
+
+/playwright/.cache//playwright/.cache/
+
+
+# Payload CMS
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# VS Code
+.vscode/

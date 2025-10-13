@@ -1,0 +1,27 @@
+{
+  "version": 3,
+  "caseSensitive": false,
+  "basePath": "",
+  "rewrites": { "beforeFiles": [], "afterFiles": [], "fallback": [] },
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "permanent": true,
+      "internal": true,
+      "regex": "^(?:\\/((?:[^\\/]+?)(?:\\/(?:[^\\/]+?))*))\\/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        { "key": "Accept-CH", "value": "Sec-CH-Prefers-Color-Scheme" },
+        { "key": "Vary", "value": "Sec-CH-Prefers-Color-Scheme" },
+        { "key": "Critical-CH", "value": "Sec-CH-Prefers-Color-Scheme" },
+        { "key": "X-Powered-By", "value": "Next.js, Payload" }
+      ],
+      "regex": "^(?:\\/((?:[^\\/]+?)(?:\\/(?:[^\\/]+?))*))?(?:\\/)?$"
+    }
+  ]
+}

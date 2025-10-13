@@ -11,9 +11,11 @@ import React from 'react'
 import { ThemePreviewLoader } from './ThemePreviewLoader.js'
 
 export default async function ThemePreviewView() {
+  const AdminGutter = Gutter as unknown as React.ComponentType<React.PropsWithChildren<unknown>>
+
   return (
     <div className="payload-admin-view">
-      <Gutter>
+      <AdminGutter>
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ marginBottom: '0.5rem' }}>🎨 Theme Preview</h1>
           <p style={{ color: 'var(--theme-elevation-500)', margin: 0 }}>
@@ -22,7 +24,7 @@ export default async function ThemePreviewView() {
           </p>
         </div>
         <ThemePreviewLoader />
-      </Gutter>
+      </AdminGutter>
     </div>
   )
 }

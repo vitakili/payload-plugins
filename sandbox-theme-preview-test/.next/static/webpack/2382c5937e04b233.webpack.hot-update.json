@@ -1,0 +1,27 @@
+{
+  "c": ["webpack"],
+  "r": ["app/(frontend)/layout", "app/(frontend)/page"],
+  "m": [
+    null,
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5CVITA%5C%5CNextjs%5C%5Cpayload-plugins%5C%5Csandbox-theme-preview-test%5C%5Csrc%5C%5Capp%5C%5C(frontend)%5C%5Cstyles.css%22%2C%22ids%22%3A%5B%5D%7D&server=false!",
+    "(app-pages-browser)/./src/app/(frontend)/styles.css",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5CVITA%5C%5CNextjs%5C%5Cpayload-plugins%5C%5Cnode_modules%5C%5C.pnpm%5C%5Cnext%4015.4.4_%40babel%2Bcore%407.28.4_%40playwright%2Btest%401.54.1_react-dom%4019.1.0_react%4019.1.0__react%4019.1.0_sass%401.77.4%5C%5Cnode_modules%5C%5Cnext%5C%5Cdist%5C%5Cclient%5C%5Cimage-component.js%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5CVITA%5C%5CNextjs%5C%5Cpayload-plugins%5C%5Cpackages%5C%5Ctheme-management%5C%5Cdist%5C%5Cproviders%5C%5CTheme%5C%5Cindex.js%22%2C%22ids%22%3A%5B%22ThemeProvider%22%5D%7D&server=false!",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/client/image-component.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/client/use-merged-ref.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/compiled/picomatch/index.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/amp-context.shared-runtime.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/amp-mode.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/get-img-props.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/head.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/image-blur-svg.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/image-config-context.shared-runtime.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/image-config.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/image-loader.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/match-local-pattern.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/match-remote-pattern.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/router-context.shared-runtime.js",
+    "(app-pages-browser)/../node_modules/.pnpm/next@15.4.4_@babel+core@7.28.4_@playwright+test@1.54.1_react-dom@19.1.0_react@19.1.0__react@19.1.0_sass@1.77.4/node_modules/next/dist/shared/lib/side-effect.js",
+    "(app-pages-browser)/../packages/theme-management/dist/providers/Theme/index.js",
+    "(app-pages-browser)/../packages/theme-management/dist/providers/Theme/shared.js"
+  ]
+}
