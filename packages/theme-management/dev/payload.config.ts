@@ -1,11 +1,9 @@
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { slateEditor } from '@payloadcms/richtext-slate'
-import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
-import { fileURLToPath } from 'url'
-
 import { themeManagementPlugin } from '../src/index.js'
 
 const filename = fileURLToPath(import.meta.url)
@@ -44,7 +42,6 @@ const buildConfigWithMemoryDB = async () => {
     db: mongooseAdapter({
       url: process.env.DATABASE_URI || 'mongodb://127.0.0.1/test-theme-plugin',
     }),
-    editor: slateEditor({}),
     plugins: [
       themeManagementPlugin({
         targetCollection: 'pages',
