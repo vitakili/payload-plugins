@@ -300,7 +300,7 @@ export const extendedThemeSelectionField: Field = {
       cs: 'Vyberte profesionální téma s plnou podporou OKLCH barev (kompatibilní s TweakCN). Všechny barvy budou automaticky vyplněny.',
     },
     components: {
-      Field: '@/fields/ExtendedThemeAutoPopulateField#default',
+      Field: '@kilivi/payloadcms-theme-management/fields/ExtendedThemeAutoPopulateField',
     },
   },
 }
