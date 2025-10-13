@@ -282,7 +282,8 @@ export const designSystemFields: Field[] = [
 ]
 
 /**
- * Extended Theme Selection Field with Visual Preview
+ * Extended Theme Selection Field with Visual Preview and Auto-Population
+ * Automatically fills all color fields when a theme is selected
  */
 export const extendedThemeSelectionField: Field = {
   name: 'extendedTheme',
@@ -295,11 +296,11 @@ export const extendedThemeSelectionField: Field = {
   options: extendedThemeOptions,
   admin: {
     description: {
-      en: 'Select a professional theme with full OKLCH color support (TweakCN compatible)',
-      cs: 'Vyberte profesionální téma s plnou podporou OKLCH barev (kompatibilní s TweakCN)',
+      en: 'Select a professional theme with full OKLCH color support (TweakCN compatible). All colors will be auto-populated.',
+      cs: 'Vyberte profesionální téma s plnou podporou OKLCH barev (kompatibilní s TweakCN). Všechny barvy budou automaticky vyplněny.',
     },
     components: {
-      Field: '@/fields/ThemePresetSelectField#default',
+      Field: '@/fields/ExtendedThemeAutoPopulateField#default',
     },
   },
 }

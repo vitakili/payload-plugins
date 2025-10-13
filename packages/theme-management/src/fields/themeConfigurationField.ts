@@ -208,10 +208,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                     cs: 'Písmo pro text',
                   },
                   defaultValue: 'preset',
-                  options: BODY_FONT_OPTIONS.map((option) => ({
-                    label: option.label,
-                    value: option.value,
-                  })),
+                  // @ts-expect-error - Pass full objects including fontFamily for custom rendering
+                  options: BODY_FONT_OPTIONS,
                   admin: {
                     width: '50%',
                     components: {
@@ -227,10 +225,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                     cs: 'Písmo pro nadpisy',
                   },
                   defaultValue: 'preset',
-                  options: HEADING_FONT_OPTIONS.map((option) => ({
-                    label: option.label,
-                    value: option.value,
-                  })),
+                  // @ts-expect-error - Pass full objects including fontFamily for custom rendering
+                  options: HEADING_FONT_OPTIONS,
                   admin: {
                     width: '50%',
                     components: {

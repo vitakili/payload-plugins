@@ -3,10 +3,7 @@ import { createThemeConfigurationField } from './fields/themeConfigurationField.
 import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
 import { defaultThemePresets } from './presets.js'
-import type {
-  FetchThemeConfigurationOptions,
-  ThemeManagementPluginOptions,
-} from './types.js'
+import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } from './types.js'
 
 const THEME_TAB_NAME = 'themeConfiguration'
 
@@ -62,13 +59,11 @@ const upsertThemeTab = (
 
   // Tabs field exists - inject our tab into it
   if (enableLogging) {
-    console.log(
-      '🎨 Theme Management Plugin: Adding theme configuration tab to existing tabs',
-    )
+    console.log('🎨 Theme Management Plugin: Adding theme configuration tab to existing tabs')
   }
 
   const tabsField = existingFields[tabsFieldIndex]
-  
+
   if (!('tabs' in tabsField)) {
     console.warn('🎨 Theme Management Plugin: Found tabs field but it has no tabs property')
     return existingFields
@@ -111,7 +106,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
     if (!enabled) {
       if (enableLogging) {
-  console.log('🎨 Theme Management Plugin: disabled via options, skipping.')
+        console.log('🎨 Theme Management Plugin: disabled via options, skipping.')
       }
       return config
     }
@@ -135,9 +130,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       collectionTouched = true
 
       if (enableLogging) {
-        console.log(
-          `🎨 Theme Management Plugin: enhancing collection "${collection.slug}"`,
-        )
+        console.log(`🎨 Theme Management Plugin: enhancing collection "${collection.slug}"`)
       }
 
       const existingFields = Array.isArray(collection.fields) ? collection.fields : []
@@ -192,10 +185,7 @@ type FetchOptionsInput = string | FetchThemeConfigurationOptions
 export const fetchThemeConfiguration = async (
   options?: FetchOptionsInput,
 ): Promise<SiteThemeConfiguration | null> => {
-  const normalizedOptions =
-    typeof options === 'string'
-      ? { tenantSlug: options }
-      : options ?? {}
+  const normalizedOptions = typeof options === 'string' ? { tenantSlug: options } : (options ?? {})
 
   const {
     tenantSlug,
@@ -247,11 +237,9 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
   return defaultThemePresets
 }
 
-
-
 export { defaultThemePresets } from './presets.js'
 export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
-export { 
+export {
   extendedThemePresets,
   allExtendedThemePresets,
   extendedThemeToCSSVariables,
@@ -277,6 +265,15 @@ export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
 export { ThemeProvider } from './providers/Theme/index.js'
+
+// Font loading utilities for Next.js integration
+export {
+  getFontLoaderCode,
+  getThemeFontFamilies,
+  ThemeFontProvider,
+  useThemeFonts,
+  FONT_IMPORT_MAP,
+} from './providers/font-loader.js'
 
 // Components
 export { ThemeLivePreview } from './fields/ThemeLivePreview.js'
