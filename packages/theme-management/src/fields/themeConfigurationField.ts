@@ -213,7 +213,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   admin: {
                     width: '50%',
                     components: {
-                      Field: '@/fields/FontSelectField#default',
+                      Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                     },
                   },
                 },
@@ -230,7 +230,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   admin: {
                     width: '50%',
                     components: {
-                      Field: '@/fields/FontSelectField#default',
+                      Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                     },
                   },
                 },
