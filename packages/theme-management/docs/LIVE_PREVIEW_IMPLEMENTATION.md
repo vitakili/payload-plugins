@@ -3,6 +3,7 @@
 ## ✅ Completed Implementation
 
 ### What Was Done
+
 Successfully implemented **automatic Live Preview** for theme configuration in the Payload CMS admin panel - **zero configuration required** by end users!
 
 ---
@@ -24,19 +25,14 @@ The Live Preview is automatically added to the admin panel when the plugin is in
 ## 📁 New Files Created
 
 ### 1. `src/views/ThemePreviewView.tsx` (Server Component)
-```typescript
-'use server'
 
-import { DefaultTemplate } from '@payloadcms/next/templates'
+```typescript
+import type { AdminViewServerProps } from 'payload'
 import { Gutter } from '@payloadcms/ui'
 
-export default async function ThemePreviewView({
-  initPageResult,
-  params,
-  searchParams,
-}: AdminViewServerProps) {
+export default async function ThemePreviewView(_props: AdminViewServerProps) {
   return (
-    <DefaultTemplate {...props}>
+    <div className="payload-admin-view">
       <Gutter>
         <h1>Theme Preview</h1>
         <p>Real-time preview of your theme configuration...</p>
@@ -48,6 +44,7 @@ export default async function ThemePreviewView({
 ```
 
 ### 2. `src/views/ThemePreviewViewClient.tsx` (Client Component)
+
 ```typescript
 'use client'
 
@@ -57,6 +54,7 @@ export function ThemeLivePreviewClient() {
 ```
 
 ### 3. `src/fields/ThemeLivePreview.css` (Preview Styles)
+
 - Professional styling for preview container
 - Light/dark mode toggle buttons
 - Preview cards with hover effects
@@ -131,12 +129,14 @@ Added Live Preview documentation:
 The plugin automatically adds a **Live Preview** page to your admin panel at `/admin/theme-preview`.
 
 ### Features:
+
 - ✅ **Zero Configuration** - Works automatically when plugin is installed
 - ✅ **Real-time Updates** - See changes instantly as you edit theme settings
 - ✅ **Light/Dark Toggle** - Preview both modes side-by-side
 - ✅ **Component Showcase** - View cards, buttons, inputs, badges, and more
 
 ### How to Access:
+
 1. Install the plugin
 2. Navigate to `/admin/theme-preview` in your Payload admin panel
 3. Open theme settings in another tab and see changes update live!
@@ -147,17 +147,20 @@ The plugin automatically adds a **Live Preview** page to your admin panel at `/a
 ## 🎨 Live Preview Features
 
 ### Real-Time Updates
+
 - Uses `useFormFields` hook to watch `themeConfiguration` changes
 - Automatically applies CSS variables to preview content
 - No page refresh needed
 
 ### Light/Dark Mode Toggle
+
 ```tsx
 <button onClick={() => setPreviewMode('light')}>Light</button>
 <button onClick={() => setPreviewMode('dark')}>Dark</button>
 ```
 
 ### Component Showcase
+
 - **Header** - Title and description with theme colors
 - **Cards** - Primary and secondary card styles
 - **Buttons** - Primary, secondary, and destructive variants
@@ -170,6 +173,7 @@ The plugin automatically adds a **Live Preview** page to your admin panel at `/a
 ## 🚀 How It Works
 
 ### 1. Plugin Installation
+
 ```typescript
 plugins: [
   themeManagementPlugin({
@@ -180,12 +184,15 @@ plugins: [
 ```
 
 ### 2. Automatic View Registration
+
 Plugin automatically adds the custom view to `config.admin.components.views`
 
 ### 3. Access Live Preview
+
 Navigate to `/admin/theme-preview` in Payload admin panel
 
 ### 4. Real-Time Updates
+
 - Open theme settings in one tab: `/admin/globals/site-settings`
 - Open preview in another: `/admin/theme-preview`
 - Edit colors/fonts → see instant updates! ⚡
@@ -231,14 +238,17 @@ Navigate to `/admin/theme-preview` in Payload admin panel
 ## ✅ Verification
 
 ### Build Status
+
 ```bash
 Successfully compiled: 35 files with swc (36.44ms)
 ```
 
 ### No Configuration Required!
+
 Users don't need to add **any** code to their Payload config. The plugin handles everything:
 
 ❌ **NOT NEEDED:**
+
 ```typescript
 admin: {
   livePreview: {
@@ -248,6 +258,7 @@ admin: {
 ```
 
 ✅ **AUTOMATIC:**
+
 ```typescript
 plugins: [
   themeManagementPlugin({ enabled: true }), // That's it!
@@ -259,6 +270,7 @@ plugins: [
 ## 🎉 Summary
 
 ### Implemented Features:
+
 1. ✅ **Custom Admin View** - Registered automatically by plugin
 2. ✅ **Live Preview Component** - Real-time theme updates
 3. ✅ **Professional UI** - Modern, clean preview interface
@@ -269,6 +281,7 @@ plugins: [
 8. ✅ **Documented** - README updated with usage guide
 
 ### User Experience:
+
 1. Install plugin ✅
 2. Navigate to `/admin/theme-preview` ✅
 3. See real-time updates ✅
