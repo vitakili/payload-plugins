@@ -1,4 +1,5 @@
 export type ThemeDefaults =
+  // Original 8 themes
   | 'cool'
   | 'brutal'
   | 'neon'
@@ -6,7 +7,27 @@ export type ThemeDefaults =
   | 'dealership'
   | 'real-estate'
   | 'real-estate-gold'
-  | 'real-estate-neutral';
+  | 'real-estate-neutral'
+  // Extended 20 color themes
+  | 'cyberpunk'
+  | 'minimal'
+  | 'retro'
+  | 'pastel'
+  | 'ocean'
+  | 'forest'
+  | 'sunset'
+  | 'lavender'
+  | 'neutral'
+  | 'blue'
+  | 'green'
+  | 'red'
+  | 'orange'
+  | 'rose'
+  | 'violet'
+  | 'zinc'
+  | 'slate'
+  | 'stone'
+  | 'gray';
 
 export type Mode = 'dark' | 'light' | 'auto';
 
@@ -24,7 +45,8 @@ export interface ThemeConfig {
   name: string;
   label: string;
   borderRadius: BorderRadiusPreset;
-  cssFile: string;
+  cssFile?: string; // Optional - if not provided, CSS is generated dynamically
+  dynamicCSS?: boolean; // If true, CSS is generated from theme preset
   preview?: {
     colors: {
       primary: string;
