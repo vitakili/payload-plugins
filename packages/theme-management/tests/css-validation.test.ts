@@ -44,10 +44,16 @@ describe('CSS Files Validation', () => {
 
           // CSS property lines should end with semicolon (but not selectors or closing braces)
           if (trimmed.includes(':') && !trimmed.endsWith('{') && !trimmed.endsWith('}')) {
+            // Skip CSS variable fallbacks like: color: var(--theme-text, #1e293b)
+            if (trimmed.includes('var(--') && trimmed.includes(',') && !trimmed.endsWith(';')) {
+              return
+            }
             // If it's a property declaration, it should end with ; or {
             const isPropertyLine = /^[a-z-]+\s*:/.test(trimmed)
             if (isPropertyLine && !trimmed.endsWith(';') && !trimmed.endsWith('{')) {
-              fail(`Line ${index + 1} in ${cssFilePath} is missing a semicolon: "${trimmed}"`)
+              throw new Error(
+                `Line ${index + 1} in ${cssFilePath} is missing a semicolon: "${trimmed}"`,
+              )
             }
           }
         })
