@@ -1,9 +1,9 @@
 'use client'
 
+import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import type {
   ResolvedTypographyPreview,
   TypographySelection,
@@ -11,6 +11,7 @@ import type {
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
 import { allThemePresets } from '../index.js'
 import type { ThemeTypographyPreset } from '../presets.js'
+import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
 interface ColorModeColors {
@@ -436,8 +437,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const previewRadius = {
     card: borderRadiusCSS['--radius-large'] ?? '1rem',
     chip: borderRadiusCSS['--radius-default'] ?? '0.75rem',
-    pill:
-      borderRadiusCSS['--radius-xl'] ?? borderRadiusCSS['--radius-large'] ?? '999px',
+    pill: borderRadiusCSS['--radius-xl'] ?? borderRadiusCSS['--radius-large'] ?? '999px',
   }
 
   const fieldLabel =
@@ -474,12 +474,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             gap: '12px',
           }}
         >
-          <div
-            style={{
-              display: 'grid',
-              gap: '10px',
-            }}
-          >
+          <div className="theme-preset-list">
             {Object.entries(themePresets).map(([key, preset]) => {
               const isSelected = key === selectedTheme
               const swatches = highlightSwatches
@@ -491,60 +486,18 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                   key={key}
                   type="button"
                   onClick={() => handleThemeSelect(key)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: isSelected
-                      ? '2px solid var(--theme-elevation-500)'
-                      : '1px solid var(--theme-elevation-200)',
-                    backgroundColor: isSelected
-                      ? 'var(--theme-elevation-50)'
-                      : 'var(--theme-input-bg)',
-                    color: 'var(--theme-elevation-800)',
-                    cursor: 'pointer',
-                    transition: 'border-color 120ms ease, background-color 120ms ease',
-                    boxShadow: isSelected
-                      ? '0 4px 12px rgba(15, 23, 42, 0.08)'
-                      : '0 1px 3px rgba(15, 23, 42, 0.04)',
-                    gap: '16px',
-                  }}
+                  className={`theme-preset-button ${isSelected ? 'selected' : ''}`}
                 >
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      gap: '4px',
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, fontSize: '13px' }}>{preset.label}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--theme-elevation-500)' }}>
-                      {key}
-                    </span>
+                  <div className="theme-info">
+                    <span className="theme-label">{preset.label}</span>
+                    <span className="theme-name">{key}</span>
                   </div>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridAutoFlow: 'column',
-                      gap: '8px',
-                      alignItems: 'center',
-                    }}
-                    aria-hidden="true"
-                  >
+                  <div className="theme-swatches" aria-hidden="true">
                     {swatches.map((color, index) => (
                       <span
                         key={`${key}-swatch-${color}-${index}`}
-                        style={{
-                          width: '26px',
-                          height: '26px',
-                          borderRadius: '999px',
-                          border: '1px solid rgba(15, 23, 42, 0.12)',
-                          backgroundColor: color,
-                          boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.08)',
-                        }}
+                        className="color-swatch"
+                        style={{ backgroundColor: color }}
                       />
                     ))}
                   </div>

@@ -17,6 +17,7 @@ export default {
   transformIgnorePatterns: ['node_modules/(?!(payload|@payloadcms)/)'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '\\.css$': '<rootDir>/tests/__mocks__/styleMock.js',
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/index.ts'],

@@ -1,3 +1,6 @@
+// Import extended color themes
+import { extendedThemes } from './extended-themes.js'
+
 export interface ThemeTypographyPreset {
   fontFamily: string
   headingFamily: string
@@ -621,11 +624,5 @@ export const defaultThemePresets: ThemePreset[] = [
   },
 ]
 
-// Import and merge TweakCN presets
-import { getAllTweakCNPresets } from './utils/tweakcnConverter.js'
-
-// Export combined presets (default + TweakCN)
-export const allThemePresets: ThemePreset[] = [
-  ...defaultThemePresets,
-  ...getAllTweakCNPresets(),
-]
+// Export all theme presets (default + extended)
+export const allThemePresets: ThemePreset[] = [...defaultThemePresets, ...extendedThemes]

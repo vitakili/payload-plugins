@@ -1,0 +1,94 @@
+/* Theme Preview Field Styles */
+
+.theme-preset-list {
+  display: grid;
+  gap: 10px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+  
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-elevation-300, #cbd5e1) var(--theme-elevation-100, #f1f5f9);
+}
+
+/* Custom scrollbar for theme list (Webkit) */
+.theme-preset-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.theme-preset-list::-webkit-scrollbar-track {
+  background: var(--theme-elevation-100, #f1f5f9);
+  border-radius: 4px;
+}
+
+.theme-preset-list::-webkit-scrollbar-thumb {
+  background: var(--theme-elevation-300, #cbd5e1);
+  border-radius: 4px;
+}
+
+.theme-preset-list::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-elevation-400, #94a3b8);
+}
+
+/* Theme preset button */
+.theme-preset-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--theme-elevation-200, #e2e8f0);
+  background-color: var(--theme-input-bg, #ffffff);
+  color: var(--theme-elevation-800, #1e293b);
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  gap: 16px;
+}
+
+.theme-preset-button:hover {
+  border-color: var(--theme-elevation-300, #cbd5e1);
+  background-color: var(--theme-elevation-25, #f8fafc);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.theme-preset-button.selected {
+  border: 2px solid var(--theme-elevation-500, #64748b);
+  background-color: var(--theme-elevation-50, #f1f5f9);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Theme info */
+.theme-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.theme-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.theme-name {
+  font-size: 11px;
+  color: var(--theme-elevation-500, #64748b);
+}
+
+/* Color swatches */
+.theme-swatches {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+}
