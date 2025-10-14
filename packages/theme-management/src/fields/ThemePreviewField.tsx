@@ -9,7 +9,7 @@ import type {
   TypographySelection,
 } from '../components/typographyPreviewUtils.js'
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
-import { defaultThemePresets } from '../index.js'
+import { allThemePresets } from '../index.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
@@ -43,9 +43,9 @@ interface ThemePresetDefinition {
   borderRadius: 'none' | 'small' | 'medium' | 'large' | 'xl'
 }
 
-const FALLBACK_THEME = defaultThemePresets[0]?.name ?? 'cool'
+const FALLBACK_THEME = allThemePresets[0]?.name ?? 'cool'
 
-const themePresets = defaultThemePresets.reduce<Record<string, ThemePresetDefinition>>(
+const themePresets = allThemePresets.reduce<Record<string, ThemePresetDefinition>>(
   (acc, preset) => {
     acc[preset.name] = {
       label: preset.label,

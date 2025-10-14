@@ -620,3 +620,12 @@ export const defaultThemePresets: ThemePreset[] = [
     },
   },
 ]
+
+// Import and merge TweakCN presets
+import { getAllTweakCNPresets } from './utils/tweakcnConverter.js'
+
+// Export combined presets (default + TweakCN)
+export const allThemePresets: ThemePreset[] = [
+  ...defaultThemePresets,
+  ...getAllTweakCNPresets(),
+]

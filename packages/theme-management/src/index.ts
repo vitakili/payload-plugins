@@ -223,7 +223,7 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
   return defaultThemePresets
 }
 
-export { defaultThemePresets } from './presets.js'
+export { defaultThemePresets, allThemePresets } from './presets.js'
 export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
 export type { ThemeTab } from './fields/themeConfigurationField.js'
 export {

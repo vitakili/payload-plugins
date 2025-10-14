@@ -58,6 +58,93 @@ jest.mock('../../src/index.js', () => ({
       darkMode: {},
     },
   ],
+  allThemePresets: [
+    {
+      name: 'cool',
+      label: 'Cool & Professional',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#112233',
+        secondary: '#223344',
+        accent: '#334455',
+        background: '#ffffff',
+        foreground: '#000000',
+      },
+      darkMode: {},
+    },
+    {
+      name: 'neon',
+      label: 'Neon Cyberpunk',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#ff00ff',
+        secondary: '#00ffff',
+        accent: '#ff9900',
+        background: '#0d0f1a',
+        foreground: '#f5f5f5',
+      },
+      darkMode: {},
+    },
+  ],
+}))
+
+jest.mock('../../src/presets.js', () => ({
+  defaultThemePresets: [
+    {
+      name: 'cool',
+      label: 'Cool & Professional',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#112233',
+        secondary: '#223344',
+        accent: '#334455',
+        background: '#ffffff',
+        foreground: '#000000',
+      },
+      darkMode: {},
+    },
+    {
+      name: 'neon',
+      label: 'Neon Cyberpunk',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#ff00ff',
+        secondary: '#00ffff',
+        accent: '#ff9900',
+        background: '#0d0f1a',
+        foreground: '#f5f5f5',
+      },
+      darkMode: {},
+    },
+  ],
+  allThemePresets: [
+    {
+      name: 'cool',
+      label: 'Cool & Professional',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#112233',
+        secondary: '#223344',
+        accent: '#334455',
+        background: '#ffffff',
+        foreground: '#000000',
+      },
+      darkMode: {},
+    },
+    {
+      name: 'neon',
+      label: 'Neon Cyberpunk',
+      borderRadius: 'medium',
+      lightMode: {
+        primary: '#ff00ff',
+        secondary: '#00ffff',
+        accent: '#ff9900',
+        background: '#0d0f1a',
+        foreground: '#f5f5f5',
+      },
+      darkMode: {},
+    },
+  ],
 }))
 
 describe('ThemePreviewField', () => {
