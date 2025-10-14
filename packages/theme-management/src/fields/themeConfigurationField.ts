@@ -1,4 +1,4 @@
-import type { Field } from 'payload'
+import type { Field, TabsField } from 'payload'
 import {
   BASE_FONT_SIZE_OPTIONS,
   BODY_FONT_OPTIONS,
@@ -17,11 +17,14 @@ interface ThemeConfigurationFieldOptions {
   enableAdvancedFeatures?: boolean
 }
 
+// Type for a single tab (not the full TabsField)
+export type ThemeTab = NonNullable<TabsField['tabs']>[number]
+
 /**
  * Theme Configuration Field with Theme Selection as default value setter
  * Theme Selection populates lightMode/darkMode colors automatically
  */
-export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): Field {
+export function createThemeConfigurationField(options: ThemeConfigurationFieldOptions): ThemeTab {
   const {
     themePresets,
     defaultTheme,
@@ -389,21 +392,24 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     })
   }
 
-  // Return just the tab configuration, not the full tabs field
-  // Return as group field with all theme configuration
+  // Return as tab configuration to be injected into tabs structure
   return {
-    name: 'themeConfiguration',
-    type: 'group',
     label: {
       en: '🎨 Appearance Settings',
       cs: '🎨 Nastavení vzhledu',
     },
-    admin: {
-      description: {
-        en: 'Configure website appearance and styling',
-        cs: 'Nakonfigurujte vzhled a stylování webu',
+    fields: [
+      {
+        name: 'themeConfiguration',
+        type: 'group',
+        admin: {
+          description: {
+            en: 'Configure website appearance and styling',
+            cs: 'Nakonfigurujte vzhled a stylování webu',
+          },
+        },
+        fields,
       },
-    },
-    fields,
+    ],
   }
 }

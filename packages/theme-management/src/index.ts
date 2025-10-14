@@ -1,5 +1,6 @@
-import type { CollectionConfig, Config, Field, Plugin } from 'payload'
+import type { CollectionConfig, Config, Field, Plugin, TabsField } from 'payload'
 import { createThemeConfigurationField } from './fields/themeConfigurationField.js'
+import type { ThemeTab } from './fields/themeConfigurationField.js'
 import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
 import { defaultThemePresets } from './presets.js'
@@ -7,24 +8,90 @@ import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } fro
 
 const THEME_FIELD_NAME = 'themeConfiguration'
 
+/**
+ * Removes existing theme configuration from a group field (legacy)
+ */
 const removeExistingThemeField = (fields: Field[] = []): Field[] =>
   fields.filter((field) => {
     const candidate = field as { name?: unknown }
     return candidate?.name !== THEME_FIELD_NAME
   })
 
-const upsertThemeField = (
+/**
+ * Finds the tabs field in the collection fields array
+ */
+const findTabsField = (fields: Field[] = []): TabsField | null => {
+  for (const field of fields) {
+    if (field.type === 'tabs') {
+      return field as TabsField
+    }
+  }
+  return null
+}
+
+/**
+ * Removes existing Appearance Settings tab if it exists
+ */
+const removeExistingThemeTab = (
+  tabs: NonNullable<TabsField['tabs']>,
+): NonNullable<TabsField['tabs']> => {
+  return tabs.filter((tab) => {
+    const labelEn =
+      typeof tab.label === 'object' && tab.label !== null
+        ? (tab.label as { en?: string }).en
+        : tab.label
+    return labelEn !== '🎨 Appearance Settings' && labelEn !== 'Appearance Settings'
+  })
+}
+
+/**
+ * Injects theme tab into existing tabs field
+ */
+const injectThemeTab = (
   fields: Field[] | undefined,
-  themeField: Field,
+  themeTab: ThemeTab,
   enableLogging: boolean,
 ): Field[] => {
-  const sanitized = removeExistingThemeField(fields ?? [])
+  // First, remove any legacy theme field (group-based)
+  const sanitizedFields = removeExistingThemeField(fields ?? [])
 
-  if (enableLogging) {
-    console.log('🎨 Theme Management Plugin: injecting theme configuration field')
+  // Find the tabs field
+  const tabsField = findTabsField(sanitizedFields)
+
+  if (!tabsField || !tabsField.tabs) {
+    if (enableLogging) {
+      console.warn(
+        '🎨 Theme Management Plugin: No tabs field found. Creating a new tabs structure.',
+      )
+    }
+
+    // If no tabs exist, create a basic tabs structure with just the theme tab
+    const newTabsField: TabsField = {
+      type: 'tabs',
+      tabs: [themeTab],
+    }
+
+    return [...sanitizedFields, newTabsField]
   }
 
-  return [...sanitized, themeField]
+  // Remove existing theme tab if present
+  const sanitizedTabs = removeExistingThemeTab(tabsField.tabs)
+
+  // Add theme tab to the end
+  const updatedTabs = [...sanitizedTabs, themeTab]
+
+  if (enableLogging) {
+    console.log('🎨 Theme Management Plugin: injecting Appearance Settings tab')
+  }
+
+  // Update the tabs field
+  const updatedTabsField: TabsField = {
+    ...tabsField,
+    tabs: updatedTabs,
+  }
+
+  // Replace the old tabs field with the updated one
+  return sanitizedFields.map((field) => (field.type === 'tabs' ? updatedTabsField : field))
 }
 
 const ensureCollectionsArray = (collections: Config['collections']): CollectionConfig[] =>
@@ -51,7 +118,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
-    const themeField = createThemeConfigurationField({
+    const themeTab = createThemeConfigurationField({
       themePresets,
       defaultTheme,
       includeColorModeToggle,
@@ -75,7 +142,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
       const existingFields = Array.isArray(collection.fields) ? collection.fields : []
 
-      const fields = upsertThemeField(existingFields, themeField, enableLogging)
+      const fields = injectThemeTab(existingFields, themeTab, enableLogging)
 
       return {
         ...collection,
@@ -158,6 +225,7 @@ export const getAvailableThemePresets = (): ThemePreset[] => {
 
 export { defaultThemePresets } from './presets.js'
 export type { ThemePreset, ThemeTypographyPreset } from './presets.js'
+export type { ThemeTab } from './fields/themeConfigurationField.js'
 export {
   extendedThemePresets,
   allExtendedThemePresets,
