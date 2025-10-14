@@ -3,11 +3,7 @@ import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import type { BorderRadiusPreset, ThemeDefaults } from '../providers/Theme/types.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import type { ResolvedThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
-import {
-  createFallbackCriticalCSS,
-  getThemeCriticalCSS,
-  getThemeCSSPath,
-} from '../utils/themeAssets.js'
+import { createFallbackCriticalCSS, getThemeCriticalCSS } from '../utils/themeAssets.js'
 import { generateThemeColorsCss } from '../utils/themeColors.js'
 import { generateThemeCSS } from '../utils/themeUtils.js'
 import { InitTheme } from './InitTheme.js'
@@ -111,7 +107,6 @@ ${borderRadiusCSS}
     .filter((block) => Boolean(block?.trim?.().length))
     .join('\n\n')
 
-  const themeCSSPath = getThemeCSSPath(theme as ThemeDefaults)
   return (
     <>
       <InitTheme />
@@ -121,8 +116,6 @@ ${borderRadiusCSS}
           __html: combinedCSS,
         }}
       />
-      <link rel="preload" href={themeCSSPath} as="style" />
-      <link rel="stylesheet" href={themeCSSPath} />
     </>
   )
 }

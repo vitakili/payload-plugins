@@ -1,55 +1,47 @@
-import { readFile } from 'fs/promises'
-import { join } from 'path'
 import type { ThemeDefaults } from '../providers/Theme/types.js'
+import { getThemeDynamicCSS } from './themeCSS.js'
 
-const themeCriticalFiles: Record<string, string> = {
-  cool: 'cool-critical.css',
-  brutal: 'brutal-critical.css',
-  neon: 'neon-critical.css',
-  solar: 'solar-critical.css',
-  dealership: 'dealership-critical.css',
-  'real-estate': 'real-estate-critical.css',
-  'real-estate-gold': 'real-estate-gold-critical.css',
-  'real-estate-neutral': 'real-estate-neutral-critical.css',
-}
-
-const themeFullFiles: Record<string, string> = {
-  cool: 'cool.css',
-  brutal: 'brutal.css',
-  neon: 'neon.css',
-  solar: 'solar.css',
-  dealership: 'dealership.css',
-  'real-estate': 'real-estate.css',
-  'real-estate-gold': 'real-estate-gold.css',
-  'real-estate-neutral': 'real-estate-neutral.css',
+function normaliseCss(css: string): string {
+  return css.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
 }
 
 export async function getThemeCriticalCSS(theme: ThemeDefaults): Promise<string | null> {
   try {
-    const filename = themeCriticalFiles[theme]
-    if (!filename) {
-      console.warn(`Critical CSS file not found for theme: ${theme}`)
+    const css = getThemeDynamicCSS(theme)
+    if (!css) {
+      console.warn(`Dynamic CSS could not be generated for theme: ${theme}`)
       return null
     }
-
-    const filePath = join(process.cwd(), 'public', 'themes', filename)
-    const css = await readFile(filePath, 'utf-8')
-
-    return css.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+    return normaliseCss(css)
   } catch (error) {
-    console.error(`Error reading critical CSS for theme ${theme}:`, error)
+    console.error(`Error generating critical CSS for theme ${theme}:`, error)
     return null
   }
 }
 
-export function getThemeCSSPath(theme: ThemeDefaults): string {
-  const filename = themeFullFiles[theme]
-  return `/themes/${filename}`
+export function getThemeCSS(theme: ThemeDefaults): string | null {
+  const css = getThemeDynamicCSS(theme)
+  return css ? normaliseCss(css) : null
 }
 
+/**
+ * @deprecated Static CSS files have been removed. This function now returns an empty string.
+ */
+export function getThemeCSSPath(theme: ThemeDefaults): string {
+  console.warn(
+    `[theme-management] getThemeCSSPath(${theme}) is deprecated. Dynamic CSS generation is used instead.`,
+  )
+  return ''
+}
+
+/**
+ * @deprecated Preload links are no longer required when CSS is inlined dynamically.
+ */
 export function generateThemePreloadLinks(theme: ThemeDefaults): string {
-  const cssPath = getThemeCSSPath(theme)
-  return `<link rel="preload" href="${cssPath}" as="style" onload="this.onload=null;this.rel='stylesheet'">`
+  console.warn(
+    `[theme-management] generateThemePreloadLinks(${theme}) is deprecated. Dynamic CSS generation is used instead.`,
+  )
+  return ''
 }
 
 export function createFallbackCriticalCSS(theme: ThemeDefaults): string {

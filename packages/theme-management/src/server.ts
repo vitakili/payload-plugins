@@ -4,7 +4,8 @@ export { ServerThemeInjector } from './components/ServerThemeInjector.js'
 
 export {
   createFallbackCriticalCSS,
-  generateThemePreloadLinks,
   getThemeCriticalCSS,
+  getThemeCSS,
+  generateThemePreloadLinks,
   getThemeCSSPath,
 } from './utils/themeAssets.js'

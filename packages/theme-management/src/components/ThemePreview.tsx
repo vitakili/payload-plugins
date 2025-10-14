@@ -2,18 +2,19 @@
 
 import { useField } from '@payloadcms/ui'
 import React, { useMemo } from 'react'
+import { allThemePresets } from '../presets.js'
 import { themeIsValid } from '../providers/Theme/types.js'
-import { defaultThemePresets } from '../presets.js'
 
 const DEFAULT_THEME_KEY = 'cool'
-const basePresetMap = defaultThemePresets.reduce<
-  Record<string, (typeof defaultThemePresets)[number]>
->((accumulator, preset) => {
-  accumulator[preset.name] = preset
-  return accumulator
-}, {})
+const basePresetMap = allThemePresets.reduce<Record<string, (typeof allThemePresets)[number]>>(
+  (accumulator, preset) => {
+    accumulator[preset.name] = preset
+    return accumulator
+  },
+  {},
+)
 
-const fallbackPreset = basePresetMap[DEFAULT_THEME_KEY] ?? defaultThemePresets[0]
+const fallbackPreset = basePresetMap[DEFAULT_THEME_KEY] ?? allThemePresets[0]
 const fallbackLightMode = fallbackPreset?.lightMode ?? {
   primary: '#3b82f6',
   accent: '#06b6d4',

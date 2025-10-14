@@ -21,13 +21,13 @@ pnpm add @kilivi/payloadcms-theme-management@0.1.9
 **BEFORE (❌ OLD - Will cause errors):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management';
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management'
 ```
 
 **AFTER (✅ NEW - Correct):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server';
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
 ```
 
 ### 3. Clear Next.js Cache
@@ -49,9 +49,10 @@ pnpm dev
 These exports are now **only available** from `@kilivi/payloadcms-theme-management/server`:
 
 - `ServerThemeInjector` - Server component for SSR theme injection
-- `getThemeCriticalCSS()` - Read CSS files from filesystem
-- `getThemeCSSPath()` - Generate theme CSS paths
-- `generateThemePreloadLinks()` - Generate preload link tags
+- `getThemeCriticalCSS()` - Generate critical CSS dynamically for a theme
+- `getThemeCSS()` - Get the full dynamic CSS for a theme
+- `getThemeCSSPath()` - **Deprecated** legacy helper (returns empty string)
+- `generateThemePreloadLinks()` - **Deprecated** legacy helper (returns empty string)
 - `createFallbackCriticalCSS()` - Create fallback CSS
 
 **Why?** These use Node.js APIs like `fs/promises` and `path` which cannot run in the browser.
@@ -82,44 +83,43 @@ These continue to work as before:
 ### Server Component (layout.tsx)
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server';
-import configPromise from '@payload-config';
-import { getPayload } from 'payload';
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const payload = await getPayload({ config: configPromise });
+  const payload = await getPayload({ config: configPromise })
 
   const siteSettings = await payload.findGlobal({
     slug: 'site-settings',
     depth: 1,
-  });
+  })
 
   return (
-    <html lang='en'>
+    <html lang="en">
       <head>
         <ServerThemeInjector themeConfiguration={siteSettings?.themeConfiguration} />
       </head>
       <body>{children}</body>
     </html>
-  );
+  )
 }
 ```
 
 ### Client Component
 
 ```tsx
-'use client';
+'use client'
 
-import { ThemeProvider } from '@kilivi/payloadcms-theme-management';
-import { generateThemeColorsCss } from '@kilivi/payloadcms-theme-management';
+import { generateThemeColorsCss, ThemeProvider } from '@kilivi/payloadcms-theme-management'
 
 export function MyClientComponent() {
   const css = generateThemeColorsCss({
     primary: { h: 200, s: 70, l: 50 },
     // ... other colors
-  });
+  })
 
-  return <div>...</div>;
+  return <div>...</div>
 }
 ```
 

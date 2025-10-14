@@ -43,12 +43,12 @@ yarn add @kilivi/payloadcms-theme-management
 ### 1. Add Plugin to Payload Config
 
 ```typescript
-import { buildConfig } from 'payload'
 import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { buildConfig } from 'payload'
 
 export default buildConfig({
   // ... other config
-  
+
   globals: [
     {
       slug: 'site-settings',
@@ -61,7 +61,7 @@ export default buildConfig({
       ],
     },
   ],
-  
+
   plugins: [
     themeManagementPlugin({
       enabled: true,
@@ -84,13 +84,9 @@ import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const payload = await getPayload({ config: configPromise })
-  
+
   const { docs } = await payload.find({
     collection: 'site-settings',
     limit: 1,
@@ -123,25 +119,22 @@ The plugin injects CSS custom properties you can use:
 Or with Tailwind CSS:
 
 ```tsx
-<div className="bg-primary text-primary-foreground rounded-lg">
-  Themed Content
-</div>
+<div className="bg-primary text-primary-foreground rounded-lg">Themed Content</div>
 ```
-
 
 ## Plugin Configuration Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enabled` | `boolean` | `true` | Enable/disable the plugin |
-| `targetCollection` | `string` | `'site-settings'` | Global or collection slug to add theme field to |
-| `themePresets` | `ThemePreset[]` | Built-in presets | Custom theme presets |
-| `defaultTheme` | `string` | `'cool'` | Default theme preset name |
-| `includeColorModeToggle` | `boolean` | `true` | Show light/dark mode toggle |
-| `includeCustomCSS` | `boolean` | `true` | Allow custom CSS injection |
-| `includeBrandIdentity` | `boolean` | `false` | Show brand identity fields |
-| `enableAdvancedFeatures` | `boolean` | `true` | Enable advanced customization |
-| `enableLogging` | `boolean` | `false` | Log plugin actions to console |
+| Option                   | Type            | Default           | Description                                     |
+| ------------------------ | --------------- | ----------------- | ----------------------------------------------- |
+| `enabled`                | `boolean`       | `true`            | Enable/disable the plugin                       |
+| `targetCollection`       | `string`        | `'site-settings'` | Global or collection slug to add theme field to |
+| `themePresets`           | `ThemePreset[]` | Built-in presets  | Custom theme presets                            |
+| `defaultTheme`           | `string`        | `'cool'`          | Default theme preset name                       |
+| `includeColorModeToggle` | `boolean`       | `true`            | Show light/dark mode toggle                     |
+| `includeCustomCSS`       | `boolean`       | `true`            | Allow custom CSS injection                      |
+| `includeBrandIdentity`   | `boolean`       | `false`           | Show brand identity fields                      |
+| `enableAdvancedFeatures` | `boolean`       | `true`            | Enable advanced customization                   |
+| `enableLogging`          | `boolean`       | `false`           | Log plugin actions to console                   |
 
 ## Available Theme Presets
 
@@ -157,6 +150,7 @@ Or with Tailwind CSS:
 The plugin automatically adds a **Live Preview** page to your admin panel at `/admin/theme-preview`.
 
 ### Features:
+
 - ✅ **Zero Configuration** - Works automatically when plugin is installed
 - ✅ **Real-time Updates** - See changes instantly as you edit theme settings
 - ✅ **Light/Dark Toggle** - Preview both modes side-by-side
@@ -164,6 +158,7 @@ The plugin automatically adds a **Live Preview** page to your admin panel at `/a
 - ✅ **Professional UI** - Clean, modern preview interface
 
 ### How to Access:
+
 1. Install the plugin (see Quick Start above)
 2. Navigate to `/admin/theme-preview` in your Payload admin panel
 3. Open theme settings in another tab and see changes update live!
@@ -178,25 +173,23 @@ Import from `@kilivi/payloadcms-theme-management` for client-safe code:
 
 ```typescript
 // Plugin
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
-
 // Client Components
-import { ThemeProvider } from '@kilivi/payloadcms-theme-management'
 
 // Utilities
-import { 
+import {
+  fetchThemeConfiguration,
   generateThemeColorsCss,
   generateThemeCSS,
   getThemeStyles,
   resolveThemeConfiguration,
-  fetchThemeConfiguration,
+  themeManagementPlugin,
+  ThemeProvider,
 } from '@kilivi/payloadcms-theme-management'
-
 // Types
 import type {
-  ThemePreset,
   ThemeDefaults,
   ThemeManagementPluginOptions,
+  ThemePreset,
 } from '@kilivi/payloadcms-theme-management'
 ```
 
@@ -206,22 +199,23 @@ import type {
 
 ```typescript
 import {
-  ServerThemeInjector,
   getThemeCriticalCSS,
-  getThemeCSSPath,
-  generateThemePreloadLinks,
+  getThemeCSS,
+  ServerThemeInjector,
 } from '@kilivi/payloadcms-theme-management/server'
 ```
+
+> **Heads up:** Legacy helpers `getThemeCSSPath` and `generateThemePreloadLinks` are still exported for backwards compatibility but now return empty strings and emit console warnings. Prefer the inline CSS utilities above.
 
 ### Subpath Exports
 
 ```typescript
 // Direct field imports
-import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
-import { ThemeTokenSelectField } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
 
 // Direct component imports
 import { ThemePreview } from '@kilivi/payloadcms-theme-management/components/ThemePreview'
+import { ThemeColorPickerField } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
+import { ThemeTokenSelectField } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
 ```
 
 ## Integration Examples
@@ -317,7 +311,6 @@ See [MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for detailed migration instr
 + import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
 ```
 
-
 ## Testing
 
 See [TEST_APP_GUIDE.md](./docs/TEST_APP_GUIDE.md) for instructions on creating a test application.
@@ -347,6 +340,7 @@ import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
 ```
 
 Then clear your cache:
+
 ```bash
 rm -rf .next node_modules/.cache
 pnpm install
@@ -430,15 +424,17 @@ Created for Payload CMS v3 applications.
 ## Changelog
 
 ### v0.1.9 (Latest)
+
 - ✅ **Fixed:** Server/client component separation
 - ✅ **Added:** `server-only` package to prevent bundling errors
 - ✅ **Changed:** `ServerThemeInjector` now exported from `/server` entry
 - ✅ **Added:** Comprehensive documentation
 
 ### v0.1.7
+
 - ✅ **Fixed:** ESM import resolution with `.js` extensions
 - ✅ **Added:** SWC + TypeScript build pipeline
 
 ### v0.1.5
-- Initial release with theme management features
 
+- Initial release with theme management features

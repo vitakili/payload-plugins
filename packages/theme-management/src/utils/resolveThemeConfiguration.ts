@@ -1,8 +1,8 @@
 import { FONT_VALUE_TO_CSS } from '../constants/themeFonts.js'
+import type { ThemeTypographyPreset } from '../presets.js'
+import { allThemePresets } from '../presets.js'
 import type { Mode, ThemeDefaults } from '../providers/Theme/types.js'
 import { themeIsValid } from '../providers/Theme/types.js'
-import type { ThemeTypographyPreset } from '../presets.js'
-import { defaultThemePresets } from '../presets.js'
 
 /**
  * Generic theme configuration structure that matches Payload's generated types
@@ -75,9 +75,7 @@ type ThemeModeOption = (typeof MODE_VALUES)[number]
 type ThemeColorConfiguration = NonNullable<GenericThemeConfiguration['lightMode']>
 
 const DEFAULT_THEME_NAME: ThemeDefaults = 'cool'
-const DEFAULT_THEME_PRESET = defaultThemePresets.find(
-  (preset) => preset.name === DEFAULT_THEME_NAME,
-)
+const DEFAULT_THEME_PRESET = allThemePresets.find((preset) => preset.name === DEFAULT_THEME_NAME)
 
 export interface ResolvedThemeConfiguration {
   theme: ThemeDefaults
@@ -188,7 +186,7 @@ export function resolveThemeConfiguration(
       ? allowColorModeToggle
       : DEFAULT_THEME_CONFIGURATION.allowColorModeToggle
   const resolvedCustomCSS = typeof customCSS === 'string' ? customCSS : null
-  const preset = defaultThemePresets.find((candidate) => candidate.name === resolvedTheme)
+  const preset = allThemePresets.find((candidate) => candidate.name === resolvedTheme)
   const baseLightMode = preset?.lightMode ?? DEFAULT_THEME_CONFIGURATION.lightMode
   const baseDarkMode = preset?.darkMode ?? DEFAULT_THEME_CONFIGURATION.darkMode
   const resolvedLightMode = mergeColorModes(baseLightMode, lightMode)

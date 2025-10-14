@@ -5,7 +5,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'cool',
     label: 'Cool & Professional',
     borderRadius: 'medium',
-    cssFile: '/themes/cool.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(221 83% 53%)',
@@ -18,7 +18,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'brutal',
     label: 'Modern Brutalism',
     borderRadius: 'none',
-    cssFile: '/themes/brutal.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(0 0% 0%)',
@@ -31,7 +31,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'neon',
     label: 'Neon Cyberpunk',
     borderRadius: 'medium',
-    cssFile: '/themes/neon.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(263 90% 51%)',
@@ -44,7 +44,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'solar',
     label: 'Solar',
     borderRadius: 'large',
-    cssFile: '/themes/solar.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(20 90% 45%)',
@@ -57,7 +57,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'dealership',
     label: 'Dealership',
     borderRadius: 'medium',
-    cssFile: '/themes/dealership.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(225 25% 25%)',
@@ -70,7 +70,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'real-estate',
     label: 'Real Estate Blue',
     borderRadius: 'large',
-    cssFile: '/themes/real-estate.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(220 90% 48%)',
@@ -83,7 +83,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'real-estate-gold',
     label: 'Real Estate Gold',
     borderRadius: 'large',
-    cssFile: '/themes/real-estate-gold.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(38 75% 45%)',
@@ -96,7 +96,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
     name: 'real-estate-neutral',
     label: 'Real Estate Neutral',
     borderRadius: 'large',
-    cssFile: '/themes/real-estate-neutral.css',
+    dynamicCSS: true,
     preview: {
       colors: {
         primary: 'hsl(25 35% 25%)',

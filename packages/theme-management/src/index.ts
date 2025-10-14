@@ -3,7 +3,7 @@ import { createThemeConfigurationField } from './fields/themeConfigurationField.
 import type { ThemeTab } from './fields/themeConfigurationField.js'
 import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
-import { defaultThemePresets } from './presets.js'
+import { allThemePresets } from './presets.js'
 import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } from './types.js'
 
 const THEME_FIELD_NAME = 'themeConfiguration'
@@ -102,7 +102,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     const {
       enabled = true,
       targetCollection = 'site-settings',
-      themePresets = defaultThemePresets,
+      themePresets = allThemePresets,
       defaultTheme = 'cool',
       includeColorModeToggle = true,
       includeCustomCSS = true,
@@ -216,11 +216,11 @@ export const fetchThemeConfiguration = async (
 }
 
 export const getThemePreset = (themeName: string): ThemePreset | null => {
-  return defaultThemePresets.find((preset) => preset.name === themeName) || null
+  return allThemePresets.find((preset) => preset.name === themeName) || null
 }
 
 export const getAvailableThemePresets = (): ThemePreset[] => {
-  return defaultThemePresets
+  return allThemePresets
 }
 
 export { defaultThemePresets, allThemePresets } from './presets.js'
@@ -249,6 +249,13 @@ export type { ResolvedThemeConfiguration } from './utils/resolveThemeConfigurati
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
 export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'
+
+// Dynamic theme CSS generation
+export {
+  generateThemeCSS as generatePresetCSS,
+  generateAllThemesCSS,
+} from './utils/generateThemeCSS.js'
+export { getThemeDynamicCSS, getAllDynamicThemesCSS } from './utils/themeCSS.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
 export { ThemeProvider } from './providers/Theme/index.js'
