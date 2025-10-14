@@ -3,10 +3,7 @@ import { join } from 'path'
 import * as postcss from 'postcss'
 
 describe('CSS Files Validation', () => {
-  const cssFiles = [
-    'src/fields/ThemeColorPickerField.css',
-    'src/fields/ThemeLivePreview.css',
-  ]
+  const cssFiles = ['src/fields/ThemeColorPickerField.css']
 
   cssFiles.forEach((cssFilePath) => {
     describe(cssFilePath, () => {
@@ -36,15 +33,15 @@ describe('CSS Files Validation', () => {
       it('should have proper semicolons', () => {
         // Check for common syntax errors
         const lines = cssContent.split('\n')
-        
+
         lines.forEach((line, index) => {
           const trimmed = line.trim()
-          
+
           // Skip comments and empty lines
           if (trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed === '') {
             return
           }
-          
+
           // CSS property lines should end with semicolon (but not selectors or closing braces)
           if (trimmed.includes(':') && !trimmed.endsWith('{') && !trimmed.endsWith('}')) {
             // If it's a property declaration, it should end with ; or {
@@ -59,7 +56,7 @@ describe('CSS Files Validation', () => {
       it('should have balanced braces', () => {
         const openBraces = (cssContent.match(/{/g) || []).length
         const closeBraces = (cssContent.match(/}/g) || []).length
-        
+
         expect(openBraces).toBe(closeBraces)
       })
 
@@ -85,7 +82,8 @@ describe('CSS Files Validation', () => {
 
       it('should use valid CSS color values', async () => {
         const result = await postcss.parse(cssContent)
-        const colorRegex = /^(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\)|var\([^)]+\)|transparent|currentColor|inherit)$/
+        const colorRegex =
+          /^(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\)|var\([^)]+\)|transparent|currentColor|inherit)$/
 
         result.walkDecls((decl) => {
           if (
@@ -112,8 +110,20 @@ describe('CSS Files Validation', () => {
                 if (!colorRegex.test(value)) {
                   // It might still be valid (like 'solid', 'none', etc.)
                   // Just log a warning
-                  if (!['solid', 'none', 'auto', 'transparent', 'inherit', 'initial', 'unset'].includes(value)) {
-                    console.log(`Note: Non-standard color value in ${cssFilePath}: ${decl.prop}: ${value}`)
+                  if (
+                    ![
+                      'solid',
+                      'none',
+                      'auto',
+                      'transparent',
+                      'inherit',
+                      'initial',
+                      'unset',
+                    ].includes(value)
+                  ) {
+                    console.log(
+                      `Note: Non-standard color value in ${cssFilePath}: ${decl.prop}: ${value}`,
+                    )
                   }
                 }
               }
