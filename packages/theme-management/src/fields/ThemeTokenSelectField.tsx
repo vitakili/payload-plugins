@@ -36,7 +36,9 @@ async function fetchThemeConfiguration(): Promise<Record<string, unknown> | null
   }
 }
 
-function buildOptionsFromConfiguration(configuration: Record<string, unknown> | null): ThemeColorOption[] {
+function buildOptionsFromConfiguration(
+  configuration: Record<string, unknown> | null,
+): ThemeColorOption[] {
   if (!configuration) {
     return FALLBACK_TOKENS
   }
@@ -165,7 +167,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
                 padding: '10px 12px',
                 borderRadius: '10px',
                 border: isActive
-                  ? '2px solid var(--theme-primary-500)'
+                  ? '2px solid var(--theme-success-500)'
                   : '1px solid var(--theme-elevation-150)',
                 backgroundColor: 'var(--theme-elevation-0)',
                 boxShadow: isActive

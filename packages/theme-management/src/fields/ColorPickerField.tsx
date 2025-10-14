@@ -223,7 +223,7 @@ export default function ColorPickerField(props: TextFieldClientProps) {
                       borderRadius: '6px',
                       border:
                         value === color
-                          ? '3px solid var(--theme-primary-500)'
+                          ? '3px solid var(--theme-success-500)'
                           : '1px solid var(--theme-elevation-150)',
                       backgroundColor: color,
                       cursor: 'pointer',
