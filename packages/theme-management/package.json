@@ -1,6 +1,6 @@
 {
   "name": "@kilivi/payloadcms-theme-management",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Theme configuration plugin for Payload CMS v3 with 60+ professional themes",
   "type": "module",
   "main": "./dist/index.js",
