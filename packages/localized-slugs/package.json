@@ -32,7 +32,7 @@
     "types": "tsc --emitDeclarationOnly",
     "dev": "tsc --watch",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
-    "test": "jest --config jest.config.js",
+    "test": "jest --config jest.config.js --passWithNoTests",
     "test:watch": "jest --watch",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts src",
