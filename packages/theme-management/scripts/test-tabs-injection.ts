@@ -51,8 +51,8 @@ const mockConfigWithTabs = {
 console.log('📦 Original config:')
 console.log('  Collections:', mockConfigWithTabs.collections.length)
 console.log('  Site-settings fields:', mockConfigWithTabs.collections[0].fields.length)
-console.log('  Existing tabs:', mockConfigWithTabs.collections[0].fields[1].tabs.length)
-mockConfigWithTabs.collections[0].fields[1].tabs.forEach((tab: any, i: number) => {
+console.log('  Existing tabs:', mockConfigWithTabs.collections?.[0].fields?.[1].tabs?.length)
+mockConfigWithTabs.collections[0].fields[1].tabs?.forEach((tab: any, i: number) => {
   console.log(`    Tab ${i + 1}: ${tab.name} (${tab.label.en})`)
 })
 
@@ -67,7 +67,9 @@ const enhancedConfig = plugin(mockConfigWithTabs as any)
 
 console.log('\n✨ Enhanced config:')
 
-const siteSettings = enhancedConfig.collections?.find((c: any) => c.slug === 'site-settings')
+const siteSettings = (enhancedConfig as any).collections?.find(
+  (c: any) => c.slug === 'site-settings',
+)
 console.log('  Site-settings fields:', siteSettings?.fields?.length)
 
 // Find tabs field
@@ -77,7 +79,7 @@ if (tabsField && 'tabs' in tabsField) {
   tabsField.tabs.forEach((tab: any, i: number) => {
     const label = typeof tab.label === 'object' ? tab.label.en : tab.label
     console.log(`    Tab ${i + 1}: ${tab.name} (${label})`)
-    
+
     if (tab.name === 'themeConfiguration') {
       console.log(`      ✅ Theme tab found!`)
       console.log(`      Fields in theme tab: ${tab.fields?.length}`)

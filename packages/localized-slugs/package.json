@@ -1,0 +1,62 @@
+{
+  "name": "@kilivi/payloadcms-localized-slugs",
+  "version": "0.1.0",
+  "description": "Localized slugs plugin for Payload CMS v3 with multi-locale support",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./fields/*": {
+      "import": "./dist/fields/*.js",
+      "types": "./dist/fields/*.d.ts"
+    },
+    "./hooks/*": {
+      "import": "./dist/hooks/*.js",
+      "types": "./dist/hooks/*.d.ts"
+    },
+    "./utils/*": {
+      "import": "./dist/utils/*.js",
+      "types": "./dist/utils/*.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm run clean && pnpm run compile && pnpm run types",
+    "compile": "tsc",
+    "types": "tsc --emitDeclarationOnly",
+    "dev": "tsc --watch",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix --ext .ts src",
+    "prepublishOnly": "pnpm test && pnpm build"
+  },
+  "keywords": [
+    "payloadcms",
+    "payload",
+    "payload-plugin",
+    "localized",
+    "slugs",
+    "i18n",
+    "internationalization"
+  ],
+  "author": "Kilián Vít",
+  "license": "MIT",
+  "peerDependencies": {
+    "payload": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

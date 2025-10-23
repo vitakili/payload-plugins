@@ -1,0 +1,16 @@
+src/
+tests/
+.eslintrc.cjs
+jest.config.js
+tsconfig.json
+*.test.ts
+*.spec.ts
+.swcrc
+.github/
+*.md
+!README.md
+dist/
+node_modules/
+.env*
+.DS_Store
+*.log
