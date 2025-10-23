@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - theme-management
+          - localized-slugs
       version:
         description: 'Version bump type'
         required: true
