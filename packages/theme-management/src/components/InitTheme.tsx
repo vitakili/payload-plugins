@@ -1,5 +1,5 @@
-import Script from 'next/script'
 import React from 'react'
+import Script from 'next/script'
 import { modeLocalStorageKey } from '../providers/Theme/shared.js'
 
 /**
@@ -10,12 +10,12 @@ import { modeLocalStorageKey } from '../providers/Theme/shared.js'
  * - User preference from localStorage
  * - Admin-controlled color mode toggle
  * - Auto mode with system preference fallback
+ *
+ * Note: Uses Next.js Script component with beforeInteractive strategy
+ * to ensure theme is applied before React hydration, preventing flash of unstyled content.
  */
 export const InitTheme: React.FC = () => {
-  return (
-    <Script
-      dangerouslySetInnerHTML={{
-        __html: `
+  const scriptContent = `
   (function () {
     function getImplicitModePreference() {
       var mediaQuery = '(prefers-color-scheme: dark)'
@@ -64,10 +64,11 @@ export const InitTheme: React.FC = () => {
       })
     }
   })();
-  `,
-      }}
-      id="theme-script"
-      strategy="beforeInteractive"
-    />
+  `
+
+  return (
+    <Script id="theme-script" strategy="beforeInteractive">
+      {scriptContent}
+    </Script>
   )
 }
