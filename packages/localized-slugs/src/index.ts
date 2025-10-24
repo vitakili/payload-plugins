@@ -32,8 +32,8 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
   return (config: Config): Config => {
     const {
       enabled = true,
-      locales = ['cs', 'en'],
-      defaultLocale = 'cs',
+      locales = [], // Allow any locale
+      defaultLocale = 'en', // Default to 'en' if not provided
       collections = [],
       enableLogging = false,
       customDiacriticsMap = {},
@@ -44,7 +44,6 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
     }
 
     if (enableLogging) {
-      // eslint-disable-next-line no-console
       console.log('🌐 Localized Slugs Plugin: Initializing with options:', {
         locales,
         defaultLocale,
@@ -52,24 +51,22 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
       })
     }
 
+    if (!locales.length) {
+      throw new Error(
+        '🌐 Localized Slugs Plugin: No locales provided. Please specify at least one locale.',
+      )
+    }
+
     // Enhance collections with localized slug fields and hooks
     const enhancedCollections = config.collections?.map((collection) => {
-      // Check if this collection should be enhanced
       const collectionConfig = collections.find((c) => c.collection === collection.slug)
 
       if (!collectionConfig) {
         return collection
       }
 
-      if (enableLogging) {
-        // eslint-disable-next-line no-console
-        console.log(`🌐 Enhancing collection "${collection.slug}" with localized slugs`)
-      }
-
-      // Add localized slug field
       const localizedSlugField = createLocalizedSlugField(locales)
 
-      // Create the hook
       const populateLocalizedSlugsHook = createPopulateLocalizedSlugsHook({
         locales,
         defaultLocale,
@@ -97,6 +94,7 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
     }
   }
 }
+
 export default localizedSlugsPlugin
 
 export * from './utils'
