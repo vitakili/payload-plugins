@@ -1,1 +1,1 @@
-export * from './SlugContext.js'
+export * from './SlugContext'
