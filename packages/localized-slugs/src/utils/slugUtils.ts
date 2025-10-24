@@ -1,59 +1,30 @@
 /**
- * Default Czech diacritics mapping for slug generation
- */
-export const defaultDiacriticsMap: Record<string, string> = {
-  á: 'a',
-  č: 'c',
-  ď: 'd',
-  é: 'e',
-  ě: 'e',
-  í: 'i',
-  ň: 'n',
-  ó: 'o',
-  ř: 'r',
-  š: 's',
-  ť: 't',
-  ú: 'u',
-  ů: 'u',
-  ý: 'y',
-  ž: 'z',
-  Á: 'A',
-  Č: 'C',
-  Ď: 'D',
-  É: 'E',
-  Ě: 'E',
-  Í: 'I',
-  Ň: 'N',
-  Ó: 'O',
-  Ř: 'R',
-  Š: 'S',
-  Ť: 'T',
-  Ú: 'U',
-  Ů: 'U',
-  Ý: 'Y',
-  Ž: 'Z',
-}
-
-/**
- * Generates a URL-friendly slug from a title with diacritics support
+ * Generates a URL-friendly slug from a title with automatic diacritics removal
  */
 export function generateSlugFromTitle(
   title: string,
   customDiacriticsMap: Record<string, string> = {},
 ): string {
-  const diacriticsMap = { ...defaultDiacriticsMap, ...customDiacriticsMap }
+  // Normalize the string to decompose diacritics (NFD form)
+  const normalizedTitle = title.normalize('NFD')
 
-  return title
-    .toLowerCase()
+  // Remove diacritics using regex and apply custom mappings if provided
+  const diacriticsRemoved = normalizedTitle.replace(/[\u0300-\u036f]/g, '')
+
+  // Apply custom mappings (if any)
+  const mappedTitle = diacriticsRemoved
     .split('')
-    .map((char) => diacriticsMap[char] || char)
+    .map((char) => customDiacriticsMap[char] || char)
     .join('')
+
+  // Generate the slug
+  return mappedTitle
+    .toLowerCase()
     .replace(/[^\w\s-]/g, '') // Remove special characters except word chars, spaces, and hyphens
     .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/-+/g, '-') // Replace multiple hyphens with a single hyphen
     .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
 }
-
 /**
  * Validates if a string is a valid slug format
  */

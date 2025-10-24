@@ -97,5 +97,7 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
     }
   }
 }
-
 export default localizedSlugsPlugin
+
+export * from './utils/slugUtils'
+export { createLocalizedSlugField } from './fields/localizedSlugField'
