@@ -1,1 +1,3 @@
-export * from './SlugContext.jsx'
+'use client'
+
+export { SlugProvider, useSlugContext } from './SlugContext'
