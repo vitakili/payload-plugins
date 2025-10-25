@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky",
-    "precommit": "pnpm run lint && pnpm run build"
+    "precommit": "pnpm run lint && pnpm run build",
+    "test": "cd test-app && node tests/run-tests.js",
+    "test:imports": "cd test-app && node tests/test-imports.js"
   },
   "keywords": [
     "payloadcms",

@@ -1,0 +1,24 @@
+{
+  "name": "payload-plugins-test-app",
+  "version": "1.0.0",
+  "description": "Test application for payload plugins",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "test:imports": "node tests/test-imports.js",
+    "test:build": "tsc --noEmit",
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "next": "15.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "workspaces": [
+    "../packages/*"
+  ]
+}

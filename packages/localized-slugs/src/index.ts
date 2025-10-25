@@ -98,5 +98,5 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
 export default localizedSlugsPlugin
 
 export * from './utils/index.js'
-export * from './providers/index.js'
+export * from './providers/index.jsx'
 export { createLocalizedSlugField } from './fields/localizedSlugField.js'
