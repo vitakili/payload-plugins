@@ -1,1 +1,1 @@
-export * from './slugUtils'
+export * from './slugUtils.js'

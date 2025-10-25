@@ -1,6 +1,6 @@
 import type { Config, Plugin } from 'payload'
-import { createLocalizedSlugField } from './fields/localizedSlugField'
-import { createPopulateLocalizedSlugsHook } from './hooks/populateLocalizedSlugs'
+import { createLocalizedSlugField } from './fields/localizedSlugField.js'
+import { createPopulateLocalizedSlugsHook } from './hooks/populateLocalizedSlugs.js'
 
 export interface LocalizedSlugsPluginOptions {
   /** Whether the plugin is enabled */
@@ -99,4 +99,4 @@ export default localizedSlugsPlugin
 
 export * from './utils/index.js'
 export * from './providers/index.js'
-export { createLocalizedSlugField } from './fields/localizedSlugField'
+export { createLocalizedSlugField } from './fields/localizedSlugField.js'

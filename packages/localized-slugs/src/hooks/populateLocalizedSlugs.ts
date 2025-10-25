@@ -1,5 +1,5 @@
 import type { CollectionAfterChangeHook } from 'payload'
-import { generateSlugFromTitle } from '../utils/slugUtils'
+import { generateSlugFromTitle } from '../utils/slugUtils.js'
 
 export interface PopulateLocalizedSlugsOptions {
   locales: string[]
