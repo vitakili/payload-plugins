@@ -22,8 +22,12 @@
       "import": "./dist/utils/*.js",
       "types": "./dist/utils/*.d.ts"
     },
+    "./providers": {
+      "import": "./dist/providers/index.jsx",
+      "types": "./dist/providers/index.d.ts"
+    },
     "./providers/*": {
-      "import": "./dist/providers/*.js",
+      "import": "./dist/providers/*.jsx",
       "types": "./dist/providers/*.d.ts"
     }
   },
