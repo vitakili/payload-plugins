@@ -1,14 +1,21 @@
-/**
- * Client-side exports for the localized slugs plugin
- * Import from '@kilivi/payloadcms-localized-slugs/client' in your Next.js app
- */
+'use client'
 
-// Client components
-export { ClientSlugHandler } from './components/ClientSlugHandler'
-export type { ClientSlugHandlerProps } from './components/ClientSlugHandler'
+import { useEffect } from 'react'
+import { useSlugContext } from '@/providers'
 
-// Providers
-export { SlugProvider, useSlugContext } from './providers/SlugContext.js'
+export interface ClientSlugHandlerProps {
+  localizedSlugs: Record<string, string>
+}
 
-// Re-export utility functions that can be used on the client
-export { generateSlugFromTitle, isValidSlug } from './utils/slugUtils.js'
+export const ClientSlugHandler = ({ localizedSlugs }: ClientSlugHandlerProps) => {
+  const { dispatch } = useSlugContext()
+
+  useEffect(() => {
+    if (localizedSlugs && Object.keys(localizedSlugs).length > 0) {
+      dispatch({ type: 'SET_SLUGS', payload: localizedSlugs })
+    }
+  }, [localizedSlugs, dispatch])
+
+  // This component only manages state and renders nothing
+  return null
+}
