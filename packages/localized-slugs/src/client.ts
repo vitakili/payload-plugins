@@ -4,8 +4,8 @@
  */
 
 // Client components
-export { ClientSlugHandler } from './components/ClientSlugHandler/index.js'
-export type { ClientSlugHandlerProps } from './components/ClientSlugHandler/index.js'
+export { ClientSlugHandler } from './components/ClientSlugHandler'
+export type { ClientSlugHandlerProps } from './components/ClientSlugHandler'
 
 // Providers
 export { SlugProvider, useSlugContext } from './providers/SlugContext.js'
