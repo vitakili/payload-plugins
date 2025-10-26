@@ -27,7 +27,7 @@
       "types": "./dist/utils/*.d.ts"
     },
     "./providers": {
-      "import": "./dist/providers/index.js",
+      "import": "./dist/providers/index.jsx",
       "types": "./dist/providers/index.d.ts"
     },
     "./components": {

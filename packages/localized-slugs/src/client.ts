@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSlugContext } from './providers'
+import { useSlugContext } from './providers/index.jsx'
 
 export interface ClientSlugHandlerProps {
   localizedSlugs: Record<string, string>
