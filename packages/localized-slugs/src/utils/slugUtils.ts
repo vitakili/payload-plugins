@@ -45,6 +45,7 @@ export interface PageData {
   localizedSlugs?: Record<string, string | LocalizedSlugData> | null
   slug?: string | null
   fullPath?: string | null
+  title?: string | null
 }
 
 const normalizeSlugPath = (path: string): string => {
@@ -64,18 +65,40 @@ export function generateLocalizedSlugs(
 ): Record<string, string> {
   const fallback = fallbackPath || '/'
 
-  if (pageData.localizedSlugs && Object.keys(pageData.localizedSlugs).length > 0) {
-    const cleanedSlugs: Record<string, string> = {}
+  const cleanedSlugs: Record<string, string> = {}
 
+  if (pageData.localizedSlugs && Object.keys(pageData.localizedSlugs).length > 0) {
     for (const [locale, data] of Object.entries(pageData.localizedSlugs)) {
+      let pathCandidate: string | undefined
+
       if (typeof data === 'string') {
-        cleanedSlugs[locale] = normalizeSlugPath(data || fallback)
+        pathCandidate = data
       } else if (data && typeof data === 'object') {
-        const path = (data as LocalizedSlugData).fullPath || (data as LocalizedSlugData).slug
-        if (path) {
-          cleanedSlugs[locale] = normalizeSlugPath(path)
+        pathCandidate = (data as LocalizedSlugData).fullPath || (data as LocalizedSlugData).slug
+      }
+
+      // If the locale entry exists but is empty, derive from page-level fields
+      if (!pathCandidate) {
+        // Prefer fullPath or slug at the page level, otherwise try to generate from title
+        const pageLevel = pageData.fullPath ?? pageData.slug ?? pageData.title ?? ''
+
+        if (typeof pageLevel === 'string' && pageLevel.length > 0) {
+          // If pageLevel looks like a path (starts with '/'), use it directly; if it looks like a title, generate slug
+          if (pageLevel.startsWith('/')) {
+            pathCandidate = pageLevel
+          } else if (pageLevel.includes(' ') || /[^\w-]/.test(pageLevel)) {
+            // treat as title and generate slug
+            pathCandidate = `/${generateSlugFromTitle(String(pageLevel))}`
+          } else {
+            // treat as slug-like string
+            pathCandidate = pageLevel.startsWith('/') ? pageLevel : `/${pageLevel}`
+          }
+        } else {
+          pathCandidate = fallback
         }
       }
+
+      cleanedSlugs[locale] = normalizeSlugPath(pathCandidate || fallback)
     }
 
     if (Object.keys(cleanedSlugs).length > 0) {

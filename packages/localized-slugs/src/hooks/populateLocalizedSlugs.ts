@@ -21,6 +21,7 @@ export const createPopulateLocalizedSlugsHook = (
   return async ({ doc, operation, req, collection }) => {
     const {
       locales,
+      defaultLocale,
       slugField,
       fullPathField,
       generateFromTitle,
@@ -40,13 +41,60 @@ export const createPopulateLocalizedSlugsHook = (
       const updatedDoc = { ...docData }
       let slugsModified = false
 
-      // Generate slugs for each locale
-      if (generateFromTitle && docData[titleField]) {
-        updatedDoc[slugField] = updatedDoc[slugField] || {}
+      // Normalize slug/fullPath fields: support both per-locale objects and single string values
+      // If collection stores slug as a single string (e.g. slug: 'kontaktujte-nas'), expand it to all locales
+      const ensureLocaleMap = (fieldName: string) => {
+        let src = docData[fieldName]
 
+        // If primary field is absent, check common alternate/top-level fields
+        if (!src) {
+          if (fieldName === slugField) {
+            // page-level slug often stored as 'slug'
+            src = docData['slug']
+          }
+
+          if (fieldName === fullPathField) {
+            // try common names for path-like fields
+            src = docData['fullPath'] ?? docData['path'] ?? docData['urlPath']
+          }
+        }
+
+        if (!src) {
+          updatedDoc[fieldName] = updatedDoc[fieldName] || {}
+          return
+        }
+
+        // If it's already an object (localized field), ensure we copy it
+        if (typeof src === 'object' && !Array.isArray(src)) {
+          updatedDoc[fieldName] = { ...(src as Record<string, unknown>) }
+          return
+        }
+
+        // If it's a primitive (string), expand to all locales
+        if (typeof src === 'string') {
+          const map: Record<string, string> = {}
+          for (const locale of locales) {
+            map[locale] = src
+          }
+          updatedDoc[fieldName] = map
+          return
+        }
+
+        // Fallback: set empty object
+        updatedDoc[fieldName] = updatedDoc[fieldName] || {}
+      }
+
+      // Normalize both slug and fullPath fields so later logic can assume an object per-locale
+      ensureLocaleMap(slugField)
+      ensureLocaleMap(fullPathField)
+
+      // Generate slugs for each locale from title if requested
+      if (generateFromTitle && docData[titleField]) {
         for (const locale of locales) {
           const titleValue =
-            docData[titleField]?.[locale] || docData[titleField]?.en || docData[titleField]
+            docData[titleField]?.[locale] ||
+            docData[titleField]?.[defaultLocale] ||
+            docData[titleField]
 
           if (titleValue && typeof titleValue === 'string') {
             updatedDoc[slugField][locale] = generateSlugFromTitle(titleValue, customDiacriticsMap)
@@ -107,6 +155,26 @@ export const createPopulateLocalizedSlugsHook = (
         console.log(`🌐 Generated localized slugs for ${collection.slug}:`, updatedDoc[slugField])
         // eslint-disable-next-line no-console
         console.log(`🌐 Generated full paths for ${collection.slug}:`, updatedDoc[fullPathField])
+      }
+
+      // Also populate the group's `localizedSlugs` field (if present in the collection)
+      try {
+        updatedDoc.localizedSlugs = updatedDoc.localizedSlugs || {}
+
+        for (const locale of locales) {
+          const slugVal = updatedDoc[slugField]?.[locale]
+          const fullPathVal = updatedDoc[fullPathField]?.[locale]
+
+          if (slugVal || fullPathVal) {
+            updatedDoc.localizedSlugs[locale] = {
+              ...(updatedDoc.localizedSlugs[locale] || {}),
+              slug: slugVal ?? updatedDoc.localizedSlugs[locale]?.slug,
+              fullPath: fullPathVal ?? updatedDoc.localizedSlugs[locale]?.fullPath,
+            }
+          }
+        }
+      } catch (e) {
+        // non-fatal: if collection doesn't have localizedSlugs field, skip
       }
 
       return updatedDoc
