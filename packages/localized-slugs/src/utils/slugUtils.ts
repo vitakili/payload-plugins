@@ -32,6 +32,76 @@ export function isValidSlug(slug: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
 }
 
+// Types and helpers for localized slug data (frontend-friendly)
+export interface LocalizedSlugData {
+  slug?: string | null
+  fullPath?: string | null
+}
+
+export interface PageData {
+  /**
+   * Map of locale -> either a string path or an object with slug/fullPath
+   */
+  localizedSlugs?: Record<string, string | LocalizedSlugData> | null
+  slug?: string | null
+  fullPath?: string | null
+}
+
+const normalizeSlugPath = (path: string): string => {
+  if (path === 'home' || path === 'homepage') return '/'
+  if (path === '/') return '/'
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+export function generateLocalizedSlugs(
+  pageData: PageData,
+  fallbackPath?: string,
+  /**
+   * Optional list of locales to ensure in the returned map when no localizedSlugs exist.
+   * If omitted and pageData.localizedSlugs is empty, defaults to ['en', 'cs'] for backwards compatibility.
+   */
+  locales?: string[],
+): Record<string, string> {
+  const fallback = fallbackPath || '/'
+
+  if (pageData.localizedSlugs && Object.keys(pageData.localizedSlugs).length > 0) {
+    const cleanedSlugs: Record<string, string> = {}
+
+    for (const [locale, data] of Object.entries(pageData.localizedSlugs)) {
+      if (typeof data === 'string') {
+        cleanedSlugs[locale] = normalizeSlugPath(data || fallback)
+      } else if (data && typeof data === 'object') {
+        const path = (data as LocalizedSlugData).fullPath || (data as LocalizedSlugData).slug
+        if (path) {
+          cleanedSlugs[locale] = normalizeSlugPath(path)
+        }
+      }
+    }
+
+    if (Object.keys(cleanedSlugs).length > 0) {
+      return cleanedSlugs
+    }
+  }
+
+  // No localized slugs present: return fallback for all requested locales (or default locales)
+  const requestedLocales = locales && locales.length > 0 ? locales : ['en', 'cs']
+  const fallbackPathNormalized = normalizeSlugPath(pageData.fullPath ?? pageData.slug ?? fallback)
+
+  const result: Record<string, string> = {}
+  for (const loc of requestedLocales) {
+    result[loc] = fallbackPathNormalized
+  }
+  return result
+}
+
+/**
+ * Gets the appropriate slug for the current locale
+ */
+export function getLocalizedSlug(pageData: PageData, locale: string, locales?: string[]): string {
+  const slugs = generateLocalizedSlugs(pageData, undefined, locales)
+  return slugs[locale] || '/'
+}
+
 /**
  * Field hook that ensures slugs are unique within a collection
  * Supports both single-tenant and multi-tenant applications
