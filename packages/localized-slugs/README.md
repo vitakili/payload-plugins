@@ -11,6 +11,14 @@ Localized slugs plugin for Payload CMS v3 with multi-locale support. Automatical
 - ⚙️ Configurable per-collection settings
 - 📦 Zero dependencies (Payload only)
 - ✅ TypeScript support with full type safety
+- 🎨 Client-side components for frontend integration
+
+## Documentation
+
+- 📖 [Client Components Usage Guide](./CLIENT_COMPONENTS_GUIDE.md) - How to use client components in your Next.js app
+- 🚀 [Quick Start Guide](./QUICK_START.md)
+- 🏢 [Multi-Tenant Guide](./MULTI_TENANT.md)
+- 📦 [NPM Deployment Guide](./NPM_DEPLOYMENT.md)
 
 ## Installation
 
@@ -351,6 +359,75 @@ localizedSlugsPlugin({
 - Ensure the collection has a parent relationship field
 - Verify `fullPathField` matches your field name
 - Full paths only generate for hierarchical collections
+
+## Client-Side Usage
+
+The plugin provides client components for use in your Next.js frontend application.
+
+### Installation in Next.js App
+
+```typescript
+// app/layout.tsx
+'use client'
+
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <SlugProvider>
+          {children}
+        </SlugProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+### Using Client Components
+
+```typescript
+// app/[locale]/posts/[slug]/page.tsx
+import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
+
+export default async function PostPage({ params }) {
+  const post = await getPayloadData('posts', params.slug)
+
+  return (
+    <div>
+      <ClientSlugHandler localizedSlugs={post.localizedSlugs} />
+      <h1>{post.title}</h1>
+    </div>
+  )
+}
+```
+
+### Language Switcher Example
+
+```typescript
+'use client'
+
+import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client'
+import Link from 'next/link'
+
+export function LanguageSwitcher() {
+  const { state } = useSlugContext()
+  const { localizedSlugs } = state
+
+  return (
+    <nav>
+      {Object.entries(localizedSlugs).map(([locale, slug]) => (
+        <Link key={locale} href={`/${locale}/${slug}`}>
+          {locale.toUpperCase()}
+        </Link>
+      ))}
+    </nav>
+  )
+}
+```
+
+📖 **For detailed client component usage, see the [Client Components Usage Guide](./CLIENT_COMPONENTS_GUIDE.md)**
 
 ## Performance
 

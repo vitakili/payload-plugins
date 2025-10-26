@@ -10,7 +10,6 @@
     "allowJs": true,
     "jsx": "preserve",
     "noEmit": false,
-    "emitDeclarationOnly": true,
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
