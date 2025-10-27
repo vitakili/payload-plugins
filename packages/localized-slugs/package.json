@@ -30,6 +30,10 @@
       "import": "./dist/providers/index.jsx",
       "types": "./dist/providers/index.d.ts"
     },
+    "./providers/*": {
+      "import": "./dist/providers/*.jsx",
+      "types": "./dist/providers/*.d.ts"
+    },
     "./components": {
       "import": "./dist/components/index.js",
       "types": "./dist/components/index.d.ts"
@@ -44,8 +48,9 @@
     "types": "tsc --emitDeclarationOnly",
     "dev": "tsc --watch",
     "clean": "rimraf dist tsconfig.tsbuildinfo",
-    "test": "jest --config jest.config.js --passWithNoTests",
-    "test:watch": "jest --watch",
+    "test": "vitest",
+    "test:unit": "vitest",
+    "test:watch": "vitest --watch",
     "lint": "eslint src",
     "lint:fix": "eslint --fix --ext .ts src",
     "prepublishOnly": "pnpm test && pnpm build"
@@ -66,9 +71,10 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.6.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^1.6.1"
   },
   "publishConfig": {
     "access": "public"

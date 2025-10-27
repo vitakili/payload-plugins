@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useSlugContext } from './providers/index'
-import type { PageData } from './utils/slugUtils'
+import type { LocalizedSlugData, PageData } from './utils/slugUtils'
 import { generateLocalizedSlugs } from './utils/slugUtils'
 
 export interface ClientSlugHandlerProps {
@@ -26,7 +26,23 @@ export const ClientSlugHandler = ({
     if (pageData) {
       slugsToDispatch = generateLocalizedSlugs(pageData, fallbackPath)
     } else if (localizedSlugs && Object.keys(localizedSlugs).length > 0) {
-      slugsToDispatch = localizedSlugs as Record<string, string>
+      // localizedSlugs may be a map of locale -> string or locale -> { slug, fullPath }
+      const cleaned: Record<string, string> = {}
+      for (const [locale, val] of Object.entries(
+        localizedSlugs as Record<string, string | LocalizedSlugData>,
+      )) {
+        if (!val) continue
+        if (typeof val === 'string') {
+          cleaned[locale] = val
+        } else if (typeof val === 'object') {
+          // prefer fullPath, otherwise slug
+          cleaned[locale] = (val.fullPath ?? val.slug) as string
+        }
+      }
+
+      if (Object.keys(cleaned).length > 0) {
+        slugsToDispatch = cleaned
+      }
     }
 
     if (slugsToDispatch && Object.keys(slugsToDispatch).length > 0) {

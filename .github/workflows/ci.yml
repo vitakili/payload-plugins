@@ -36,3 +36,6 @@ jobs:
 
       - name: Check types
         run: pnpm exec tsc --noEmit
+
+      - name: Run workspace tests
+        run: pnpm -r test

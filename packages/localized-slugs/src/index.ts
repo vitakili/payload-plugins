@@ -65,6 +65,10 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
         return collection
       }
 
+      if (enableLogging) {
+        console.log(`🌐 Enhancing collection "${collection.slug}" with localized slugs`)
+      }
+
       const localizedSlugField = createLocalizedSlugField(locales)
 
       const populateLocalizedSlugsHook = createPopulateLocalizedSlugsHook({
@@ -99,3 +103,4 @@ export default localizedSlugsPlugin
 
 export * from './utils/index.js'
 export { createLocalizedSlugField } from './fields/localizedSlugField.js'
+export * from './providers/index.js'

@@ -72,6 +72,41 @@ export const createPopulateLocalizedSlugsHook = (
 
         // If it's a primitive (string), expand to all locales
         if (typeof src === 'string') {
+          // If configured to generate from title and a title exists, try to generate
+          // locale-specific values instead of blindly copying the single string.
+          if (generateFromTitle && docData[titleField]) {
+            const map: Record<string, string> = {}
+            const titleIsObject =
+              typeof docData[titleField] === 'object' && !Array.isArray(docData[titleField])
+
+            for (const locale of locales) {
+              let generatedForLocale: string | undefined
+
+              if (titleIsObject) {
+                const titleValue =
+                  docData[titleField]?.[locale] ?? docData[titleField]?.[defaultLocale]
+                if (titleValue && typeof titleValue === 'string') {
+                  const gen = generateSlugFromTitle(String(titleValue), customDiacriticsMap)
+                  generatedForLocale = fieldName === fullPathField ? `/${gen}` : gen
+                }
+              } else {
+                // title is a single string; only use it for the defaultLocale, keep src for others
+                if (locale === defaultLocale) {
+                  const gen = generateSlugFromTitle(
+                    String(docData[titleField]),
+                    customDiacriticsMap,
+                  )
+                  generatedForLocale = fieldName === fullPathField ? `/${gen}` : gen
+                }
+              }
+
+              map[locale] = generatedForLocale ?? src
+            }
+
+            updatedDoc[fieldName] = map
+            return
+          }
+
           const map: Record<string, string> = {}
           for (const locale of locales) {
             map[locale] = src
@@ -90,11 +125,16 @@ export const createPopulateLocalizedSlugsHook = (
 
       // Generate slugs for each locale from title if requested
       if (generateFromTitle && docData[titleField]) {
+        const titleIsObject =
+          typeof docData[titleField] === 'object' && !Array.isArray(docData[titleField])
         for (const locale of locales) {
-          const titleValue =
-            docData[titleField]?.[locale] ||
-            docData[titleField]?.[defaultLocale] ||
-            docData[titleField]
+          // If title is localized object, pick per-locale; if title is a single string, only apply to defaultLocale
+          let titleValue: string | undefined
+          if (titleIsObject) {
+            titleValue = docData[titleField]?.[locale] ?? docData[titleField]?.[defaultLocale]
+          } else if (locale === defaultLocale) {
+            titleValue = docData[titleField]
+          }
 
           if (titleValue && typeof titleValue === 'string') {
             updatedDoc[slugField][locale] = generateSlugFromTitle(titleValue, customDiacriticsMap)
@@ -166,9 +206,20 @@ export const createPopulateLocalizedSlugsHook = (
           const fullPathVal = updatedDoc[fullPathField]?.[locale]
 
           if (slugVal || fullPathVal) {
+            // Derive slug from fullPath when slug is missing (e.g., '/contact-us' -> 'contact-us')
+            const derivedSlug =
+              slugVal ??
+              (typeof fullPathVal === 'string' ? fullPathVal.replace(/^\/+/, '') : undefined)
+
+            // Ensure the per-field maps also get the derived slug when missing
+            if (derivedSlug && !updatedDoc[slugField]?.[locale]) {
+              updatedDoc[slugField] = updatedDoc[slugField] || {}
+              updatedDoc[slugField][locale] = derivedSlug
+              slugsModified = true
+            }
+
             updatedDoc.localizedSlugs[locale] = {
-              ...(updatedDoc.localizedSlugs[locale] || {}),
-              slug: slugVal ?? updatedDoc.localizedSlugs[locale]?.slug,
+              slug: derivedSlug ?? updatedDoc.localizedSlugs[locale]?.slug,
               fullPath: fullPathVal ?? updatedDoc.localizedSlugs[locale]?.fullPath,
             }
           }
