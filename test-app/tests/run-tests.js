@@ -95,10 +95,11 @@ console.log(`\n${colors.blue}5. Export Tests${colors.reset}`)
 const localizedIndexContent = fs.readFileSync(localizedIndex, 'utf8')
 const themeIndexContent = fs.readFileSync(themeIndex, 'utf8')
 
+// The providers are client components and should be exported via package.json subpath
 logTest(
-  'localized-slugs index.js exports from providers',
-  localizedIndexContent.includes("from './providers"),
-  'Providers are exported',
+  'localized-slugs main index.js does NOT re-export client providers',
+  !localizedIndexContent.includes("from './providers"),
+  'Providers are available under package subpath, not re-exported from main index',
 )
 
 logTest(

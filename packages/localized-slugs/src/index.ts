@@ -106,4 +106,6 @@ export default localizedSlugsPlugin
 export * from './utils/index.js'
 export { createLocalizedSlugField } from './fields/localizedSlugField.js'
 // Export providers with explicit .jsx extension so compiled output points to the correct runtime file
-export * from './providers/index.jsx'
+// Note: providers are client-only components and are exported via the package subpath
+// (see package.json './providers' export). Do NOT re-export providers from the
+// main server entry to avoid bundling client components into server builds.
