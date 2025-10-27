@@ -44,6 +44,7 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
     }
 
     if (enableLogging) {
+      // eslint-disable-next-line no-console
       console.log('🌐 Localized Slugs Plugin: Initializing with options:', {
         locales,
         defaultLocale,
@@ -66,6 +67,7 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
       }
 
       if (enableLogging) {
+        // eslint-disable-next-line no-console
         console.log(`🌐 Enhancing collection "${collection.slug}" with localized slugs`)
       }
 
@@ -103,4 +105,5 @@ export default localizedSlugsPlugin
 
 export * from './utils/index.js'
 export { createLocalizedSlugField } from './fields/localizedSlugField.js'
-export * from './providers/index.js'
+// Export providers with explicit .jsx extension so compiled output points to the correct runtime file
+export * from './providers/index.jsx'

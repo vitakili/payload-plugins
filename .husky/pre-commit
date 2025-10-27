@@ -1,3 +1,4 @@
 pnpm exec lint-staged
 # Run workspace tests after lint-staged to catch issues before commit
-pnpm -r test
+# Ensure tests run in non-watch mode by setting CI=true so vitest doesn't enter watch mode
+CI=true pnpm -r test

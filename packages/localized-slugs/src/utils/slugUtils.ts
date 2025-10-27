@@ -74,7 +74,9 @@ export function generateLocalizedSlugs(
       if (typeof data === 'string') {
         pathCandidate = data
       } else if (data && typeof data === 'object') {
-        pathCandidate = (data as LocalizedSlugData).fullPath || (data as LocalizedSlugData).slug
+        // Use nullish coalescing so `null` doesn't flow into `pathCandidate` (which is string | undefined)
+        pathCandidate =
+          (data as LocalizedSlugData).fullPath ?? (data as LocalizedSlugData).slug ?? undefined
       }
 
       // If the locale entry exists but is empty, derive from page-level fields
