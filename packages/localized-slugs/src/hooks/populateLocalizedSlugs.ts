@@ -154,7 +154,7 @@ export const createPopulateLocalizedSlugsHook = (
             let fullPath = slug
 
             // Check if document has a parent for hierarchical path
-            if (docData.parent && typeof docData.parent === 'object') {
+            if (docData.parent) {
               const parentId =
                 typeof docData.parent === 'string' ? docData.parent : docData.parent.id
 

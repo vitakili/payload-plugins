@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSlugContext } from './providers/index'
+import { useSlugContext } from './providers/index.jsx'
 import type { LocalizedSlugData, PageData } from './utils/slugUtils'
 import { generateLocalizedSlugs } from './utils/slugUtils'
 
@@ -58,4 +58,4 @@ export const ClientSlugHandler = ({
 export { generateLocalizedSlugs } from './utils/slugUtils'
 
 // Re-export client components and hooks
-export { SlugProvider, useSlugContext } from './providers/index'
+export { SlugProvider, useSlugContext } from './providers/index.jsx'
