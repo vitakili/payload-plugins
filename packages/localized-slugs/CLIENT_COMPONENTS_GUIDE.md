@@ -62,7 +62,8 @@ In your Next.js app components (e.g., `app/layout.tsx` or pages):
 ```typescript
 'use client'
 
-import { SlugProvider, ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/providers'
+import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
 
 export function RootLayout({ children }) {
   return (

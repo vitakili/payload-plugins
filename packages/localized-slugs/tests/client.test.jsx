@@ -1,12 +1,13 @@
 import { render } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
-import { ClientSlugHandler, SlugProvider, useSlugContext } from '../dist/client.js'
+import { ClientSlugHandler } from '../dist/client.js'
+import { SlugProvider, useSlugContext } from '../dist/providers/index.jsx'
 
 describe('Client Components', () => {
   test('SlugProvider provides context', () => {
     const TestComponent = () => {
-      const { slugs } = useSlugContext()
-      return <div data-testid="slugs">{JSON.stringify(slugs)}</div>
+      const { state } = useSlugContext()
+      return <div data-testid="slugs">{JSON.stringify(state.localizedSlugs)}</div>
     }
 
     const { getByTestId } = render(

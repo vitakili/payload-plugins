@@ -57,5 +57,5 @@ export const ClientSlugHandler = ({
 // Re-export helpers for client usage
 export { generateLocalizedSlugs } from './utils/slugUtils'
 
-// Re-export client components and hooks
-export { SlugProvider, useSlugContext } from './providers'
+// Note: Providers are exported separately via "./providers" in package.json
+// Import them directly: import { SlugProvider, useSlugContext } from '@kilivi/payloadcms-localized-slugs/providers'
