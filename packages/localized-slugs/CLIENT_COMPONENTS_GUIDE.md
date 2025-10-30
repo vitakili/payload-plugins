@@ -17,13 +17,18 @@ Following the pattern used by Payload CMS and other modern libraries, we use **s
   "exports": {
     ".": {
       // Server-side exports (plugin, hooks, fields)
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
     },
     "./client": {
-      // Client-side exports (components, providers)
-      "import": "./dist/client.js",
-      "types": "./dist/client.d.ts"
+      // Client components
+      "import": "./src/exports/client/index.ts",
+      "types": "./src/exports/client/index.ts"
+    },
+    "./client/react": {
+      // React providers and hooks
+      "import": "./src/exports/client/react.ts",
+      "types": "./src/exports/client/react.ts"
     }
   }
 }
@@ -62,7 +67,7 @@ In your Next.js app components (e.g., `app/layout.tsx` or pages):
 ```typescript
 'use client'
 
-import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/providers'
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
 import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
 
 export function RootLayout({ children }) {
@@ -114,7 +119,7 @@ export default async function PostPage({ params }) {
 ```typescript
 'use client'
 
-import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client'
+import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client/react'
 import Link from 'next/link'
 
 export function LanguageSwitcher() {
@@ -172,8 +177,10 @@ src/
 ├── index.ts              # Server-side exports (NO "use client")
 │   └── exports: plugin, hooks, fields
 │
-├── client.ts             # Client-side exports (re-exports from files with "use client")
-│   └── exports: components, providers, utils
+├── exports/
+│   └── client/
+│       ├── index.ts      # Re-exports client components
+│       └── react.ts      # Re-exports providers and hooks
 │
 ├── components/
 │   └── ClientSlugHandler/
@@ -192,8 +199,9 @@ src/
 ## ✨ Key Takeaways
 
 1. ✅ **DO** put `"use client"` in individual component files
-2. ✅ **DO** create separate export paths for server/client code
-3. ✅ **DO** re-export client components from `client.ts`
-4. ❌ **DON'T** put `"use client"` in `index.ts`
-5. ❌ **DON'T** mix server and client exports in the same file
-6. ❌ **DON'T** try to import client components from the main package export
+2. ✅ **DO** create separate export paths for server/client code (`./client` and `./client/react`)
+3. ✅ **DO** re-export client components from `src/exports/client/index.ts`
+4. ✅ **DO** re-export providers and hooks from `src/exports/client/react.ts`
+5. ❌ **DON'T** put `"use client"` in `index.ts`
+6. ❌ **DON'T** mix server and client exports in the same file
+7. ❌ **DON'T** try to import client components from the main package export
