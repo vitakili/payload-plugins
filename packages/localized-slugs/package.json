@@ -1,6 +1,6 @@
 {
   "name": "@kilivi/payloadcms-localized-slugs",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "description": "Localized slugs plugin for Payload CMS v3 with multi-locale support",
   "type": "module",
   "main": "./dist/index.js",
