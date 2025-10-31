@@ -1,40 +1,40 @@
 {
   "name": "@kilivi/payloadcms-localized-slugs",
-  "version": "0.1.34",
+  "version": "0.1.36",
   "description": "Localized slugs plugin for Payload CMS v3 with multi-locale support",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./client": {
-      "import": "./src/exports/client/index.ts",
-      "types": "./src/exports/client/index.ts",
-      "default": "./src/exports/client/index.ts"
+      "import": "./dist/exports/client/index.js",
+      "types": "./dist/exports/client/index.d.ts",
+      "default": "./dist/exports/client/index.js"
     },
     "./client/react": {
-      "import": "./src/exports/client/react.ts",
-      "types": "./src/exports/client/react.ts",
-      "default": "./src/exports/client/react.ts"
+      "import": "./dist/exports/client/react.js",
+      "types": "./dist/exports/client/react.d.ts",
+      "default": "./dist/exports/client/react.js"
     },
     "./fields/*": {
-      "import": "./src/fields/*.ts",
-      "types": "./src/fields/*.ts",
-      "default": "./src/fields/*.ts"
+      "import": "./dist/fields/*.js",
+      "types": "./dist/fields/*.d.ts",
+      "default": "./dist/fields/*.js"
     },
     "./hooks/*": {
-      "import": "./src/hooks/*.ts",
-      "types": "./src/hooks/*.ts",
-      "default": "./src/hooks/*.ts"
+      "import": "./dist/hooks/*.js",
+      "types": "./dist/hooks/*.d.ts",
+      "default": "./dist/hooks/*.js"
     },
     "./utils/*": {
-      "import": "./src/utils/*.ts",
-      "types": "./src/utils/*.ts",
-      "default": "./src/utils/*.ts"
+      "import": "./dist/utils/*.js",
+      "types": "./dist/utils/*.d.ts",
+      "default": "./dist/utils/*.js"
     }
   },
   "files": [

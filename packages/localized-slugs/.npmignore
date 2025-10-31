@@ -9,7 +9,6 @@ tsconfig.json
 .github/
 *.md
 !README.md
-dist/
 node_modules/
 .env*
 .DS_Store
