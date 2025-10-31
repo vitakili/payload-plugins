@@ -19,7 +19,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Search for incorrect imports
-grep -r "from '@kilivi/payloadcms-theme-management'" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" . 2>/dev/null | \
+grep -r "from '@kilivi/payloadcms-theme-management'" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.js" . 2>/dev/null | \
 grep "ServerThemeInjector" | \
 while IFS=: read -r file line; do
   echo -e "${RED}❌ $file${NC}"
@@ -63,7 +63,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "Run this to automatically fix imports:"
 echo ""
-echo -e "${YELLOW}find . -type f \\( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \\) -exec sed -i \"s|from '@kilivi/payloadcms-theme-management'|from '@kilivi/payloadcms-theme-management/server'|g\" {} + && grep -l ServerThemeInjector{}${NC}"
+echo -e "${YELLOW}find . -type f \\( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.js' \\) -exec sed -i \"s|from '@kilivi/payloadcms-theme-management'|from '@kilivi/payloadcms-theme-management/server'|g\" {} + && grep -l ServerThemeInjector{}${NC}"
 echo ""
 echo "⚠️  WARNING: Review changes before committing!"
 echo ""

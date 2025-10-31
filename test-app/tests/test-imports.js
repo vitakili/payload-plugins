@@ -80,27 +80,27 @@ try {
   logTest('Can load utils/index.js', false, err.message)
 }
 
-// Test JSX files exist (can't require .jsx files directly in Node.js, but we can check they exist)
+// Test JSX files exist (can't require .js files directly in Node.js, but we can check they exist)
 console.log(`\n${colors.blue}Testing provider component files:${colors.reset}\n`)
 
-const providerIndexPath = path.join(localizedSlugsDist, 'providers', 'index.jsx')
-const slugContextPath = path.join(localizedSlugsDist, 'providers', 'SlugContext.jsx')
+const providerIndexPath = path.join(localizedSlugsDist, 'providers', 'index.js')
+const slugContextPath = path.join(localizedSlugsDist, 'providers', 'SlugContext.js')
 
-logTest('providers/index.jsx file exists', fs.existsSync(providerIndexPath))
+logTest('providers/index.js file exists', fs.existsSync(providerIndexPath))
 
-logTest('providers/SlugContext.jsx file exists', fs.existsSync(slugContextPath))
+logTest('providers/SlugContext.js file exists', fs.existsSync(slugContextPath))
 
 // Check content of JSX files
 if (fs.existsSync(providerIndexPath)) {
   const content = fs.readFileSync(providerIndexPath, 'utf8')
   logTest(
-    'providers/index.jsx contains "use client"',
+    'providers/index.js contains "use client"',
     content.includes("'use client'"),
     'Client directive found',
   )
 
   logTest(
-    'providers/index.jsx exports SlugProvider',
+    'providers/index.js exports SlugProvider',
     content.includes('SlugProvider'),
     'SlugProvider export found',
   )
@@ -109,13 +109,13 @@ if (fs.existsSync(providerIndexPath)) {
 if (fs.existsSync(slugContextPath)) {
   const content = fs.readFileSync(slugContextPath, 'utf8')
   logTest(
-    'SlugContext.jsx contains "use client"',
+    'SlugContext.js contains "use client"',
     content.includes("'use client'"),
     'Client directive found',
   )
 
   logTest(
-    'SlugContext.jsx contains JSX syntax',
+    'SlugContext.js contains JSX syntax',
     content.includes('<SlugContext.Provider'),
     'JSX component found',
   )

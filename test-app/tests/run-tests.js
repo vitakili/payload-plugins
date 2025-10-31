@@ -62,14 +62,14 @@ logTest('theme-management index.js exists', fs.existsSync(themeIndex))
 console.log(`\n${colors.blue}3. Provider Component Tests${colors.reset}`)
 
 const localizedProviders = path.join(localizedSlugsDist, 'providers')
-const localizedProviderIndex = path.join(localizedProviders, 'index.jsx')
-const slugContext = path.join(localizedProviders, 'SlugContext.jsx')
+const localizedProviderIndex = path.join(localizedProviders, 'index.js')
+const slugContext = path.join(localizedProviders, 'SlugContext.js')
 
 logTest('localized-slugs providers directory exists', fs.existsSync(localizedProviders))
 
-logTest('localized-slugs providers/index.jsx exists', fs.existsSync(localizedProviderIndex))
+logTest('localized-slugs providers/index.js exists', fs.existsSync(localizedProviderIndex))
 
-logTest('localized-slugs SlugContext.jsx exists', fs.existsSync(slugContext))
+logTest('localized-slugs SlugContext.js exists', fs.existsSync(slugContext))
 
 // Test 4: Check for 'use client' directives
 console.log(`\n${colors.blue}4. Client Component Directive Tests${colors.reset}`)
@@ -78,13 +78,13 @@ const localizedProviderContent = fs.readFileSync(localizedProviderIndex, 'utf8')
 const slugContextContent = fs.readFileSync(slugContext, 'utf8')
 
 logTest(
-  'localized-slugs providers/index.jsx has "use client"',
+  'localized-slugs providers/index.js has "use client"',
   localizedProviderContent.includes("'use client'"),
   'Client component directive found',
 )
 
 logTest(
-  'localized-slugs SlugContext.jsx has "use client"',
+  'localized-slugs SlugContext.js has "use client"',
   slugContextContent.includes("'use client'"),
   'Client component directive found',
 )
@@ -124,9 +124,9 @@ logTest(
 console.log(`\n${colors.blue}6. File Extension Tests${colors.reset}`)
 
 logTest(
-  'localized-slugs uses .jsx for client components',
-  fs.existsSync(path.join(localizedProviders, 'SlugContext.jsx')),
-  'SlugContext.jsx found',
+  'localized-slugs uses .js for client components',
+  fs.existsSync(path.join(localizedProviders, 'SlugContext.js')),
+  'SlugContext.js found',
 )
 
 logTest(

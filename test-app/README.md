@@ -11,7 +11,7 @@ This test suite ensures that:
 - ✅ Client components are marked with `'use client'`
 - ✅ TypeScript definitions are generated
 - ✅ No module resolution errors occur
-- ✅ File extensions are correct (`.jsx` for components, `.js` for utilities)
+- ✅ File extensions are correct (`.js` for components, `.js` for utilities)
 
 ## Quick Start
 
@@ -74,7 +74,7 @@ test-app/
 
 ### 6. File Extensions (3 tests)
 
-- Validates correct use of `.jsx` for components and `.js` for utilities
+- Validates correct use of `.js` for components and `.js` for utilities
 
 ### 7. TypeScript Definitions (3 tests)
 
@@ -137,12 +137,12 @@ Review the failing test(s) and check:
 ### Test fails with "use client not found"
 
 - Check that JSX files contain `'use client'` directive
-- Ensure `.tsx` files are compiling to `.jsx` format
+- Ensure `.tsx` files are compiling to `.js` format
 
-### Import tests fail with "Unknown file extension .jsx"
+### Import tests fail with "Unknown file extension .js"
 
 - This is expected in Node.js - it's not a problem for Next.js
-- Next.js handles `.jsx` files correctly
+- Next.js handles `.js` files correctly
 - File existence checks should pass
 
 ## Integration with CI/CD

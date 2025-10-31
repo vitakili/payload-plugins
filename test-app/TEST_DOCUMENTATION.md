@@ -21,12 +21,12 @@ This test suite validates that both plugins (`@kilivi/payloadcms-localized-slugs
 
 3. Provider Component Tests (3/3 ✅)
    ✓ localized-slugs providers directory exists
-   ✓ localized-slugs providers/index.jsx exists
-   ✓ localized-slugs SlugContext.jsx exists
+   ✓ localized-slugs providers/index.js exists
+   ✓ localized-slugs SlugContext.js exists
 
 4. Client Component Directive Tests (2/2 ✅)
-   ✓ localized-slugs providers/index.jsx has "use client"
-   ✓ localized-slugs SlugContext.jsx has "use client"
+   ✓ localized-slugs providers/index.js has "use client"
+   ✓ localized-slugs SlugContext.js has "use client"
 
 5. Export Tests (4/4 ✅)
    ✓ localized-slugs index.js exports from providers
@@ -35,7 +35,7 @@ This test suite validates that both plugins (`@kilivi/payloadcms-localized-slugs
    ✓ theme-management index.js exports ThemeProvider
 
 6. File Extension Tests (3/3 ✅)
-   ✓ localized-slugs uses .jsx for client components
+   ✓ localized-slugs uses .js for client components
    ✓ localized-slugs uses .js for utilities
    ✓ localized-slugs uses .js for hooks
 
@@ -53,16 +53,16 @@ This test suite validates that both plugins (`@kilivi/payloadcms-localized-slugs
 
 ### Import Verification Test (test-imports.js)
 
-**Status: ✅ PARTIAL (Expected - Node.js doesn't support .jsx natively)**
+**Status: ✅ PARTIAL (Expected - Node.js doesn't support .js natively)**
 
 ```
 Provider Component File Checks (6/6 ✅)
-✓ providers/index.jsx file exists
-✓ providers/SlugContext.jsx file exists
-✓ providers/index.jsx contains "use client"
-✓ providers/index.jsx exports SlugProvider
-✓ SlugContext.jsx contains "use client"
-✓ SlugContext.jsx contains JSX syntax
+✓ providers/index.js file exists
+✓ providers/SlugContext.js file exists
+✓ providers/index.js contains "use client"
+✓ providers/index.js exports SlugProvider
+✓ SlugContext.js contains "use client"
+✓ SlugContext.js contains JSX syntax
 
 Theme Management Import Tests (3/3 ✅)
 ✓ Can load theme-management main entry point
@@ -70,7 +70,7 @@ Theme Management Import Tests (3/3 ✅)
 ✓ ThemeProvider is exported
 ```
 
-**Note:** The `.jsx` file import failures in Node.js are expected and NOT a problem. Next.js handles `.jsx` files correctly in server/client components. These tests confirm:
+**Note:** The `.js` file import failures in Node.js are expected and NOT a problem. Next.js handles `.js` files correctly in server/client components. These tests confirm:
 
 - Files exist and have correct extensions
 - "use client" directives are present
@@ -81,12 +81,12 @@ Theme Management Import Tests (3/3 ✅)
 ```
 packages/localized-slugs/dist/
 ├── index.js (main entry)
-│   ├── Exports from ./providers/index.jsx ✅
+│   ├── Exports from ./providers/index.js ✅
 │   ├── Exports from ./utils/index.js ✅
 │   └── Exports createLocalizedSlugField ✅
 ├── providers/
-│   ├── index.jsx (with 'use client') ✅
-│   ├── SlugContext.jsx (with 'use client') ✅
+│   ├── index.js (with 'use client') ✅
+│   ├── SlugContext.js (with 'use client') ✅
 │   └── *.d.ts (TypeScript definitions) ✅
 ├── utils/
 │   ├── index.js ✅
@@ -153,7 +153,7 @@ node tests/test-imports.js
 
 ### 5. **File Extensions**
 
-- `.jsx` for components with React/JSX syntax
+- `.js` for components with React/JSX syntax
 - `.js` for utilities and server-side code
 
 ### 6. **Package.json Configuration**
@@ -165,14 +165,14 @@ node tests/test-imports.js
 
 1. **Proper JSX Compilation**
    - Changed `src/providers/index.ts` → `src/providers/index.tsx`
-   - TypeScript now correctly compiles to `.jsx` format
+   - TypeScript now correctly compiles to `.js` format
 
 2. **Client Component Context Preserved**
    - `'use client'` directive properly preserved in re-exports
    - Client components marked with `'use client'` at all levels
 
 3. **Module Resolution Fixed**
-   - `.jsx` extensions used for compiled components
+   - `.js` extensions used for compiled components
    - `.js` extensions used for utilities and logic
    - Consistent naming across the build
 

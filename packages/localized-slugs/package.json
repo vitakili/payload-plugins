@@ -1,56 +1,59 @@
 {
   "name": "@kilivi/payloadcms-localized-slugs",
-  "version": "0.1.40",
+  "version": "0.1.42",
   "description": "Localized slugs plugin for Payload CMS v3 with multi-locale support",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./src/index.ts",
+      "types": "./src/index.d.ts",
+      "default": "./src/index.ts"
     },
     "./client": {
-      "import": "./dist/exports/client/index.js",
-      "types": "./dist/exports/client/index.d.ts",
-      "default": "./dist/exports/client/index.js"
+      "import": "./src/exports/client/index.ts",
+      "types": "./src/exports/client/index.d.ts",
+      "default": "./src/exports/client/index.ts"
     },
     "./client/react": {
-      "import": "./dist/exports/client/react.js",
-      "types": "./dist/exports/client/react.d.ts",
-      "default": "./dist/exports/client/react.js"
+      "import": "./src/exports/client/react.ts",
+      "types": "./src/exports/client/react.d.ts",
+      "default": "./src/exports/client/react.ts"
     },
     "./fields/*": {
-      "import": "./dist/fields/*.js",
-      "types": "./dist/fields/*.d.ts",
-      "default": "./dist/fields/*.js"
+      "import": "./src/fields/*.ts",
+      "types": "./src/fields/*.d.ts",
+      "default": "./src/fields/*.ts"
     },
     "./hooks/*": {
-      "import": "./dist/hooks/*.js",
-      "types": "./dist/hooks/*.d.ts",
-      "default": "./dist/hooks/*.js"
+      "import": "./src/hooks/*.ts",
+      "types": "./src/hooks/*.d.ts",
+      "default": "./src/hooks/*.ts"
     },
     "./utils/*": {
-      "import": "./dist/utils/*.js",
-      "types": "./dist/utils/*.d.ts",
-      "default": "./dist/utils/*.js"
+      "import": "./src/utils/*.ts",
+      "types": "./src/utils/*.d.ts",
+      "default": "./src/utils/*.ts"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run clean && pnpm run compile && pnpm run types",
-    "compile": "tsc",
-    "types": "tsc --emitDeclarationOnly",
+    "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
+    "build:swc": "swc ./src -d ./dist --config-file .swcrc",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist",
+    "compile": "swc ./src -d ./dist --config-file .swcrc",
+    "types": "tsc --emitDeclarationOnly --outDir dist",
     "dev": "tsc --watch",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "rimraf -g {dist,*.tsbuildinfo}",
+    "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "test": "vitest",
     "test:unit": "vitest",
     "test:watch": "vitest --watch",
-    "lint": "eslint src",
-    "lint:fix": "eslint --fix --ext .ts src",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prepublishOnly": "pnpm test && pnpm build"
   },
   "keywords": [

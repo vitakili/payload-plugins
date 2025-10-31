@@ -1,5 +1,5 @@
 {
-  "extends": ["../../tsconfig.json", "./tsconfig.paths.json"],
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
@@ -12,14 +12,8 @@
     "noEmit": false,
     "skipLibCheck": true,
     "baseUrl": "./src",
-    "paths": {
-      "@/*": ["./*"]
-    },
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": false
+    "strict": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.test.tsx"]
 }

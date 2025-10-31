@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 import { ClientSlugHandler } from '../dist/client.js'
-import { SlugProvider, useSlugContext } from '../dist/providers/index.jsx'
+import { SlugProvider, useSlugContext } from '../dist/providers/index.js'
 
 describe('Client Components', () => {
   test('SlugProvider provides context', () => {

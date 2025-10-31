@@ -1,1 +1,1 @@
-export { SlugProvider, useSlugContext } from '../../providers/index.jsx'
+export { SlugProvider, useSlugContext } from '../../providers/index.js'
