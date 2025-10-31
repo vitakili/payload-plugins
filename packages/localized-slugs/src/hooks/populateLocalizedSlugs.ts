@@ -34,6 +34,62 @@ function populateLocalizedSlugsField(
 }
 
 /**
+ * Checks if the localizedSlugs field is already correctly populated
+ */
+function isLocalizedSlugsAlreadyPopulated(
+  currentLocalizedSlugs: Record<string, { slug?: string; fullPath?: string }>,
+  newLocalizedSlugs: Record<string, { slug?: string; fullPath?: string }>,
+): boolean {
+  return JSON.stringify(newLocalizedSlugs) === JSON.stringify(currentLocalizedSlugs)
+}
+
+/**
+ * Updates the document with localizedSlugs if needed
+ */
+async function updateLocalizedSlugsIfNeeded(
+  doc: Record<string, unknown>,
+  collection: { slug: string },
+  req: { payload?: { update: (args: any) => Promise<any> }; locale?: string | null },
+  newLocalizedSlugs: Record<string, { slug?: string; fullPath?: string }>,
+  enableLogging: boolean,
+): Promise<void> {
+  const currentLocalizedSlugs =
+    (doc.localizedSlugs as Record<string, { slug?: string; fullPath?: string }>) || {}
+
+  if (isLocalizedSlugsAlreadyPopulated(currentLocalizedSlugs, newLocalizedSlugs)) {
+    if (enableLogging) {
+      // eslint-disable-next-line no-console
+      console.log(`🌐 localizedSlugs already populated for document ${doc.id}, skipping update`)
+    }
+    return
+  }
+
+  if (!req?.payload) {
+    return
+  }
+
+  try {
+    await req.payload.update({
+      collection: collection.slug,
+      id: doc.id as string,
+      data: { localizedSlugs: newLocalizedSlugs },
+      locale: req.locale,
+      depth: 0,
+    })
+
+    if (enableLogging) {
+      // eslint-disable-next-line no-console
+      console.log(`🌐 Successfully saved localizedSlugs for document ${doc.id}`)
+    }
+  } catch (error) {
+    if (enableLogging) {
+      // eslint-disable-next-line no-console
+      console.error(`🌐 Failed to save localizedSlugs for document ${doc.id}:`, error)
+    }
+  }
+}
+
+/**
  * Creates a hook that populates localized slugs and full paths for a collection
  */
 export const createPopulateLocalizedSlugsHook = (
@@ -67,28 +123,14 @@ export const createPopulateLocalizedSlugsHook = (
         )
       }
 
-      // Save the updated document back to the database
-      if (req?.payload) {
-        try {
-          await req.payload.update({
-            collection: collection.slug,
-            id: doc.id,
-            data: { localizedSlugs: updatedDoc.localizedSlugs },
-            locale: req.locale,
-            depth: 0,
-          })
-
-          if (enableLogging) {
-            // eslint-disable-next-line no-console
-            console.log(`🌐 Successfully saved localizedSlugs for document ${doc.id}`)
-          }
-        } catch (error) {
-          if (enableLogging) {
-            // eslint-disable-next-line no-console
-            console.error(`🌐 Failed to save localizedSlugs for document ${doc.id}:`, error)
-          }
-        }
-      }
+      // Update the document with localizedSlugs if needed (prevents infinite loops)
+      await updateLocalizedSlugsIfNeeded(
+        docData,
+        collection,
+        req,
+        updatedDoc.localizedSlugs,
+        enableLogging,
+      )
 
       return updatedDoc
     } catch (error) {
