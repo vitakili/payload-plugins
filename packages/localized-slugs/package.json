@@ -81,6 +81,40 @@
     "vitest": "^1.6.1"
   },
   "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./client": {
+        "import": "./dist/exports/client/index.js",
+        "types": "./dist/exports/client/index.d.ts",
+        "default": "./dist/exports/client/index.js"
+      },
+      "./client/react": {
+        "import": "./dist/exports/client/react.js",
+        "types": "./dist/exports/client/react.d.ts",
+        "default": "./dist/exports/client/react.js"
+      },
+      "./fields/*": {
+        "import": "./dist/fields/*.js",
+        "types": "./dist/fields/*.d.ts",
+        "default": "./dist/fields/*.js"
+      },
+      "./hooks/*": {
+        "import": "./dist/hooks/*.js",
+        "types": "./dist/hooks/*.d.ts",
+        "default": "./dist/hooks/*.js"
+      },
+      "./utils/*": {
+        "import": "./dist/utils/*.js",
+        "types": "./dist/utils/*.d.ts",
+        "default": "./dist/utils/*.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "access": "public"
   }
 }
