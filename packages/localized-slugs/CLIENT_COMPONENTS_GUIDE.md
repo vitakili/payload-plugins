@@ -62,19 +62,70 @@ export default buildConfig({
 
 ### 2. Client-Side (Next.js App)
 
-In your Next.js app components (e.g., `app/layout.tsx` or pages):
+**CRITICAL**: `SlugProvider` is a client component and **MUST** be used in a client component context. You **CANNOT** import `SlugProvider` directly in server components like `layout.tsx`.
+
+#### ❌ WRONG - This will cause build errors:
 
 ```typescript
-'use client'
+// app/layout.tsx (Server Component)
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react' // ❌ ERROR
 
-import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
-import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
-
-export function RootLayout({ children }) {
+export default function RootLayout({ children }) {
   return (
     <html>
       <body>
-        <SlugProvider>
+        <SlugProvider>  {/* ❌ This fails because SlugProvider is client component in server component */}
+          {children}
+        </SlugProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+#### ✅ CORRECT - Create a client component wrapper:
+
+```typescript
+// components/SlugProviderWrapper.tsx (Client Component)
+'use client'
+
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
+
+export function SlugProviderWrapper({ children }: { children: React.ReactNode }) {
+  return <SlugProvider>{children}</SlugProvider>
+}
+```
+
+```typescript
+// app/layout.tsx (Server Component)
+import { SlugProviderWrapper } from '@/components/SlugProviderWrapper'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <SlugProviderWrapper>  {/* ✅ This works */}
+          {children}
+        </SlugProviderWrapper>
+      </body>
+    </html>
+  )
+}
+```
+
+#### ✅ Alternative - Make your layout a client component:
+
+```typescript
+// app/layout.tsx (Client Component)
+'use client'
+
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <SlugProvider>  {/* ✅ This works if layout is client component */}
           {children}
         </SlugProvider>
       </body>
