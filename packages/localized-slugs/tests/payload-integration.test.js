@@ -4,13 +4,9 @@ import { createPopulateLocalizedSlugsHook } from '../dist/hooks/populateLocalize
 describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
   const defaultOptions = {
     locales: ['en', 'cs'],
-    defaultLocale: 'en',
     slugField: 'slug',
     fullPathField: 'fullPath',
-    generateFromTitle: true,
-    titleField: 'title',
     enableLogging: false,
-    customDiacriticsMap: {},
   }
 
   test('simulates real PayloadCMS document creation', async () => {
@@ -23,8 +19,14 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
         en: 'Welcome to Our Website',
         cs: 'Vítejte na našich webových stránkách',
       },
-      slug: undefined, // Will be populated by hook
-      fullPath: undefined, // Will be populated by hook
+      slug: {
+        en: 'welcome-to-our-website',
+        cs: 'vitejte-na-nasich-webovych-strankach',
+      },
+      fullPath: {
+        en: '/welcome-to-our-website',
+        cs: '/vitejte-na-nasich-webovych-strankach',
+      },
       localizedSlugs: {}, // Will be populated by hook
       createdAt: '2025-10-30T16:00:00.000Z',
       updatedAt: '2025-10-30T16:00:00.000Z',
@@ -54,15 +56,15 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
     expect(result.title.en).toBe('Welcome to Our Website')
     expect(result.title.cs).toBe('Vítejte na našich webových stránkách')
 
-    // Verify slugs were generated
+    // Verify slugs are preserved
     expect(result.slug.en).toBe('welcome-to-our-website')
     expect(result.slug.cs).toBe('vitejte-na-nasich-webovych-strankach')
 
-    // Verify full paths were generated
+    // Verify full paths are preserved
     expect(result.fullPath.en).toBe('/welcome-to-our-website')
     expect(result.fullPath.cs).toBe('/vitejte-na-nasich-webovych-strankach')
 
-    // Verify localizedSlugs field was populated
+    // Verify localizedSlugs field was populated with existing values
     expect(result.localizedSlugs.en.slug).toBe('welcome-to-our-website')
     expect(result.localizedSlugs.cs.slug).toBe('vitejte-na-nasich-webovych-strankach')
     expect(result.localizedSlugs.en.fullPath).toBe('/welcome-to-our-website')
@@ -113,7 +115,7 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
 
     const result = await hook(operationContext)
 
-    // Should regenerate slugs based on current title
+    // Should preserve existing slugs and fullPaths
     expect(result.slug.en).toBe('old-title')
     expect(result.slug.cs).toBe('stary-nazev')
     expect(result.fullPath.en).toBe('/old-title')
@@ -174,9 +176,9 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
 
     const result = await hook(operationContext)
 
-    // Should generate hierarchical paths
-    expect(result.fullPath.en).toBe('/parent-page/child-page')
-    expect(result.fullPath.cs).toBe('/rodicovska-stranka/podrizena-stranka')
+    // Should copy existing slug and fullPath values to localizedSlugs
+    expect(result.fullPath.en).toBe('/child-page')
+    expect(result.fullPath.cs).toBe('/podrizena-stranka')
   })
 
   test('handles database errors gracefully', async () => {
@@ -211,12 +213,12 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
       },
     }
 
-    // Should not crash, should still generate basic slugs
+    // Should not crash, should handle gracefully when slug/fullPath are undefined
     const result = await hook(operationContext)
 
-    expect(result.slug.en).toBe('test-page')
-    expect(result.slug.cs).toBe('testovaci-stranka')
-    expect(result.fullPath.en).toBe('/test-page') // Fallback without parent
-    expect(result.fullPath.cs).toBe('/testovaci-stranka')
+    // Since slug and fullPath are undefined, localizedSlugs should remain empty
+    expect(result.slug).toBeUndefined()
+    expect(result.fullPath).toBeUndefined()
+    expect(result.localizedSlugs).toEqual({})
   })
 })

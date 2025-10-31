@@ -2,11 +2,10 @@ import { describe, expect, test } from 'vitest'
 import localizedSlugsPlugin from '../dist/index.js'
 
 describe('Integration: Localized Slugs Generation', () => {
-  test('end-to-end localizedSlugs generation', async () => {
+  test('end-to-end localizedSlugs copying', async () => {
     const options = {
       locales: ['en', 'cs'],
-      defaultLocale: 'en',
-      collections: [{ collection: 'pages', generateFromTitle: true }],
+      collections: [{ collection: 'pages', slugField: 'slug', fullPathField: 'fullPath' }],
       enableLogging: false,
     }
 
@@ -28,8 +27,8 @@ describe('Integration: Localized Slugs Generation', () => {
     // Simulate document creation
     const testDoc = {
       title: { en: 'Hello World', cs: 'Ahoj Svět' },
-      slug: undefined,
-      fullPath: undefined,
+      slug: { en: 'hello-world', cs: 'ahoj-svet' },
+      fullPath: { en: '/hello-world', cs: '/ahoj-svet' },
       localizedSlugs: {},
     }
 
@@ -40,14 +39,11 @@ describe('Integration: Localized Slugs Generation', () => {
       collection: { slug: 'pages' },
     })
 
-    // Verify localizedSlugs were generated
-    expect(result.localizedSlugs).toBeDefined()
-    expect(result.localizedSlugs.en).toBeDefined()
-    expect(result.localizedSlugs.cs).toBeDefined()
-    expect(result.localizedSlugs.en.slug).toBe('hello-world')
-    expect(result.localizedSlugs.cs.slug).toBe('ahoj-svet')
-    expect(result.localizedSlugs.en.fullPath).toBe('/hello-world')
-    expect(result.localizedSlugs.cs.fullPath).toBe('/ahoj-svet')
+    // Verify localizedSlugs were copied
+    expect(result.localizedSlugs).toEqual({
+      en: { slug: 'hello-world', fullPath: '/hello-world' },
+      cs: { slug: 'ahoj-svet', fullPath: '/ahoj-svet' },
+    })
 
     // Verify slug and path fields were populated
     expect(result.slug).toEqual({ en: 'hello-world', cs: 'ahoj-svet' })

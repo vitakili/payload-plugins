@@ -4,16 +4,12 @@ import { createPopulateLocalizedSlugsHook } from '../dist/hooks/populateLocalize
 describe('Localized Slugs Generation - Real World Scenarios', () => {
   const defaultOptions = {
     locales: ['en', 'cs', 'de'],
-    defaultLocale: 'en',
     slugField: 'slug',
     fullPathField: 'fullPath',
-    generateFromTitle: true,
-    titleField: 'title',
     enableLogging: false,
-    customDiacriticsMap: {},
   }
 
-  test('generates slugs for multiple locales with diacritics', async () => {
+  test('copies slugs for multiple locales with diacritics', async () => {
     const hook = createPopulateLocalizedSlugsHook(defaultOptions)
 
     const doc = {
@@ -22,9 +18,17 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         cs: 'Kontaktujte nás dnes',
         de: 'Kontaktieren Sie uns heute',
       },
-      slug: undefined,
-      fullPath: undefined,
-      localizedSlugs: { en: {}, cs: {}, de: {} },
+      slug: {
+        en: 'contact-us-today',
+        cs: 'kontaktujte-nas-dnes',
+        de: 'kontaktieren-sie-uns-heute',
+      },
+      fullPath: {
+        en: '/contact-us-today',
+        cs: '/kontaktujte-nas-dnes',
+        de: '/kontaktieren-sie-uns-heute',
+      },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -51,9 +55,17 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         en: 'About Us',
         cs: 'O nás', // Missing de title
       },
-      slug: undefined,
-      fullPath: undefined,
-      localizedSlugs: { en: {}, cs: {}, de: {} },
+      slug: {
+        en: 'about-us',
+        cs: 'o-nas',
+        de: 'about-us', // Manually set for de
+      },
+      fullPath: {
+        en: '/about-us',
+        cs: '/o-nas',
+        de: '/about-us',
+      },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -65,14 +77,11 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
 
     expect(result.localizedSlugs.en.slug).toBe('about-us')
     expect(result.localizedSlugs.cs.slug).toBe('o-nas')
-    expect(result.localizedSlugs.de.slug).toBe('about-us') // Falls back to default locale
+    expect(result.localizedSlugs.de.slug).toBe('about-us')
   })
 
-  test('respects existing slugs when not generating from title', async () => {
-    const hook = createPopulateLocalizedSlugsHook({
-      ...defaultOptions,
-      generateFromTitle: false,
-    })
+  test('copies existing slugs and paths', async () => {
+    const hook = createPopulateLocalizedSlugsHook(defaultOptions)
 
     const doc = {
       title: {
@@ -83,8 +92,11 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         en: 'custom-slug-en',
         cs: 'vlastni-slug-cs',
       },
-      fullPath: undefined,
-      localizedSlugs: { en: {}, cs: {} },
+      fullPath: {
+        en: '/custom-slug-en',
+        cs: '/vlastni-slug-cs',
+      },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -109,17 +121,14 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         cs: 'Aktualizovaný název',
       },
       slug: {
-        en: 'old-slug',
-        cs: 'stary-slug',
+        en: 'updated-slug',
+        cs: 'aktualizovany-slug',
       },
       fullPath: {
-        en: '/old-path',
-        cs: '/stary-slug',
+        en: '/updated-path',
+        cs: '/aktualizovany-slug',
       },
-      localizedSlugs: {
-        en: { slug: 'old-slug', fullPath: '/old-path' },
-        cs: { slug: 'stary-slug', fullPath: '/stary-slug' },
-      },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -129,11 +138,11 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
       collection: { slug: 'pages' },
     })
 
-    // Should regenerate based on title
-    expect(result.localizedSlugs.en.slug).toBe('updated-title')
-    expect(result.localizedSlugs.cs.slug).toBe('aktualizovany-nazev')
-    expect(result.localizedSlugs.en.fullPath).toBe('/updated-title')
-    expect(result.localizedSlugs.cs.fullPath).toBe('/aktualizovany-nazev')
+    // Should copy the current slug and fullPath values
+    expect(result.localizedSlugs.en.slug).toBe('updated-slug')
+    expect(result.localizedSlugs.cs.slug).toBe('aktualizovany-slug')
+    expect(result.localizedSlugs.en.fullPath).toBe('/updated-path')
+    expect(result.localizedSlugs.cs.fullPath).toBe('/aktualizovany-slug')
   })
 
   test('handles complex titles with special characters', async () => {
@@ -144,9 +153,15 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         en: 'Café & Restaurant - Best Food in Town!',
         cs: 'Kavárna & Restaurace - Nejlepší jídlo ve městě!',
       },
-      slug: undefined,
-      fullPath: undefined,
-      localizedSlugs: { en: {}, cs: {} },
+      slug: {
+        en: 'cafe-restaurant-best-food-in-town',
+        cs: 'kavarna-restaurace-nejlepsi-jidlo-ve-meste',
+      },
+      fullPath: {
+        en: '/cafe-restaurant-best-food-in-town',
+        cs: '/kavarna-restaurace-nejlepsi-jidlo-ve-meste',
+      },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -165,7 +180,6 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
       ...defaultOptions,
       slugField: 'urlSlug',
       fullPathField: 'urlPath',
-      titleField: 'pageTitle',
     })
 
     const doc = {
@@ -173,9 +187,15 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
         en: 'Custom Fields Test',
         cs: 'Test vlastních polí',
       },
-      urlSlug: undefined,
-      urlPath: undefined,
-      localizedSlugs: { en: {}, cs: {} },
+      urlSlug: {
+        en: 'custom-fields-test',
+        cs: 'test-vlastnich-poli',
+      },
+      urlPath: {
+        en: '/custom-fields-test',
+        cs: '/test-vlastnich-poli',
+      },
+      localizedSlugs: {},
     }
 
     const result = await hook({

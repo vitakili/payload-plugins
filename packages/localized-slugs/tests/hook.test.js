@@ -1,23 +1,19 @@
 import { expect, test } from 'vitest'
 import { createPopulateLocalizedSlugsHook } from '../dist/hooks/populateLocalizedSlugs.js'
 
-test('populateLocalizedSlugs hook generates localized slugs and fullPaths', async () => {
+test('populateLocalizedSlugs hook copies existing slug and path values', async () => {
   const hook = createPopulateLocalizedSlugsHook({
     locales: ['cs', 'en'],
-    defaultLocale: 'cs',
     slugField: 'slug',
     fullPathField: 'path',
-    generateFromTitle: true,
-    titleField: 'title',
     enableLogging: false,
-    customDiacriticsMap: {},
   })
 
   const sample = {
     title: { cs: 'Kontaktujte nás', en: 'Contact us' },
-    slug: undefined,
-    path: undefined,
-    localizedSlugs: { cs: {}, en: {} },
+    slug: { cs: 'kontaktujte-nas', en: 'contact-us' },
+    path: { cs: '/kontaktujte-nas', en: '/contact-us' },
+    localizedSlugs: {},
   }
 
   const result = await hook({
@@ -27,11 +23,10 @@ test('populateLocalizedSlugs hook generates localized slugs and fullPaths', asyn
     collection: { slug: 'pages' },
   })
 
-  expect(result.slug).toBeDefined()
-  expect(result.path).toBeDefined()
-  expect(result.localizedSlugs).toBeDefined()
-  expect(result.localizedSlugs.cs.slug).toBe('kontaktujte-nas')
-  expect(result.localizedSlugs.en.slug).toBe('contact-us')
-  expect(result.localizedSlugs.cs.fullPath).toBe('/kontaktujte-nas')
-  expect(result.localizedSlugs.en.fullPath).toBe('/contact-us')
+  expect(result.slug).toEqual({ cs: 'kontaktujte-nas', en: 'contact-us' })
+  expect(result.path).toEqual({ cs: '/kontaktujte-nas', en: '/contact-us' })
+  expect(result.localizedSlugs).toEqual({
+    cs: { slug: 'kontaktujte-nas', fullPath: '/kontaktujte-nas' },
+    en: { slug: 'contact-us', fullPath: '/contact-us' },
+  })
 })

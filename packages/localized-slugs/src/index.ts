@@ -7,8 +7,6 @@ export interface LocalizedSlugsPluginOptions {
   enabled?: boolean
   /** Array of supported locales */
   locales?: ('cs' | 'en')[]
-  /** Default locale */
-  defaultLocale?: 'cs' | 'en'
   /** Collections to apply localized slugs to */
   collections?: {
     /** Collection slug */
@@ -17,15 +15,9 @@ export interface LocalizedSlugsPluginOptions {
     slugField?: string
     /** Field name that contains the full path (default: 'fullPath') */
     fullPathField?: string
-    /** Whether to auto-generate slugs from title */
-    generateFromTitle?: boolean
-    /** Title field name for auto-generation (default: 'title') */
-    titleField?: string
   }[]
   /** Whether to enable console logging */
   enableLogging?: boolean
-  /** Custom diacritics mapping for slug generation */
-  customDiacriticsMap?: Record<string, string>
 }
 
 export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}): Plugin => {
@@ -33,10 +25,8 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
     const {
       enabled = true,
       locales = [], // Allow any locale
-      defaultLocale = 'en', // Default to 'en' if not provided
       collections = [],
       enableLogging = false,
-      customDiacriticsMap = {},
     } = options
 
     if (!enabled) {
@@ -47,7 +37,6 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
       // eslint-disable-next-line no-console
       console.log('🌐 Localized Slugs Plugin: Initializing with options:', {
         locales,
-        defaultLocale,
         collections: collections.map((c) => c.collection),
       })
     }
@@ -75,13 +64,9 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions = {}):
 
       const populateLocalizedSlugsHook = createPopulateLocalizedSlugsHook({
         locales,
-        defaultLocale,
         slugField: collectionConfig.slugField || 'slug',
         fullPathField: collectionConfig.fullPathField || 'fullPath',
-        generateFromTitle: collectionConfig.generateFromTitle || false,
-        titleField: collectionConfig.titleField || 'title',
         enableLogging,
-        customDiacriticsMap,
       })
 
       return {

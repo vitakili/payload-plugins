@@ -63,19 +63,16 @@ describe('Hook Edge Cases', () => {
   test('handles update operations', async () => {
     const hook = createPopulateLocalizedSlugsHook({
       locales: ['en'],
-      defaultLocale: 'en',
       slugField: 'slug',
       fullPathField: 'path',
-      generateFromTitle: true,
-      titleField: 'title',
       enableLogging: false,
     })
 
     const sample = {
       title: { en: 'Updated Title' },
-      slug: 'old-slug',
-      path: '/old-path',
-      localizedSlugs: { en: { slug: 'old-slug', fullPath: '/old-path' } },
+      slug: { en: 'updated-slug' },
+      path: { en: '/updated-path' },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -85,27 +82,24 @@ describe('Hook Edge Cases', () => {
       collection: { slug: 'pages' },
     })
 
-    // Should update the slugs
-    expect(result.localizedSlugs.en.slug).toBe('updated-title')
-    expect(result.localizedSlugs.en.fullPath).toBe('/updated-title')
+    // Should copy the existing slug and path values
+    expect(result.localizedSlugs.en.slug).toBe('updated-slug')
+    expect(result.localizedSlugs.en.fullPath).toBe('/updated-path')
   })
 
-  test('respects existing slugs when not generating from title', async () => {
+  test('copies existing slug and path values', async () => {
     const hook = createPopulateLocalizedSlugsHook({
       locales: ['en'],
-      defaultLocale: 'en',
       slugField: 'slug',
       fullPathField: 'path',
-      generateFromTitle: false, // Don't generate from title
-      titleField: 'title',
       enableLogging: false,
     })
 
     const sample = {
       title: { en: 'Some Title' },
-      slug: 'custom-slug',
-      path: '/custom-path',
-      localizedSlugs: { en: {} },
+      slug: { en: 'custom-slug' },
+      path: { en: '/custom-path' },
+      localizedSlugs: {},
     }
 
     const result = await hook({
@@ -115,8 +109,9 @@ describe('Hook Edge Cases', () => {
       collection: { slug: 'pages' },
     })
 
-    // Should use the existing slug values and generate path from slug
+    // Should copy the existing slug and path values
     expect(result.slug).toEqual({ en: 'custom-slug' })
-    expect(result.path).toEqual({ en: '/custom-slug' })
+    expect(result.path).toEqual({ en: '/custom-path' })
+    expect(result.localizedSlugs).toEqual({ en: { slug: 'custom-slug', fullPath: '/custom-path' } })
   })
 })
