@@ -9,26 +9,11 @@ export interface PopulateLocalizedSlugsOptions {
   titleField?: string
 }
 
-// Const pro označení, že jsme již prošli hook
-const LOCALIZED_SLUGS_PROCESSING = '__localized_slugs_processing__'
+// Flag to prevent infinite recursion
+const SKIP_LOCALIZED_SLUG_HOOK = 'skipLocalizedSlugHook'
 
 /**
- * Detects whether a field is localized (object with locale keys) or not
- */
-function isLocalizedField(fieldValue: unknown): boolean {
-  return (
-    typeof fieldValue === 'object' &&
-    fieldValue !== null &&
-    !Array.isArray(fieldValue) &&
-    !(fieldValue instanceof Date)
-  )
-}
-
-/**
- * Populates the localizedSlugs field from existing slug and fullPath fields
- */
-/**
- * Helper: Generate slug from title using simple slugification
+ * Simple slug generation from title
  */
 function slugify(str: string): string {
   return str
@@ -40,110 +25,69 @@ function slugify(str: string): string {
 }
 
 /**
- * Helper: Extract slug and fullPath for a single locale from existing fields
+ * Helper: Extract slug and fullPath from a document (handles both fetch and direct pass)
  */
-function extractExistingValues(
-  docData: Record<string, unknown>,
-  locales: string[],
+function extractSlugData(
+  localizedDoc: Record<string, unknown>,
   slugField: string,
   fullPathField: string,
-  _enableLogging: boolean,
-): Record<string, { slug?: string; fullPath?: string }> {
-  const localizedSlugs: Record<string, { slug?: string; fullPath?: string }> = {}
-  const slugFieldValue = docData[slugField]
-  const fullPathFieldValue = docData[fullPathField]
+  generateFromTitle: boolean,
+  titleField: string | undefined,
+  locale: string,
+): { slug?: string; fullPath?: string } {
+  let slug: string | undefined
+  let fullPath: string | undefined
 
-  const slugIsLocalized = isLocalizedField(slugFieldValue)
-  const fullPathIsLocalized = isLocalizedField(fullPathFieldValue)
-
-  for (const locale of locales) {
-    let slugVal: string | undefined
-    let fullPathVal: string | undefined
-
-    if (slugIsLocalized) {
-      slugVal = (slugFieldValue as Record<string, string>)?.[locale]
-    } else {
-      slugVal = locale === locales[0] ? (slugFieldValue as string) : undefined
-    }
-
-    if (fullPathIsLocalized) {
-      fullPathVal = (fullPathFieldValue as Record<string, string>)?.[locale]
-    } else {
-      fullPathVal = locale === locales[0] ? (fullPathFieldValue as string) : undefined
-    }
-
-    if (slugVal || fullPathVal) {
-      localizedSlugs[locale] = {
-        slug: slugVal,
-        fullPath: fullPathVal,
+  if (generateFromTitle && titleField) {
+    const titleValue = localizedDoc[titleField]
+    // Handle both localized object and plain string
+    if (titleValue && typeof titleValue === 'object' && !Array.isArray(titleValue)) {
+      const titleObj = titleValue as Record<string, unknown>
+      const val = titleObj[locale]
+      if (val && typeof val === 'string') {
+        slug = slugify(val)
+        fullPath = `/${slug}`
       }
+    } else if (titleValue && typeof titleValue === 'string') {
+      slug = slugify(titleValue)
+      fullPath = `/${slug}`
+    }
+  } else {
+    const slugValue = localizedDoc[slugField]
+    const fullPathValue = localizedDoc[fullPathField]
+
+    // Handle both localized fields (objects) and plain fields (strings)
+    if (slugValue && typeof slugValue === 'object' && !Array.isArray(slugValue)) {
+      const slugObj = slugValue as Record<string, unknown>
+      if (typeof slugObj[locale] === 'string') {
+        slug = slugObj[locale] as string
+      }
+    } else if (typeof slugValue === 'string') {
+      slug = slugValue
+    }
+
+    if (fullPathValue && typeof fullPathValue === 'object' && !Array.isArray(fullPathValue)) {
+      const pathObj = fullPathValue as Record<string, unknown>
+      if (typeof pathObj[locale] === 'string') {
+        fullPath = pathObj[locale] as string
+      }
+    } else if (typeof fullPathValue === 'string') {
+      fullPath = fullPathValue
     }
   }
 
-  return localizedSlugs
+  return { slug, fullPath }
 }
 
 /**
- * Helper: Generate slug and fullPath from title field
- */
-function generateFromTitleField(
-  docData: Record<string, unknown>,
-  locales: string[],
-  titleField: string,
-  _enableLogging: boolean,
-): Record<string, { slug?: string; fullPath?: string }> {
-  const localizedSlugs: Record<string, { slug?: string; fullPath?: string }> = {}
-  const titleFieldValue = docData[titleField]
-
-  if (!titleFieldValue) {
-    return localizedSlugs
-  }
-
-  const titleIsLocalized = isLocalizedField(titleFieldValue)
-
-  for (const locale of locales) {
-    let titleVal: string | undefined
-
-    if (titleIsLocalized) {
-      titleVal = (titleFieldValue as Record<string, string>)?.[locale]
-    } else {
-      titleVal = locale === locales[0] ? (titleFieldValue as string) : undefined
-    }
-
-    if (titleVal) {
-      const generatedSlug = slugify(titleVal)
-      localizedSlugs[locale] = {
-        slug: generatedSlug,
-        fullPath: `/${generatedSlug}`,
-      }
-    }
-  }
-
-  return localizedSlugs
-}
-
-function populateLocalizedSlugsField(
-  docData: Record<string, unknown>,
-  locales: string[],
-  slugField: string,
-  fullPathField: string,
-  enableLogging: boolean,
-  generateFromTitle: boolean = false,
-  titleField: string = 'title',
-): Record<string, { slug?: string; fullPath?: string }> {
-  if (generateFromTitle) {
-    return generateFromTitleField(docData, locales, titleField, enableLogging)
-  }
-
-  return extractExistingValues(docData, locales, slugField, fullPathField, enableLogging)
-}
-
-/**
- * Creates a hook that populates localized slugs and full paths for a collection
+ * Creates a hook that populates localized slugs by fetching each locale's version of the document.
  *
- * IMPORTANT: This hook ONLY modifies the in-memory document that gets saved.
- * It does NOT call req.payload.update() to prevent infinite loops in multitenant environments.
- * Payload CMS will automatically persist the returned document.
+ * THIS IS THE CRITICAL PATTERN:
+ * 1. Check if we're in a recursive call (context flag)
+ * 2. Fetch the document in EACH locale using req.payload.findByID()
+ * 3. Extract slug/fullPath from each locale's version
+ * 4. Build the localizedSlugs object
+ * 5. Return updated doc (Payload persists it automatically)
  */
 export const createPopulateLocalizedSlugsHook = (
   options: PopulateLocalizedSlugsOptions,
@@ -153,70 +97,115 @@ export const createPopulateLocalizedSlugsHook = (
       options
 
     try {
+      // Skip if this is a recursive call to prevent infinite loops
+      if (req?.context?.[SKIP_LOCALIZED_SLUG_HOOK]) {
+        if (enableLogging) {
+          // eslint-disable-next-line no-console
+          console.log(`🌐 [${collection.slug}] Skipping (recursive call)`)
+        }
+        return doc
+      }
+
       // Only process on create/update operations
       if (operation !== 'create' && operation !== 'update') {
         return doc
       }
 
-      // Prevent infinite loops - if we're already processing, skip
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((req as any)?.[LOCALIZED_SLUGS_PROCESSING]) {
+      // Don't process if document is not published
+      if ('_status' in doc && doc._status !== 'published') {
         if (enableLogging) {
           // eslint-disable-next-line no-console
-          console.log(`🌐 Already processing for document ${doc.id}, skipping to prevent loops`)
+          console.log(`🌐 [${collection.slug}] Skipping unpublished document`)
         }
         return doc
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const docData = doc as any
-      const updatedDoc = { ...docData }
+      const docId = doc.id
+      const localizedSlugs: Record<string, { slug?: string; fullPath?: string }> = {}
 
-      // Mark that we're processing this document
-      if (req) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(req as any)[LOCALIZED_SLUGS_PROCESSING] = true
-      }
+      // CRITICAL: Fetch the document in EACH locale (or use provided doc if req.payload not available)
+      for (const locale of locales) {
+        try {
+          let localizedDoc: Record<string, unknown>
 
-      // Populate the localizedSlugs field
-      updatedDoc.localizedSlugs = populateLocalizedSlugsField(
-        docData,
-        locales,
-        slugField,
-        fullPathField,
-        enableLogging,
-        generateFromTitle,
-        titleField,
-      )
+          // Check if req.payload.findByID is available (production) or fallback to doc (tests/fallback)
+          if (req?.payload?.findByID) {
+            // Production: Fetch from Payload
+            const fetched = await req.payload.findByID({
+              collection: collection.slug,
+              id: docId,
+              locale,
+            })
 
-      // Only proceed if we actually have localizedSlugs data to populate
-      const hasLocalizedSlugsData = Object.keys(updatedDoc.localizedSlugs).length > 0
+            if (fetched) {
+              localizedDoc = fetched as Record<string, unknown>
+            } else {
+              // Fallback to provided doc if fetch returns null
+              localizedDoc = doc as Record<string, unknown>
+            }
+          } else {
+            // Fallback: Use the provided document (for tests or when req.payload not available)
+            localizedDoc = doc as Record<string, unknown>
+          }
 
-      if (!hasLocalizedSlugsData) {
-        if (enableLogging) {
-          // eslint-disable-next-line no-console
-          console.log(
-            `🌐 No localizedSlugs data for ${collection.slug} (source fields not populated yet)`,
+          const data = extractSlugData(
+            localizedDoc,
+            slugField,
+            fullPathField,
+            generateFromTitle || false,
+            titleField,
+            locale,
           )
+
+          if (data.slug || data.fullPath) {
+            localizedSlugs[locale] = data
+
+            if (enableLogging) {
+              // eslint-disable-next-line no-console
+              console.log(
+                `🌐 [${collection.slug}] Locale ${locale}: slug="${data.slug}", fullPath="${data.fullPath}"`,
+              )
+            }
+          }
+        } catch (error) {
+          if (enableLogging) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `🌐 [${collection.slug}] Failed to fetch locale ${locale}:`,
+              error instanceof Error ? error.message : error,
+            )
+          }
+        }
+      }
+
+      // If no slugs were populated, return original document
+      if (Object.keys(localizedSlugs).length === 0) {
+        if (enableLogging) {
+          // eslint-disable-next-line no-console
+          console.log(`🌐 [${collection.slug}] No slug data found in any locale`)
         }
         return doc
+      }
+
+      const updatedDoc = {
+        ...doc,
+        localizedSlugs,
       }
 
       if (enableLogging) {
         // eslint-disable-next-line no-console
         console.log(
-          `🌐 Populated localizedSlugs for ${collection.slug}:`,
-          updatedDoc.localizedSlugs,
+          `🌐 [${collection.slug}] ✅ Populated localizedSlugs:`,
+          JSON.stringify(localizedSlugs, null, 2),
         )
       }
 
-      // IMPORTANT: Return the modified document without calling req.payload.update()
-      // Payload CMS will automatically persist this returned document in the afterChange hook
+      // Return updated document - Payload CMS will automatically persist it
       return updatedDoc
     } catch (error) {
       if (enableLogging) {
         // eslint-disable-next-line no-console
-        console.error('🌐 Error in populateLocalizedSlugsHook:', error)
+        console.error(`🌐 [${collection.slug}] Error in populateLocalizedSlugsHook:`, error)
       }
       return doc
     }
