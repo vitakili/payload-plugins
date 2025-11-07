@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-11-07
+
+### ✨ New Features & Configuration API
+
+#### Added
+
+- **Simplified configuration API** - Match your exact requirements:
+  ```typescript
+  localizedSlugsPlugin({
+    enabled: true,
+    locales: ['cs', 'en'],
+    defaultLocale: 'cs',
+    collections: [
+      {
+        collection: 'pages',
+        generateFromTitle: false,
+        titleField: 'title',
+        fullPathField: 'path',
+      },
+      { collection: 'categories' },
+      { collection: 'products' },
+    ],
+    enableLogging: true,
+  })
+  ```
+- **`generateFromTitle` option** - Generate slugs from title field when needed
+  - Set `generateFromTitle: true` to auto-generate slugs from title
+  - Set `generateFromTitle: false` to copy from existing slug/fullPath fields (default)
+  - Works with both localized and non-localized title fields
+- **`titleField` option** - Specify custom title field name (default: 'title')
+- **Flexible collection configuration** - Mix string slugs with detailed configs
+
+#### Changed
+
+- Configuration now supports `enabled`, `locales`, `defaultLocale`, `collections`, and `enableLogging` at top level
+- Collection config now properly typed for both simple strings and detailed objects
+- Improved TypeScript types for better IDE autocomplete
+
+#### Notes
+
+- All existing 38 tests pass ✅
+- Fully backward compatible with v1.0.0 multitenant fixes
+- Works with both Payload CMS 3.58.0 and newer versions
+
 ## [1.0.0] - 2025-11-07
 
 ### 🎉 Major Release - Infinite Loop Fix & Multitenant Support
