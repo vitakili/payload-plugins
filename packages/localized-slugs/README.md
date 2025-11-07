@@ -1,20 +1,22 @@
 # @kilivi/payloadcms-localized-slugs
 
-Localized slugs plugin for Payload CMS v3 with multi-locale support. Automatically generate and manage URL-friendly slugs for collections with internationalization (i18n) capabilities.
+Localized slugs plugin for Payload CMS v3 with multi-locale support. Automatically copies and manages URL-friendly slugs for collections with internationalization (i18n) capabilities.
 
 ## Features
 
 - 🌐 Multi-locale slug support (Czech, English, and extensible)
-- 🔤 Automatic slug generation from title fields
-- 🎯 Diacritic character mapping and normalization
-- 🔗 Full path generation for hierarchical content
+- � Copy slug/fullPath values from existing localized fields to `localizedSlugs`
+- 🎯 Automatic localization detection (handles both localized and non-localized fields)
+- 🔗 Full path support for hierarchical content
 - ⚙️ Configurable per-collection settings
 - 📦 Zero dependencies (Payload only)
 - ✅ TypeScript support with full type safety
 - 🎨 Client-side components for frontend integration
+- ✅ **Fully compatible with multitenant plugins** - no infinite loops!
 
 ## Documentation
 
+- 📖 [Integration Guide](./INTEGRATION_GUIDE.md) - **Start here!** Complete setup and troubleshooting
 - 📖 [Client Components Usage Guide](./CLIENT_COMPONENTS_GUIDE.md) - How to use client components in your Next.js app
 - 🚀 [Quick Start Guide](./QUICK_START.md)
 - 🏢 [Multi-Tenant Guide](./MULTI_TENANT.md)
@@ -38,16 +40,72 @@ import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 export default buildConfig({
   plugins: [
     localizedSlugsPlugin({
+      enabled: true,
       locales: ['cs', 'en'],
-      defaultLocale: 'cs',
       collections: [
         {
-          collection: 'posts',
+          collection: 'pages',
           slugField: 'slug',
           fullPathField: 'fullPath',
-          generateFromTitle: true,
-          titleField: 'title',
         },
+      ],
+      enableLogging: true, // Show debug logs
+    }),
+  ],
+})
+```
+
+## How It Works
+
+The plugin automatically:
+
+1. **Detects localized fields** - Works with both `localized: true` and regular fields
+2. **Copies values** - Takes `slug` and `fullPath` values and copies them to `localizedSlugs`
+3. **Creates a computed field** - Stores the localized slugs for easy access
+4. **Prevents infinite loops** - Uses internal flags to prevent multitenant recursion
+
+## Example Output
+
+**Input Collection:**
+
+```typescript
+{
+  name: 'slug',
+  type: 'text',
+  localized: true,  // Must be localized!
+}
+{
+  name: 'fullPath',
+  type: 'text',
+  localized: true,  // Must be localized!
+}
+```
+
+**Output Document:**
+
+```json
+{
+  "slug": {
+    "en": "contact-us",
+    "cs": "kontaktujte-nas"
+  },
+  "fullPath": {
+    "en": "/contact-us",
+    "cs": "/kontaktujte-nas"
+  },
+  "localizedSlugs": {
+    "en": {
+      "slug": "contact-us",
+      "fullPath": "/contact-us"
+    },
+    "cs": {
+      "slug": "kontaktujte-nas",
+      "fullPath": "/kontaktujte-nas"
+    }
+  }
+}
+```
+
         {
           collection: 'pages',
           slugField: 'urlSlug',
@@ -57,9 +115,11 @@ export default buildConfig({
       ],
       enableLogging: true,
     }),
-  ],
+
+],
 })
-```
+
+````
 
 ## Configuration
 
@@ -85,7 +145,7 @@ interface LocalizedSlugsPluginOptions {
   /** Custom diacritics mapping for slug generation */
   customDiacriticsMap?: Record<string, string>
 }
-```
+````
 
 ### Collection Configuration
 
