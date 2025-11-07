@@ -34,7 +34,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'create',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 
@@ -71,7 +71,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'create',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 
@@ -102,7 +102,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'create',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 
@@ -134,7 +134,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'update',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 
@@ -167,7 +167,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'create',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 
@@ -201,7 +201,7 @@ describe('Localized Slugs Generation - Real World Scenarios', () => {
     const result = await hook({
       doc,
       operation: 'create',
-      req: {},
+      req: { payload: { findByID: async () => null, update: async (data) => data } },
       collection: { slug: 'pages' },
     })
 

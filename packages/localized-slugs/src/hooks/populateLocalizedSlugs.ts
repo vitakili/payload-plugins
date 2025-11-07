@@ -9,9 +9,6 @@ export interface PopulateLocalizedSlugsOptions {
   titleField?: string
 }
 
-// Flag to prevent infinite recursion
-const SKIP_LOCALIZED_SLUG_HOOK = 'skipLocalizedSlugHook'
-
 /**
  * Simple slug generation from title
  */
@@ -25,7 +22,7 @@ function slugify(str: string): string {
 }
 
 /**
- * Helper: Extract slug and fullPath from a document (handles both fetch and direct pass)
+ * Helper: Extract slug and fullPath from a document
  */
 function extractSlugData(
   localizedDoc: Record<string, unknown>,
@@ -80,38 +77,39 @@ function extractSlugData(
 }
 
 /**
- * Creates a hook that populates localized slugs by fetching each locale's version of the document.
+ * Creates a hook that populates localized slugs by fetching each locale's version and UPDATING with req.payload.update()
  *
- * THIS IS THE CRITICAL PATTERN:
- * 1. Check if we're in a recursive call (context flag)
- * 2. Fetch the document in EACH locale using req.payload.findByID()
- * 3. Extract slug/fullPath from each locale's version
- * 4. Build the localizedSlugs object
- * 5. Return updated doc (Payload persists it automatically)
+ * CRITICAL PATTERN (from your working hook):
+ * 1. Check context flag to prevent recursion
+ * 2. Fetch document in EACH locale using req.payload.findByID()
+ * 3. Extract slug/fullPath from each locale
+ * 4. Build localizedSlugs object
+ * 5. Call req.payload.update() with context: { skipLocalizedSlugHook: true } to persist
+ * 6. Update all OTHER locales too
  */
 export const createPopulateLocalizedSlugsHook = (
   options: PopulateLocalizedSlugsOptions,
 ): CollectionAfterChangeHook => {
-  return async ({ doc, operation, req, collection }) => {
+  return async ({ doc, operation, req, context, collection }) => {
     const { locales, slugField, fullPathField, enableLogging, generateFromTitle, titleField } =
       options
 
     try {
-      // Skip if this is a recursive call to prevent infinite loops
-      if (req?.context?.[SKIP_LOCALIZED_SLUG_HOOK]) {
+      // ✅ CRITICAL: Skip if recursive call
+      if (context?.skipLocalizedSlugHook) {
         if (enableLogging) {
           // eslint-disable-next-line no-console
-          console.log(`🌐 [${collection.slug}] Skipping (recursive call)`)
+          console.log(`🌐 [${collection.slug}] Skipping recursive call`)
         }
         return doc
       }
 
-      // Only process on create/update operations
+      // Only process create/update
       if (operation !== 'create' && operation !== 'update') {
         return doc
       }
 
-      // Don't process if document is not published
+      // Skip unpublished
       if ('_status' in doc && doc._status !== 'published') {
         if (enableLogging) {
           // eslint-disable-next-line no-console
@@ -123,28 +121,23 @@ export const createPopulateLocalizedSlugsHook = (
       const docId = doc.id
       const localizedSlugs: Record<string, { slug?: string; fullPath?: string }> = {}
 
-      // CRITICAL: Fetch the document in EACH locale (or use provided doc if req.payload not available)
+      // ✅ CRITICAL: Fetch EACH locale and build localizedSlugs
       for (const locale of locales) {
         try {
           let localizedDoc: Record<string, unknown>
 
-          // Check if req.payload.findByID is available (production) or fallback to doc (tests/fallback)
           if (req?.payload?.findByID) {
-            // Production: Fetch from Payload
+            // Fetch this locale's version
             const fetched = await req.payload.findByID({
               collection: collection.slug,
               id: docId,
               locale,
             })
 
-            if (fetched) {
-              localizedDoc = fetched as Record<string, unknown>
-            } else {
-              // Fallback to provided doc if fetch returns null
-              localizedDoc = doc as Record<string, unknown>
-            }
+            // Use fetched if available, otherwise fall back to doc
+            localizedDoc = (fetched || doc) as Record<string, unknown>
           } else {
-            // Fallback: Use the provided document (for tests or when req.payload not available)
+            // Fallback for tests
             localizedDoc = doc as Record<string, unknown>
           }
 
@@ -157,55 +150,97 @@ export const createPopulateLocalizedSlugsHook = (
             locale,
           )
 
+          // Always set the data (even if empty strings)
           if (data.slug || data.fullPath) {
             localizedSlugs[locale] = data
+          }
 
-            if (enableLogging) {
-              // eslint-disable-next-line no-console
-              console.log(
-                `🌐 [${collection.slug}] Locale ${locale}: slug="${data.slug}", fullPath="${data.fullPath}"`,
-              )
-            }
+          if (enableLogging) {
+            // eslint-disable-next-line no-console
+            console.log(
+              `🌐 [${collection.slug}] Locale ${locale}: slug="${data.slug}", fullPath="${data.fullPath}"`,
+            )
           }
         } catch (error) {
           if (enableLogging) {
             // eslint-disable-next-line no-console
-            console.warn(
-              `🌐 [${collection.slug}] Failed to fetch locale ${locale}:`,
-              error instanceof Error ? error.message : error,
-            )
+            console.warn(`🌐 [${collection.slug}] Error fetching locale ${locale}:`, error)
           }
+          localizedSlugs[locale] = { slug: '', fullPath: '' }
         }
       }
 
-      // If no slugs were populated, return original document
-      if (Object.keys(localizedSlugs).length === 0) {
-        if (enableLogging) {
-          // eslint-disable-next-line no-console
-          console.log(`🌐 [${collection.slug}] No slug data found in any locale`)
-        }
-        return doc
-      }
-
+      // ✅ CRITICAL: Build updated document with localizedSlugs
       const updatedDoc = {
         ...doc,
         localizedSlugs,
       }
 
+      // Try to use req.payload.update() if available (production)
+      if (req?.payload?.update && docId) {
+        try {
+          const currentLocale = req?.locale || locales[0]
+
+          await req.payload.update({
+            collection: collection.slug,
+            id: docId,
+            locale: currentLocale,
+            overrideAccess: true,
+            data: {
+              localizedSlugs,
+            } as any,
+            context: {
+              skipLocalizedSlugHook: true,
+            },
+          })
+
+          // Update other locales too
+          for (const locale of locales) {
+            if (locale !== currentLocale) {
+              try {
+                await req.payload.update({
+                  collection: collection.slug,
+                  id: docId,
+                  locale,
+                  overrideAccess: true,
+                  data: {
+                    localizedSlugs,
+                  } as any,
+                  context: {
+                    skipLocalizedSlugHook: true,
+                  },
+                })
+              } catch (error) {
+                if (enableLogging) {
+                  // eslint-disable-next-line no-console
+                  console.warn(`🌐 [${collection.slug}] Error updating locale ${locale}:`, error)
+                }
+              }
+            }
+          }
+        } catch (error) {
+          if (enableLogging) {
+            // eslint-disable-next-line no-console
+            console.warn(`🌐 [${collection.slug}] Error calling update:`, error)
+          }
+          // Continue - return doc with localizedSlugs anyway
+        }
+      }
+
       if (enableLogging) {
         // eslint-disable-next-line no-console
         console.log(
-          `🌐 [${collection.slug}] ✅ Populated localizedSlugs:`,
+          `🌐 [${collection.slug}] ✅ Updated localizedSlugs:`,
           JSON.stringify(localizedSlugs, null, 2),
         )
       }
 
-      // Return updated document - Payload CMS will automatically persist it
+      // ✅ Return updated document with localizedSlugs
       return updatedDoc
     } catch (error) {
       if (enableLogging) {
         // eslint-disable-next-line no-console
-        console.error(`🌐 [${collection.slug}] Error in populateLocalizedSlugsHook:`, error)
+        console.error(`🌐 [${collection.slug}] Error:`, error)
       }
       return doc
     }

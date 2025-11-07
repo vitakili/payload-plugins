@@ -216,9 +216,12 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
     // Should not crash, should handle gracefully when slug/fullPath are undefined
     const result = await hook(operationContext)
 
-    // Since slug and fullPath are undefined, localizedSlugs should remain empty
+    // Since slug and fullPath are undefined, localizedSlugs should have empty strings
     expect(result.slug).toBeUndefined()
     expect(result.fullPath).toBeUndefined()
-    expect(result.localizedSlugs).toEqual({})
+    expect(result.localizedSlugs).toEqual({
+      en: { slug: '', fullPath: '' },
+      cs: { slug: '', fullPath: '' },
+    })
   })
 })
