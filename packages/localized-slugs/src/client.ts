@@ -7,7 +7,7 @@ import { generateLocalizedSlugs } from './utils/slugUtils'
 
 export interface ClientSlugHandlerProps {
   /** Either pass a pre-computed map of locale -> path, or the full page data */
-  localizedSlugs?: Record<string, string> | null
+  localizedSlugs?: Record<string, string | LocalizedSlugData> | null
   pageData?: PageData | null
   /** Optional fallback path when page data has no slugs */
   fallbackPath?: string
