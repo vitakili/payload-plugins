@@ -2,8 +2,9 @@
 
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
-import { useCallback, useEffect, useState } from 'react'
-import { defaultThemePresets } from '../presets.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { allThemePresets } from '../index.js'
+import type { ThemePreset } from '../presets.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
 interface ThemeColorOption {
@@ -38,13 +39,14 @@ async function fetchThemeConfiguration(): Promise<Record<string, unknown> | null
 
 function buildOptionsFromConfiguration(
   configuration: Record<string, unknown> | null,
+  themePresets: ThemePreset[],
 ): ThemeColorOption[] {
   if (!configuration) {
     return FALLBACK_TOKENS
   }
 
   const resolved = resolveThemeConfiguration(configuration)
-  const lightMode = resolved.lightMode ?? defaultThemePresets[0]?.lightMode ?? {}
+  const lightMode = resolved.lightMode ?? themePresets[0]?.lightMode ?? {}
   const orderedKeys: string[] = [
     'background',
     'card',
@@ -91,12 +93,18 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   const [options, setOptions] = useState<ThemeColorOption[]>(FALLBACK_TOKENS)
   const selectedValue = value || 'background'
 
+  // Get themePresets from admin.custom or use defaults
+  const themePresets = useMemo(() => {
+    const customPresets = (field.admin?.custom as { themePresets?: ThemePreset[] })?.themePresets
+    return customPresets && customPresets.length > 0 ? customPresets : allThemePresets
+  }, [field.admin?.custom])
+
   useEffect(() => {
     let isMounted = true
 
     fetchThemeConfiguration().then((configuration) => {
       if (!isMounted) return
-      setOptions(buildOptionsFromConfiguration(configuration))
+      setOptions(buildOptionsFromConfiguration(configuration, themePresets))
     })
 
     return () => {

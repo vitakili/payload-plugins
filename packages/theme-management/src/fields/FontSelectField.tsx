@@ -135,7 +135,7 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
                 type="button"
                 onClick={() => handleSelect(option.value)}
                 style={{
-                  width: '100%',
+                  width: '250px',
                   padding: '12px 14px',
                   border: 'none',
                   backgroundColor: isSelected ? 'var(--theme-elevation-100)' : 'transparent',

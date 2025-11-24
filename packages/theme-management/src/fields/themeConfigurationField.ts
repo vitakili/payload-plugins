@@ -17,6 +17,11 @@ interface ThemeConfigurationFieldOptions {
   enableAdvancedFeatures?: boolean
 }
 
+// Type for admin.custom property to avoid ts-expect-error
+interface ThemeAdminCustom {
+  themePresets?: ThemePreset[]
+}
+
 // Type for a single tab (not the full TabsField)
 export type ThemeTab = NonNullable<TabsField['tabs']>[number]
 
@@ -59,7 +64,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
         custom: {
           themePresets,
-        },
+        } as ThemeAdminCustom,
       },
     },
   ]
@@ -221,8 +226,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   cs: 'Písmo pro text',
                 },
                 defaultValue: 'preset',
-                // @ts-expect-error - Pass full objects including fontFamily for custom rendering
-                options: BODY_FONT_OPTIONS,
+                options: [...BODY_FONT_OPTIONS],
                 admin: {
                   width: '50%',
                   components: {
@@ -238,8 +242,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   cs: 'Písmo pro nadpisy',
                 },
                 defaultValue: 'preset',
-                // @ts-expect-error - Pass full objects including fontFamily for custom rendering
-                options: HEADING_FONT_OPTIONS,
+                options: [...HEADING_FONT_OPTIONS],
                 admin: {
                   width: '50%',
                   components: {
@@ -330,8 +333,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   })
 
-  // Custom Theme Presets importer
-  fields.push({
+  const customPresetsField: Field = {
     type: 'collapsible',
     label: {
       en: '🧩 Custom Theme Presets',
@@ -363,7 +365,9 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
       },
     ],
-  })
+  }
+
+  fields.push(customPresetsField)
 
   // Advanced Settings (when using extended theme configuration)
   if (enableAdvancedFeatures) {
