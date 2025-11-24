@@ -33,25 +33,21 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     enableAdvancedFeatures = true,
   } = options
 
-  const themeOptions = themePresets.map((preset) => {
-    const previewColor = preset.preview?.colors.primary
-    const label = previewColor ? `${preset.label} • ${previewColor}` : preset.label
-    return {
-      label,
-      value: preset.name,
-    }
-  })
-
   const fields: Field[] = [
     {
       name: 'theme',
-      type: 'select',
+      type: 'text',
       required: true,
       defaultValue: defaultTheme,
-      options: themeOptions,
       label: {
         en: '🎨 Theme Selection',
         cs: '🎨 Výběr tématu',
+      },
+      validate: (value: unknown) => {
+        if (typeof value === 'string' && value.trim().length > 0) {
+          return true
+        }
+        return 'Select a theme'
       },
       admin: {
         description: {
@@ -60,6 +56,9 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
         components: {
           Field: '@kilivi/payloadcms-theme-management/fields/ThemePreviewField',
+        },
+        custom: {
+          themePresets,
         },
       },
     },
@@ -327,6 +326,41 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
             ],
           },
         ],
+      },
+    ],
+  })
+
+  // Custom Theme Presets importer
+  fields.push({
+    type: 'collapsible',
+    label: {
+      en: '🧩 Custom Theme Presets',
+      cs: '🧩 Vlastní motivy',
+    },
+    admin: {
+      initCollapsed: true,
+      description: {
+        en: 'Import additional theme presets via JSON to extend or override the defaults. These presets become available instantly in the Theme Selection above.',
+        cs: 'Importujte další motivy pomocí JSONu a rozšiřte nebo přepište výchozí nabídku. Motivy budou ihned k dispozici ve výběru výše.',
+      },
+    },
+    fields: [
+      {
+        name: 'customThemePresets',
+        type: 'json',
+        label: {
+          en: 'Custom Preset JSON',
+          cs: 'JSON s vlastními motivy',
+        },
+        admin: {
+          description: {
+            en: 'Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.',
+            cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světly/tmavý režim.',
+          },
+          components: {
+            Field: '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField',
+          },
+        },
       },
     ],
   })

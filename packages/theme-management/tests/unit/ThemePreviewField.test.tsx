@@ -168,6 +168,40 @@ describe('ThemePreviewField', () => {
     path: 'themeConfiguration.theme',
   } satisfies Partial<SelectFieldClientProps>
 
+  it('uses admin.themePresets when provided', () => {
+    const customPresets = [
+      {
+        name: 'hotpink',
+        label: 'Hot Pink',
+        borderRadius: 'medium',
+        lightMode: {
+          primary: '#ff66aa',
+          secondary: '#ffe6f3',
+          accent: '#ff66aa',
+          background: '#ffffff',
+          foreground: '#111111',
+        },
+        darkMode: {},
+      },
+    ]
+
+    const props = {
+      ...baseProps,
+      field: {
+        ...(baseProps.field as any),
+        admin: {
+          ...(baseProps.field!.admin as any),
+          themePresets: customPresets,
+        },
+      },
+    } as SelectFieldClientProps
+
+    render(<ThemePreviewField {...props} />)
+
+    const hotpinkButton = screen.getByRole('button', { name: /Hot Pink/i })
+    expect(hotpinkButton).toBeInTheDocument()
+  })
+
   it('renders theme options with color swatches', () => {
     render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
 

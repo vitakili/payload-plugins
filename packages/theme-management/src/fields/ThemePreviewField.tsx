@@ -10,7 +10,7 @@ import type {
 } from '../components/typographyPreviewUtils.js'
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
 import { allThemePresets } from '../index.js'
-import type { ThemeTypographyPreset } from '../presets.js'
+import type { ThemePreset, ThemeTypographyPreset } from '../presets.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
@@ -44,21 +44,7 @@ interface ThemePresetDefinition {
   borderRadius: 'none' | 'small' | 'medium' | 'large' | 'xl'
 }
 
-const FALLBACK_THEME = allThemePresets[0]?.name ?? 'cool'
-
-const themePresets = allThemePresets.reduce<Record<string, ThemePresetDefinition>>(
-  (acc, preset) => {
-    acc[preset.name] = {
-      label: preset.label,
-      lightMode: { ...lightModeDefaults, ...(preset.lightMode ?? {}) },
-      darkMode: { ...darkModeDefaults, ...(preset.darkMode ?? {}) },
-      typography: preset.typography,
-      borderRadius: preset.borderRadius,
-    }
-    return acc
-  },
-  {},
-)
+// FALLBACK_THEME and runtime theme presets are computed inside the component
 
 const colorKeys = Object.keys(lightModeDefaults) as (keyof ColorModeColors)[]
 
@@ -269,6 +255,25 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
 
 export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
+  // If the plugin provided theme presets via admin config, prefer those; otherwise fallback to allThemePresets
+  const baseThemePresets =
+    (field?.admin as unknown as { themePresets?: ThemePreset[] })?.themePresets ?? allThemePresets
+  const runtimeThemePresets = useMemo(() => {
+    return (baseThemePresets as ThemePreset[]).reduce<Record<string, ThemePresetDefinition>>(
+      (acc, preset) => {
+        acc[preset.name] = {
+          label: preset.label,
+          lightMode: { ...lightModeDefaults, ...(preset.lightMode ?? {}) },
+          darkMode: { ...darkModeDefaults, ...(preset.darkMode ?? {}) },
+          typography: preset.typography,
+          borderRadius: preset.borderRadius,
+        }
+        return acc
+      },
+      {},
+    )
+  }, [baseThemePresets])
+  const fallbackTheme = baseThemePresets[0]?.name ?? 'cool'
   const { value: selectedTheme, setValue } = useField<string>({ path })
   const { dispatchFields } = useForm()
   const formFields = useFormFields(([formState]) => formState)
@@ -276,7 +281,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
 
   const applyPreset = useCallback(
     (presetName: string) => {
-      const preset = themePresets[presetName]
+      const preset = runtimeThemePresets[presetName]
       if (!preset) {
         return
       }
@@ -324,12 +329,12 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
       return
     }
 
-    if (themePresets[selectedTheme]) {
+    if (runtimeThemePresets[selectedTheme]) {
       return
     }
 
     hasAppliedInitialPresetRef.current = false
-    setValue(FALLBACK_THEME)
+    setValue(fallbackTheme)
   }, [selectedTheme, setValue])
 
   useEffect(() => {
@@ -345,7 +350,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
       return
     }
 
-    const preset = themePresets[selectedTheme]
+    const preset = runtimeThemePresets[selectedTheme]
     if (!preset) {
       hasAppliedInitialPresetRef.current = true
       return
@@ -371,7 +376,9 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   }, [selectedTheme, formFields, applyPreset])
 
   const lightModeColors = useMemo(() => {
-    const presetLightMode = selectedTheme ? themePresets[selectedTheme]?.lightMode : undefined
+    const presetLightMode = selectedTheme
+      ? runtimeThemePresets[selectedTheme]?.lightMode
+      : undefined
 
     return colorKeys.reduce<ColorModeColors>((acc, key) => {
       const fieldState = formFields?.[`themeConfiguration.lightMode.${key}`]
@@ -386,7 +393,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   }, [formFields, selectedTheme])
 
   const darkModeColors = useMemo(() => {
-    const presetDarkMode = selectedTheme ? themePresets[selectedTheme]?.darkMode : undefined
+    const presetDarkMode = selectedTheme ? runtimeThemePresets[selectedTheme]?.darkMode : undefined
 
     return colorKeys.reduce<ColorModeColors>((acc, key) => {
       const fieldState = formFields?.[`themeConfiguration.darkMode.${key}`]
@@ -400,7 +407,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
     }, {} as ColorModeColors)
   }, [formFields, selectedTheme])
 
-  const activePreset = selectedTheme ? themePresets[selectedTheme] : undefined
+  const activePreset = selectedTheme ? runtimeThemePresets[selectedTheme] : undefined
   const formTypographySelection = useMemo<TypographySelection | null>(() => {
     if (!formFields) {
       return null
@@ -475,7 +482,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           }}
         >
           <div className="theme-preset-list">
-            {Object.entries(themePresets).map(([key, preset]) => {
+            {Object.entries(runtimeThemePresets).map(([key, preset]) => {
               const isSelected = key === selectedTheme
               const swatches = highlightSwatches
                 .map(({ key: colorKey }) => preset.lightMode[colorKey])

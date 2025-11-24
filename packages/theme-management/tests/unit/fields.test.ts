@@ -172,6 +172,38 @@ describe('Field Configuration', () => {
         validateComponentPaths(field.fields as Field[], 'themeConfiguration.fields')
       }
     })
+
+    it('should expose themePresets in admin config for ThemePreviewField', () => {
+      const field = createThemeConfigurationField({
+        themePresets: defaultThemePresets,
+        defaultTheme: 'cool',
+        includeColorModeToggle: true,
+        includeCustomCSS: true,
+        includeBrandIdentity: false,
+        enableAdvancedFeatures: true,
+      })
+
+      function findField(fields: Field[] | undefined, name: string): Field | undefined {
+        if (!fields) return undefined
+        for (const f of fields) {
+          if ((f as any)?.name === name) return f
+          if (Array.isArray((f as any).fields)) {
+            const nested = findField((f as any).fields, name)
+            if (nested) return nested
+          }
+        }
+        return undefined
+      }
+
+      const themeSelect = findField(field.fields, 'theme') as any
+      expect(themeSelect).toBeDefined()
+      expect(themeSelect.admin).toBeDefined()
+      // Theme field now uses admin.custom to store presets for ThemePreviewField
+      expect(themeSelect.admin.custom).toBeDefined()
+      expect(themeSelect.admin.custom.themePresets).toBeDefined()
+      // Should be the same object reference we passed in
+      expect(themeSelect.admin.custom.themePresets).toBe(defaultThemePresets)
+    })
   })
 
   describe('lightModeField', () => {
