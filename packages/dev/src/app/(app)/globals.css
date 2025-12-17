@@ -1,0 +1,199 @@
+@import 'tailwindcss';
+
+@config '../../../tailwind.config.mjs';
+
+@layer base {
+  /* Theme Configuration CSS Variables */
+  :root {
+    /* Font Scale Presets */
+    --font-scale-small: 0.875;
+    --font-scale-medium: 1;
+    --font-scale-large: 1.125;
+    --font-scale-xl: 1.25;
+
+    /* Spacing Presets */
+    --spacing-compact: 0.75;
+    --spacing-comfortable: 1;
+    --spacing-spacious: 1.25;
+    --spacing-xl: 1.5;
+
+    /* Animation Levels */
+    --animation-none-duration: 0ms;
+    --animation-reduced-duration: 100ms;
+    --animation-normal-duration: 200ms;
+    --animation-enhanced-duration: 300ms;
+
+    /* Dynamic theme configuration (set by JS) */
+    --theme-font-scale: var(--font-scale-medium);
+    --theme-spacing: var(--spacing-comfortable);
+    --theme-animation-level: normal;
+
+    /* Apply spacing multiplier to layout */
+    --layout-containerPadding-scaled: calc(
+      var(--layout-containerPadding) * var(--theme-spacing, 1)
+    );
+    --layout-containerPaddingTablet-scaled: calc(
+      var(--layout-containerPaddingTablet) * var(--theme-spacing, 1)
+    );
+    --layout-containerPaddingDesktop-scaled: calc(
+      var(--layout-containerPaddingDesktop) * var(--theme-spacing, 1)
+    );
+    --layout-sectionSpacing-scaled: calc(var(--layout-sectionSpacing) * var(--theme-spacing, 1));
+    --layout-sectionSpacingTablet-scaled: calc(
+      var(--layout-sectionSpacingTablet) * var(--theme-spacing, 1)
+    );
+    --layout-sectionSpacingDesktop-scaled: calc(
+      var(--layout-sectionSpacingDesktop) * var(--theme-spacing, 1)
+    );
+    --components-card-padding-scaled: calc(
+      var(--components-card-padding) * var(--theme-spacing, 1)
+    );
+    --components-button-padding-scaled: var(
+      --components-button-padding
+    ); /* Keep button padding consistent */
+    --components-input-padding-scaled: var(
+      --components-input-padding
+    ); /* Keep input padding consistent */
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: calc(var(--typography-baseFontSize, 16px) * var(--theme-font-scale, 1));
+    line-height: var(--typography-lineHeight, 1.5);
+    font-family: var(--typography-fontFamily, system-ui, sans-serif);
+    visibility: hidden;
+  }
+
+  /* Animation level controls */
+  [data-animation-level='none'] * {
+    animation-duration: var(--animation-none-duration) !important;
+    transition-duration: var(--animation-none-duration) !important;
+  }
+
+  [data-animation-level='reduced'] * {
+    animation-duration: var(--animation-reduced-duration) !important;
+    transition-duration: var(--animation-reduced-duration) !important;
+  }
+
+  [data-animation-level='normal'] * {
+    animation-duration: var(--animation-normal-duration);
+    transition-duration: var(--animation-normal-duration);
+  }
+
+  [data-animation-level='enhanced'] * {
+    animation-duration: var(--animation-enhanced-duration);
+    transition-duration: var(--animation-enhanced-duration);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(
+      --typography-headingFamily,
+      var(--typography-fontFamily, system-ui, sans-serif)
+    );
+    font-weight: var(--typography-fontWeights-bold, 700);
+    line-height: 1.2;
+  }
+
+  /* Theme definitions moved to individual files in /public/themes/ folder */
+  /* Import themes via ThemeProvider component - themes are loaded dynamically */
+
+  /* Prevent flash of unstyled content except for Storybook */
+  :root:not([data-theme]):not([data-theme-mode]):not(.sb-show-main) {
+    visibility: hidden;
+  }
+
+  :root[data-theme][data-theme-mode],
+  .sb-show-main {
+    visibility: visible;
+  }
+
+  html:not(.sb-show-main) {
+    opacity: 0;
+  }
+
+  html[data-theme-mode='dark'],
+  html[data-theme-mode='light'],
+  html.sb-show-main {
+    opacity: 1;
+    transition: opacity 0ms;
+  }
+
+  /* Force immediate opacity when JS is disabled */
+  html:not([data-theme-mode]) {
+    opacity: 1;
+  }
+
+  /* Media queries for responsive layout */
+  @media (min-width: 640px) {
+    :root {
+      --layout-containerPadding: var(--layout-containerPaddingTablet, 2rem);
+      --layout-sectionSpacing: var(--layout-sectionSpacingTablet, 3rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --layout-containerPadding: var(--layout-containerPaddingDesktop, 2rem);
+      --layout-sectionSpacing: var(--layout-sectionSpacingDesktop, 4rem);
+    }
+  }
+
+  /* Ensure dark mode styles take precedence */
+  html[data-theme-mode='dark'] {
+    color-scheme: dark;
+  }
+
+  /* Native View Transitions API - React 19 */
+  @view-transition {
+    navigation: auto;
+  }
+
+  /* Smooth fade transition for page navigation */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-in-out;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: fade-in;
+  }
+
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Respect user's reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.01ms !important;
+    }
+  }
+}

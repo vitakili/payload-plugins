@@ -102,6 +102,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     const {
       enabled = true,
       targetCollection = 'site-settings',
+      useStandaloneCollection = false,
+      standaloneCollectionSlug = 'appearance-settings',
+      standaloneCollectionLabel = 'Appearance Settings',
       themePresets = allThemePresets,
       defaultTheme = 'cool',
       includeColorModeToggle = true,
@@ -127,6 +130,93 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       enableAdvancedFeatures,
     })
 
+    // If using standalone collection, create a new global
+    if (useStandaloneCollection) {
+      if (enableLogging) {
+        console.log(
+          `🎨 Theme Management Plugin: creating standalone global "${standaloneCollectionSlug}"`,
+        )
+      }
+
+      // Extract the fields from the tab directly (no wrapping in group)
+      const tabFields = (themeTab.fields ?? []) as Field[]
+
+      /**
+       * Hook to auto-populate lightMode and darkMode colors when theme changes
+       */
+      const beforeChangeHook = async (args: any) => {
+        const { data } = args
+
+        // If theme is being changed, auto-populate color modes
+        if (data?.themeConfiguration?.theme) {
+          const themeName = data.themeConfiguration.theme
+          const selectedPreset = themePresets.find((p) => p.name === themeName)
+
+          if (selectedPreset) {
+            // Initialize light and dark mode colors from preset if not already set
+            if (!data.themeConfiguration.lightMode) {
+              data.themeConfiguration.lightMode = {}
+            }
+            if (!data.themeConfiguration.darkMode) {
+              data.themeConfiguration.darkMode = {}
+            }
+
+            // Only populate if not manually edited (first time or empty)
+            const isLightModeEmpty = !data.themeConfiguration.lightMode?.background
+            const isDarkModeEmpty = !data.themeConfiguration.darkMode?.background
+
+            if (isLightModeEmpty && selectedPreset.lightMode) {
+              data.themeConfiguration.lightMode = { ...selectedPreset.lightMode }
+            }
+
+            if (isDarkModeEmpty && selectedPreset.darkMode) {
+              data.themeConfiguration.darkMode = { ...selectedPreset.darkMode }
+            }
+          }
+        }
+
+        return data
+      }
+
+      const standaloneGlobal: any = {
+        slug: standaloneCollectionSlug,
+        label: standaloneCollectionLabel,
+        admin: {
+          group: 'Settings',
+        },
+        access: {
+          read: () => true,
+          create: ({ req }) => !!req.user,
+          update: ({ req }) => !!req.user,
+          delete: ({ req }) => !!req.user,
+        },
+        fields: tabFields,
+        hooks: {
+          beforeChange: [beforeChangeHook],
+        },
+      }
+
+      const globals = Array.isArray(config.globals) ? config.globals : []
+
+      // Check if global already exists
+      const existingIndex = globals.findIndex((g) => g.slug === standaloneCollectionSlug)
+
+      if (existingIndex !== -1) {
+        if (enableLogging) {
+          console.warn(
+            `🎨 Theme Management Plugin: global "${standaloneCollectionSlug}" already exists, skipping creation.`,
+          )
+        }
+        return config
+      }
+
+      return {
+        ...config,
+        globals: [...globals, standaloneGlobal],
+      }
+    }
+
+    // Otherwise, add as tab to existing collection
     let collectionTouched = false
 
     const collections = ensureCollectionsArray(config.collections).map((collection) => {
@@ -175,40 +265,71 @@ export const fetchThemeConfiguration = async (
 
   const {
     tenantSlug,
-    collectionSlug = 'site-settings',
+    collectionSlug = 'site-settings', // Can be overridden to 'appearance-settings' if using standalone
     depth,
     locale,
     draft,
     queryParams = {},
+    useGlobal = false, // Set to true if using standalone global instead of collection
   } = normalizedOptions
 
-  const params = new URLSearchParams({ limit: '1' })
-
-  if (typeof depth === 'number') params.set('depth', String(depth))
-  if (tenantSlug) params.set('tenant', tenantSlug)
-  if (locale) params.set('locale', locale)
-  if (draft) params.set('draft', 'true')
-
-  Object.entries(queryParams).forEach(([key, value]) => {
-    if (value === undefined) return
-    params.set(key, String(value))
-  })
-
-  const url = `/api/${collectionSlug}?${params.toString()}`
-
   try {
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch theme configuration (status ${response.status})`)
+    if (useGlobal) {
+      // Fetch from global endpoint
+      const params = new URLSearchParams()
+
+      if (typeof depth === 'number') params.set('depth', String(depth))
+      if (tenantSlug) params.set('tenant', tenantSlug)
+      if (locale) params.set('locale', locale)
+      if (draft) params.set('draft', 'true')
+
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value === undefined) return
+        params.set(key, String(value))
+      })
+
+      const queryString = params.toString()
+      const url = `/api/globals/${collectionSlug}${queryString ? `?${queryString}` : ''}`
+
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch theme global (status ${response.status})`)
+      }
+
+      const data = (await response.json()) as {
+        themeConfiguration?: SiteThemeConfiguration
+      }
+
+      return data?.themeConfiguration ?? null
+    } else {
+      // Fetch from collection endpoint (legacy/default behavior)
+      const params = new URLSearchParams({ limit: '1' })
+
+      if (typeof depth === 'number') params.set('depth', String(depth))
+      if (tenantSlug) params.set('tenant', tenantSlug)
+      if (locale) params.set('locale', locale)
+      if (draft) params.set('draft', 'true')
+
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value === undefined) return
+        params.set(key, String(value))
+      })
+
+      const url = `/api/${collectionSlug}?${params.toString()}`
+
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch theme configuration (status ${response.status})`)
+      }
+
+      const data = (await response.json()) as {
+        docs?: Array<{ themeConfiguration?: SiteThemeConfiguration }>
+      }
+
+      const doc = data.docs?.[0]
+
+      return doc?.themeConfiguration ?? null
     }
-
-    const data = (await response.json()) as {
-      docs?: Array<{ themeConfiguration?: SiteThemeConfiguration }>
-    }
-
-    const doc = data.docs?.[0]
-
-    return doc?.themeConfiguration ?? null
   } catch (error) {
     console.warn('Failed to fetch theme configuration:', error)
     return null

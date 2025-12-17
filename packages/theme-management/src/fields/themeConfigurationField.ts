@@ -95,6 +95,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
           width: '50%',
         },
+        dbName: 'border_radius',
       },
       {
         name: 'spacing',
@@ -116,6 +117,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
           width: '50%',
         },
+        dbName: 'spacing',
       },
     ],
   })
@@ -171,6 +173,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 },
                 width: '50%',
               },
+              dbName: 'color_mode',
             },
             {
               name: 'allowColorModeToggle',
@@ -233,6 +236,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                     Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                   },
                 },
+                dbName: 'body_font',
               },
               {
                 name: 'headingFont',
@@ -249,6 +253,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                     Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                   },
                 },
+                dbName: 'heading_font',
               },
             ],
           },
@@ -309,6 +314,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 admin: {
                   width: '50%',
                 },
+                dbName: 'base_font_size',
               },
               {
                 name: 'lineHeight',
@@ -325,6 +331,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 admin: {
                   width: '50%',
                 },
+                dbName: 'line_height',
               },
             ],
           },
@@ -393,6 +400,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
           width: '50%',
         },
+        dbName: 'animation_level',
       },
     ]
 

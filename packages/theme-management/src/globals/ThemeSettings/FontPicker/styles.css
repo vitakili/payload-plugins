@@ -1,0 +1,337 @@
+.font-picker {
+  display: flex;
+  height: 700px;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--theme-elevation-0);
+}
+
+/* Preview Panel (Left) */
+.font-picker__preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--theme-elevation-300);
+  background: var(--theme-elevation-50);
+}
+
+.font-picker__preview-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--theme-elevation-300);
+  background: var(--theme-elevation-0);
+}
+
+.font-picker__preview-tab {
+  flex: 1;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--theme-elevation-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.font-picker__preview-tab:hover {
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-900);
+}
+
+.font-picker__preview-tab--active {
+  color: var(--theme-elevation-900);
+  border-bottom-color: var(--theme-elevation-900);
+  background: var(--theme-elevation-50);
+}
+
+.font-picker__preview-content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--theme-elevation-0);
+}
+
+/* Selection Panel (Right) */
+.font-picker__selection-panel {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-elevation-0);
+}
+
+.font-picker__controls {
+  padding: 16px;
+  border-bottom: 1px solid var(--theme-elevation-300);
+  background: var(--theme-elevation-0);
+}
+
+.font-picker__search {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-900);
+}
+
+.font-picker__search:focus {
+  outline: none;
+  border-color: var(--theme-elevation-500);
+  box-shadow: 0 0 0 3px var(--theme-elevation-100);
+}
+
+.font-picker__search::placeholder {
+  color: var(--theme-elevation-500);
+}
+
+.font-picker__filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.font-picker__select {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-900);
+  cursor: pointer;
+}
+
+.font-picker__select:focus {
+  outline: none;
+  border-color: var(--theme-elevation-500);
+  box-shadow: 0 0 0 3px var(--theme-elevation-100);
+}
+
+.font-picker__view-toggle {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.font-picker__view-button {
+  padding: 8px 12px;
+  background: var(--theme-elevation-100);
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 6px;
+  color: var(--theme-elevation-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.font-picker__view-button:hover {
+  background: var(--theme-elevation-200);
+  color: var(--theme-elevation-900);
+}
+
+.font-picker__view-button--active {
+  background: var(--theme-elevation-900);
+  color: var(--theme-elevation-0);
+  border-color: var(--theme-elevation-900);
+}
+
+.font-picker__view-button svg {
+  display: block;
+}
+
+.font-picker__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.font-picker__list--row .font-picker__item {
+  margin-bottom: 4px;
+}
+
+.font-picker__list--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.font-picker__list--grid .font-picker__item {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px;
+}
+
+.font-picker__list--grid .font-picker__item-preview {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.font-picker__item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid var(--theme-elevation-200);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--theme-elevation-0);
+}
+
+.font-picker__item:hover {
+  background: var(--theme-elevation-50);
+  border-color: var(--theme-elevation-400);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.font-picker__item--selected {
+  background: var(--theme-elevation-100);
+  border-color: var(--theme-elevation-600);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.font-picker__item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.font-picker__item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-elevation-900);
+}
+
+.font-picker__favorite {
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--theme-elevation-400);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.font-picker__favorite:hover {
+  color: var(--theme-elevation-600);
+  transform: scale(1.1);
+}
+
+.font-picker__favorite--active {
+  color: #fbbf24;
+}
+
+.font-picker__favorite--active:hover {
+  color: #f59e0b;
+}
+
+.font-picker__item-preview {
+  font-size: 14px;
+  color: var(--theme-elevation-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.font-picker__loading {
+  padding: 24px;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-size: 14px;
+}
+
+.font-picker__empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--theme-elevation-500);
+  font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .font-picker {
+    flex-direction: column;
+    height: auto;
+    max-height: 800px;
+  }
+
+  .font-picker__preview-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--theme-elevation-300);
+    min-height: 300px;
+  }
+
+  .font-picker__selection-panel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .font-picker__preview-tabs {
+    overflow-x: auto;
+  }
+
+  .font-picker__preview-tab {
+    flex: none;
+    min-width: 100px;
+    font-size: 13px;
+  }
+
+  .font-picker__controls {
+    padding: 12px;
+  }
+
+  .font-picker__filters {
+    flex-direction: column;
+  }
+
+  .font-picker__select {
+    width: 100%;
+  }
+
+  .font-picker__list--grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* Scrollbar styling */
+.font-picker__preview-content::-webkit-scrollbar,
+.font-picker__list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.font-picker__preview-content::-webkit-scrollbar-track,
+.font-picker__list::-webkit-scrollbar-track {
+  background: var(--theme-elevation-100);
+}
+
+.font-picker__preview-content::-webkit-scrollbar-thumb,
+.font-picker__list::-webkit-scrollbar-thumb {
+  background: var(--theme-elevation-400);
+  border-radius: 4px;
+}
+
+.font-picker__preview-content::-webkit-scrollbar-thumb:hover,
+.font-picker__list::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-elevation-500);
+}
+
+/* Animation for font loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animation to font items */
+.font-picker__list .font-picker__item {
+  animation: fadeIn 0.3s ease;
+}

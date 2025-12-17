@@ -44,3 +44,5 @@ tests/**/*.d.ts.map
 .temp/
 temp/
 *.log
+
+# packages/dev/*
