@@ -77,9 +77,32 @@ jobs:
           NEW=$(node -e "const v=(process.argv[1]||'0.0.0').split('.').map(n=>parseInt(n)); const b=process.argv[2]; if(b==='patch'){v[2]++;}else if(b==='minor'){v[1]++;v[2]=0;}else if(b==='major'){v[0]++;v[1]=0;v[2]=0;} console.log(v.join('.'))" "$CURRENT" "$BUMP_TYPE")
           echo "NEW=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Bump version
+      - name: Check if version is already published
+        run: |
+          set -e
+          PUBLISHED="${{ steps.registry.outputs.PUBLISHED }}"
+          NEW="${{ steps.newver.outputs.NEW }}"
+          echo "Published: $PUBLISHED, New: $NEW"
+          if [ "$PUBLISHED" = "$NEW" ]; then
+            echo "Version $NEW is already published to npm. Aborting publish." >&2
+            exit 1
+          fi
+
+      - name: Bump version (if needed)
+        id: bump
         working-directory: packages/${{ inputs.package }}
-        run: pnpm version ${{ steps.newver.outputs.NEW }} --no-git-tag-version
+        run: |
+          set -e
+          NEW="${{ steps.newver.outputs.NEW }}"
+          LOCAL=$(node -p "require('./packages/${{ inputs.package }}/package.json').version")
+          echo "Local version: $LOCAL, New version: $NEW"
+          if [ "$LOCAL" = "$NEW" ]; then
+            echo "No version change required, skipping pnpm version"
+            echo "SKIP=1" >> $GITHUB_OUTPUT
+          else
+            pnpm version $NEW --no-git-tag-version
+            echo "SKIP=0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Configure temporary .npmrc for authentication
         run: |
