@@ -54,7 +54,7 @@ import { buildConfig } from 'payload'
 export default buildConfig({
   // ... other config
 
-  globals: [
+  collections: [
     {
       slug: 'site-settings',
       fields: [
@@ -62,7 +62,7 @@ export default buildConfig({
           name: 'siteName',
           type: 'text',
         },
-        // Theme configuration will be injected here as a tab
+        // Theme configuration will be injected here as a tab inside this collection
       ],
     },
   ],
@@ -78,6 +78,8 @@ export default buildConfig({
   ],
 })
 ```
+
+> **Note:** Option A injects an **Appearance Settings** tab into the specified collection (`targetCollection`). If you prefer a separate global (standalone settings), use **Option B** below and set `useStandaloneCollection: true` in the plugin options.
 
 #### Option B: Create Standalone Global (Separate Settings)
 
@@ -900,7 +902,19 @@ Created for Payload CMS v3 applications.
 
 ## Changelog
 
-### v0.1.9 (Latest)
+### v0.6.0 (Latest)
+
+- ✅ **Added:** Standalone Global Support — create separate appearance settings as a global
+- ✅ **Added:** Auto-populate Light/Dark colors when selecting a theme
+- ✅ **Added:** Multi-tenant support and tenant-aware theme fetching
+- ✅ **Fixed:** Cleaner data structure for improved API integration
+- ✅ **Added:** Live Theme Preview at `/admin/theme-preview` (real-time updates)
+- ✅ **Added:** Professional color picker (react-colorful)
+- ✅ **Improved:** shadcn/ui and TweakCN compatibility
+- ✅ **Improved:** SSR theme injection, zero FOUC, and performance optimizations
+- ✅ **Updated:** Documentation and examples
+
+### v0.1.9
 
 - ✅ **Fixed:** Server/client component separation
 - ✅ **Added:** `server-only` package to prevent bundling errors
