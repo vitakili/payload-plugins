@@ -35,13 +35,10 @@ jobs:
         run: pnpm lint
 
       - name: Build
-        run: pnpm build
+        run: pnpm -r build
 
       - name: Check types
         run: pnpm exec tsc --noEmit
 
-      - name: Run workspace tests (exclude local 'dev')
-        run: pnpm -r --filter "!payload-plugins-dev" test
-        # 'packages/dev' is intended for local development and uses environment variables
-        # that are not present in CI (e.g., PAYLOAD_SECRET). We exclude it from CI test runs
-        # to avoid spurious failures — maintainers should run tests in `packages/dev` locally.
+      - name: Run workspace tests
+        run: pnpm -r test

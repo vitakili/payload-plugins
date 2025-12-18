@@ -1,5 +1,5 @@
 pnpm exec lint-staged
 # Run workspace tests after lint-staged to catch issues before commit
-# Exclude local-only `packages/dev` to avoid failing commits when local env vars are missing
+# Run workspace tests after lint-staged to catch issues before commit
 # Ensure tests run in non-watch mode by setting CI=true so vitest doesn't enter watch mode
-CI=true pnpm -r --filter "!payload-plugins-dev" test
+CI=true pnpm -r test

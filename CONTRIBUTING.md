@@ -58,10 +58,6 @@ This is a **pnpm monorepo** with the following structure:
 
 ## 🔌 Creating a New Plugin
 
-> Note: The `packages/dev` package is intended solely for local development and integration testing. It relies on local environment variables (e.g. `PAYLOAD_SECRET`) and is **excluded from CI test runs**. If you need to run its tests, run them locally with the appropriate `.env` setup.
-
-## 🔌 Creating a New Plugin
-
 ### 1. Create Package Directory
 
 ```bash

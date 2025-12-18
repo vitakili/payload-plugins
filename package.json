@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky",
-    "precommit": "pnpm run lint && pnpm run build",
+    "precommit": "pnpm run lint && pnpm -r build",
     "test:all": "pnpm -r test",
     "test:ci": "pnpm -r test",
     "test": "cd test-app && node tests/run-tests.js",

@@ -4,3 +4,6 @@ build
 *.d.ts
 *.js.map
 *.d.ts.map
+
+# Ignore local-only development package
+dev-local/*
