@@ -29,7 +29,7 @@ export async function getThemeSettings(payload?: Payload): Promise<ThemeSettings
   }
 
   try {
-    const themeSettings = await payload.findGlobal({
+    const themeSettings = await payload!.findGlobal({
       slug: 'themeSettings',
     })
 

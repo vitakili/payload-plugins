@@ -6,12 +6,12 @@ import {
   SlugProvider as PublishedSlugProvider,
   useSlugContext as PublishedUseSlugContext,
 } from '@kilivi/payloadcms-localized-slugs/client/react'
-import { ClientSlugHandler } from '../../packages/localized-slugs/src/exports/client/index.ts'
+import { localizedSlugsPlugin } from '../../packages/localized-slugs/src'
+import { ClientSlugHandler } from '../../packages/localized-slugs/src/exports/client'
 import {
   SlugProvider,
   useSlugContext,
-} from '../../packages/localized-slugs/src/exports/client/react.ts'
-import { localizedSlugsPlugin } from '../../packages/localized-slugs/src/index.ts'
+} from '../../packages/localized-slugs/src/exports/client/react'
 
 console.log('All direct imports successful!')
 console.log('localizedSlugsPlugin:', typeof localizedSlugsPlugin)

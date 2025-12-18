@@ -186,9 +186,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         },
         access: {
           read: () => true,
-          create: ({ req }) => !!req.user,
-          update: ({ req }) => !!req.user,
-          delete: ({ req }) => !!req.user,
+          create: ({ req }: { req?: any }) => !!req?.user,
+          update: ({ req }: { req?: any }) => !!req?.user,
+          delete: ({ req }: { req?: any }) => !!req?.user,
         },
         fields: tabFields,
         hooks: {
