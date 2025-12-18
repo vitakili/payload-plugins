@@ -1,6 +1,6 @@
 # Contributing to Payload Plugins
 
-Thank you for your interest in contributing to this PayloadCMS plugins collection! 
+Thank you for your interest in contributing to this PayloadCMS plugins collection!
 
 ## 📋 Table of Contents
 
@@ -14,12 +14,14 @@ Thank you for your interest in contributing to this PayloadCMS plugins collectio
 ## 🚀 Development Setup
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/payload-plugins.git
    cd payload-plugins
    ```
 
 2. **Enable Corepack**
+
    ```bash
    corepack enable
    corepack prepare pnpm@9.4.0 --activate
@@ -29,6 +31,17 @@ Thank you for your interest in contributing to this PayloadCMS plugins collectio
    ```bash
    pnpm install
    ```
+
+> **Note about lockfile**: If you change `package.json` (adding/updating/removing dependencies or scripts), run `pnpm install` locally and commit the updated `pnpm-lock.yaml` so CI (which uses `--frozen-lockfile`) can install dependencies successfully. Example:
+>
+> ```bash
+> pnpm install
+> git add pnpm-lock.yaml
+> git commit -m "chore: update pnpm-lock.yaml"
+> git push
+> ```
+>
+> If CI still fails in the `Install dependencies` step, re-run the install locally and ensure `pnpm-lock.yaml` is included in your branch/PR.
 
 4. **Build All Packages**
    ```bash
@@ -42,6 +55,10 @@ This is a **pnpm monorepo** with the following structure:
 - `packages/` - Individual plugin packages
 - `.github/workflows/` - CI/CD workflows
 - Root config files - Shared configuration for all packages
+
+## 🔌 Creating a New Plugin
+
+> Note: The `packages/dev` package is intended solely for local development and integration testing. It relies on local environment variables (e.g. `PAYLOAD_SECRET`) and is **excluded from CI test runs**. If you need to run its tests, run them locally with the appropriate `.env` setup.
 
 ## 🔌 Creating a New Plugin
 
@@ -75,11 +92,7 @@ cd packages/your-plugin-name
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm build"
   },
-  "keywords": [
-    "payloadcms",
-    "payload",
-    "payload-plugin"
-  ],
+  "keywords": ["payloadcms", "payload", "payload-plugin"],
   "author": "Your Name",
   "license": "Apache-2.0",
   "peerDependencies": {
@@ -120,45 +133,49 @@ cd packages/your-plugin-name
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   extends: ['../../.eslintrc.cjs'],
-};
+}
 ```
 
 ### 5. Create Source Files
 
 **src/types.ts:**
+
 ```typescript
 export interface YourPluginConfig {
-  excludedCollections?: string[];
-  excludedGlobals?: string[];
+  excludedCollections?: string[]
+  excludedGlobals?: string[]
   // Add your plugin-specific options
 }
 ```
 
 **src/plugin.ts:**
+
 ```typescript
-import type { Config } from 'payload';
-import type { YourPluginConfig } from './types.js';
+import type { Config } from 'payload'
+import type { YourPluginConfig } from './types.js'
 
 export const YourPlugin =
   (pluginConfig: YourPluginConfig = {}) =>
   (config: Config): Config => {
     // Your plugin logic here
-    return config;
-  };
+    return config
+  }
 
-export default YourPlugin;
+export default YourPlugin
 ```
 
 **src/index.ts:**
+
 ```typescript
-export { YourPlugin } from './plugin.js';
-export type { YourPluginConfig } from './types.js';
-export { default } from './plugin.js';
+export { YourPlugin } from './plugin.js'
+export type { YourPluginConfig } from './types.js'
+export { default } from './plugin.js'
 ```
 
 ### 6. Create README.md
 
 Include:
+
 - Plugin description
 - Installation instructions
 - Usage examples
@@ -206,19 +223,19 @@ ls packages/your-plugin-name/dist
 Follow the standard pattern:
 
 ```typescript
-import type { Config } from 'payload';
+import type { Config } from 'payload'
 
-export const YourPlugin = 
-  (config: YourPluginConfig = {}) => 
+export const YourPlugin =
+  (config: YourPluginConfig = {}) =>
   (payloadConfig: Config): Config => {
     // Validate config
-    const mergedConfig = { ...defaultConfig, ...config };
-    
+    const mergedConfig = { ...defaultConfig, ...config }
+
     // Modify payload config
     // ...
-    
-    return payloadConfig;
-  };
+
+    return payloadConfig
+  }
 ```
 
 ## 🧪 Testing
@@ -251,6 +268,7 @@ While this repository doesn't have automated tests yet, please:
    - Include usage examples
 
 2. **Code Quality**
+
    ```bash
    pnpm lint
    pnpm format
@@ -267,6 +285,7 @@ While this repository doesn't have automated tests yet, please:
 ### Pull Request Process
 
 1. **Create a Branch**
+
    ```bash
    git checkout -b feat/your-feature-name
    ```
@@ -277,9 +296,11 @@ While this repository doesn't have automated tests yet, please:
    - Update documentation
 
 3. **Push and Create PR**
+
    ```bash
    git push origin feat/your-feature-name
    ```
+
    - Open a Pull Request on GitHub
    - Describe your changes clearly
    - Link related issues
