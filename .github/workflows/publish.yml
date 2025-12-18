@@ -65,11 +65,13 @@ jobs:
       - name: Compute new version
         id: newver
         run: |
-          CURRENT="$PUBLISHED"
+          PUBLISHED="${{ steps.registry.outputs.PUBLISHED }}"
           BUMP_TYPE="${{ inputs.version }}"
-          if [ "$CURRENT" = "0.0.0" ]; then
-            # If package not found on npm, use local package.json version
+          if [ "$PUBLISHED" = "0.0.0" ] || [ -z "$PUBLISHED" ]; then
+            # If package not found on npm or blank, use local package.json version
             CURRENT=$(node -p "require('./packages/${{ inputs.package }}/package.json').version")
+          else
+            CURRENT="$PUBLISHED"
           fi
           echo "Current base version: $CURRENT"
           NEW=$(node -e "const v=(process.argv[1]||'0.0.0').split('.').map(n=>parseInt(n)); const b=process.argv[2]; if(b==='patch'){v[2]++;}else if(b==='minor'){v[1]++;v[2]=0;}else if(b==='major'){v[0]++;v[1]=0;v[2]=0;} console.log(v.join('.'))" "$CURRENT" "$BUMP_TYPE")
@@ -78,6 +80,16 @@ jobs:
       - name: Bump version
         working-directory: packages/${{ inputs.package }}
         run: pnpm version ${{ steps.newver.outputs.NEW }} --no-git-tag-version
+
+      - name: Configure temporary .npmrc for authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Validate NPM token
+        run: |
+          set -e
+          echo "Validating NPM token by running 'npm whoami'"
+          npm whoami --registry=https://registry.npmjs.org || (echo "NPM auth failed: check repository secret 'NPM_TOKEN' and token permissions" && exit 1)
 
       - name: Build packages
         run: pnpm build
