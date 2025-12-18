@@ -94,7 +94,7 @@ jobs:
         run: |
           set -e
           NEW="${{ steps.newver.outputs.NEW }}"
-          LOCAL=$(node -p "require('./packages/${{ inputs.package }}/package.json').version")
+          LOCAL=$(node -p "require('./package.json').version")
           echo "Local version: $LOCAL, New version: $NEW"
           if [ "$LOCAL" = "$NEW" ]; then
             echo "No version change required, skipping pnpm version"
