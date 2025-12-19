@@ -257,7 +257,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
   // If the plugin provided theme presets via admin config, prefer those; otherwise fallback to allThemePresets
   const baseThemePresets =
-    (field?.admin as unknown as { themePresets?: ThemePreset[] })?.themePresets ?? allThemePresets
+    (field?.admin?.custom as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
+    allThemePresets
   const runtimeThemePresets = useMemo(() => {
     return (baseThemePresets as ThemePreset[]).reduce<Record<string, ThemePresetDefinition>>(
       (acc, preset) => {
