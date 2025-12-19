@@ -1,0 +1,72 @@
+name: Check NPM token expiry
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Weekly on Monday 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for issue context)
+        uses: actions/checkout@v4
+
+      - name: Configure .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: List tokens
+        id: list
+        run: |
+          set -e
+          npm token list --json > /tmp/npm-tokens.json || (echo "COULD_NOT_LIST" > /tmp/npm-tokens.json && exit 0)
+          echo "TOKENS=$(cat /tmp/npm-tokens.json | jq -c .)" >> $GITHUB_OUTPUT
+
+      - name: Check expiry and create issue if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          if grep -q "COULD_NOT_LIST" /tmp/npm-tokens.json 2>/dev/null; then
+            echo "Cannot list tokens (token lacks list permission). Creating an issue to remind maintainers to check token expiry."
+            echo "$GITHUB_TOKEN" | gh auth login --with-token
+            gh issue create --title "NPM token: can't list tokens (check permissions)" --body "Automated check failed to list npm tokens. Ensure the repository's NPM token has permission to list tokens or rotate it soon." || true
+            exit 0
+          fi
+
+          NOTE_CANDIDATES=("github-actions:publish" "github-actions:publish:payload-plugins" "payload-plugins CI" "github-actions")
+          TARGET_EXPIRES=""
+          for note in "${NOTE_CANDIDATES[@]}"; do
+            val=$(jq -r ".[] | select(.note == \"$note\") | .expires" /tmp/npm-tokens.json | head -n1)
+            if [ -n "$val" ] && [ "$val" != "null" ]; then
+              TARGET_EXPIRES="$val"
+              FOUND_NOTE="$note"
+              break
+            fi
+          done
+
+          if [ -z "$TARGET_EXPIRES" ]; then
+            echo "No token found with expected note; creating issue to remind to check token expiry manually"
+            echo "$GITHUB_TOKEN" | gh auth login --with-token
+            gh issue create --title "NPM token: unable to detect token by note" --body "Automated check couldn't find token by common notes. Please ensure your NPM token exists and consider using note 'github-actions:publish' or similar."
+            exit 0
+          fi
+
+          EXPIRE_TS=$(date -d "$TARGET_EXPIRES" +%s)
+          NOW_TS=$(date +%s)
+          DAYS_LEFT=$(( (EXPIRE_TS - NOW_TS) / 86400 ))
+          echo "Token (note='$FOUND_NOTE') expires in $DAYS_LEFT days"
+
+          if [ "$DAYS_LEFT" -lt 14 ]; then
+            echo "$GITHUB_TOKEN" | gh auth login --with-token
+            gh issue create --title "NPM token expiring soon" --body "NPM token with note '$FOUND_NOTE' expires in $DAYS_LEFT days. Please rotate it and update repository secret 'NPM_TOKEN'."
+          else
+            echo "Token expiry is sufficient ($DAYS_LEFT days left)"
+          fi

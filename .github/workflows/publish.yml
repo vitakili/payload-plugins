@@ -19,6 +19,10 @@ on:
           - minor
           - major
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -113,6 +117,37 @@ jobs:
           set -e
           echo "Validating NPM token by running 'npm whoami'"
           npm whoami --registry=https://registry.npmjs.org || (echo "NPM auth failed: check repository secret 'NPM_TOKEN' and token permissions" && exit 1)
+
+      - name: Check NPM token expiry (optional)
+        run: |
+          set -e
+          echo "Checking NPM token expiry (attempting to list tokens)"
+          # Install jq if missing
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          TOKENS_JSON=$(npm token list --json 2>/dev/null || echo "")
+          if [ -z "$TOKENS_JSON" ]; then
+            echo "Could not list tokens (token may not allow listing). Skipping expiry check."
+            exit 0
+          fi
+
+          # Look for a token with an identifiable note (common names)
+          EXPIRES=$(echo "$TOKENS_JSON" | jq -r '.[] | select(.note=="github-actions:publish" or .note=="github-actions:publish:payload-plugins" or .note=="payload-plugins CI") | .expires' | head -n1)
+
+          if [ -z "$EXPIRES" ] || [ "$EXPIRES" = "null" ]; then
+            echo "No token found with the expected note; skipping expiry check"
+            exit 0
+          fi
+
+          EXPIRE_TS=$(date -d "$EXPIRES" +%s)
+          NOW_TS=$(date +%s)
+          DAYS_LEFT=$(( (EXPIRE_TS - NOW_TS) / 86400 ))
+          echo "NPM token expires in $DAYS_LEFT days"
+          if [ "$DAYS_LEFT" -lt 7 ]; then
+            echo "NPM token expires in less than 7 days; aborting publish" >&2
+            exit 1
+          fi
 
       - name: Build packages
         run: pnpm build
