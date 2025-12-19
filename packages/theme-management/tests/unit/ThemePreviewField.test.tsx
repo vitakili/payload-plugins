@@ -191,7 +191,9 @@ describe('ThemePreviewField', () => {
         ...(baseProps.field as any),
         admin: {
           ...(baseProps.field!.admin as any),
-          themePresets: customPresets,
+          custom: {
+            themePresets: customPresets,
+          },
         },
       },
     } as SelectFieldClientProps
@@ -213,6 +215,38 @@ describe('ThemePreviewField', () => {
 
     const swatches = coolButton.querySelectorAll('[aria-hidden="true"] span')
     expect(swatches.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('still supports legacy admin.themePresets for compatibility', () => {
+    const legacyProps = {
+      ...baseProps,
+      field: {
+        ...(baseProps.field as any),
+        admin: {
+          ...(baseProps.field!.admin as any),
+          themePresets: [
+            {
+              name: 'legacy',
+              label: 'Legacy Theme',
+              borderRadius: 'medium',
+              lightMode: {
+                primary: '#111111',
+                secondary: '#222222',
+                accent: '#333333',
+                background: '#fff',
+                foreground: '#000',
+              },
+              darkMode: {},
+            },
+          ],
+        },
+      },
+    } as SelectFieldClientProps
+
+    render(<ThemePreviewField {...legacyProps} />)
+
+    const legacyButton = screen.getByRole('button', { name: /Legacy Theme/i })
+    expect(legacyButton).toBeInTheDocument()
   })
 
   it('updates value and dispatches preset when a theme is selected', async () => {

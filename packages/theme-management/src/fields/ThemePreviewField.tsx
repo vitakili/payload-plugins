@@ -255,9 +255,14 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
 
 export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
-  // If the plugin provided theme presets via admin config, prefer those; otherwise fallback to allThemePresets
+  // If the plugin provided theme presets via admin config, prefer those;
+  // support both `field.admin.themePresets` (legacy) and `field.admin.custom.themePresets`
+  // otherwise fallback to `allThemePresets`.
+  // Prefer presets passed via `admin.custom.themePresets` (set by the field factory / plugin).
+  // Fall back to legacy `admin.themePresets` for backwards compatibility, then to `allThemePresets`.
   const baseThemePresets =
     (field?.admin?.custom as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
+    (field?.admin as any)?.themePresets ??
     allThemePresets
   const runtimeThemePresets = useMemo(() => {
     return (baseThemePresets as ThemePreset[]).reduce<Record<string, ThemePresetDefinition>>(
