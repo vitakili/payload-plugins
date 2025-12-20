@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.0] - 2025-12-20
+
+### 🔧 Fixes & Improvements
+
+- **ThemeTokenSelectField:** Fix preview swatch by resolving CSS variable references (e.g., `var(--primary)`) to computed colors so the preview shows the real color in the admin. ✅
+- **Robust fetching:** If initial fetch from the configured collection returns no configuration, we now retry fetching from the standalone global (`useGlobal: true`) — default `appearance-settings` or `field.admin.custom.collectionSlug` if provided. This makes the field work correctly with both collection-based and standalone global setups.
+- **Field overrides:** Respect `field.admin.custom` overrides (`fetchThemeConfigurationOptions`, `fetchOptions`, `collectionSlug`, `useGlobal`) to make theme config lookup configurable per-field.
+- **Types & safety:** Update `buildOptionsFromConfiguration` to accept `SiteThemeConfiguration` and prevent unnecessary type casts.
+
+### 🧪 Notes
+
+- Build and tests were run locally to validate the changes. If you want me to publish this package to npm, confirm and I'll proceed with tagging and publishing.
+
+---
+
 ## [0.6.0] - 2025-12-17
 
 ### ✨ NEW: Standalone Global Support with Theme Selection Hook
