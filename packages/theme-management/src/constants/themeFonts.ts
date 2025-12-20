@@ -88,6 +88,7 @@ export const HEADING_FONT_OPTIONS = [
 ] as const
 
 export const BASE_FONT_SIZE_OPTIONS = [
+  { label: 'preset', value: 'preset' },
   { label: '14px', value: '14' },
   { label: '15px', value: '15' },
   { label: '16px', value: '16' },
@@ -96,6 +97,7 @@ export const BASE_FONT_SIZE_OPTIONS = [
 ] as const
 
 export const LINE_HEIGHT_OPTIONS = [
+  { label: 'preset', value: 'preset' },
   { label: '1.4', value: '1.4' },
   { label: '1.5', value: '1.5' },
   { label: '1.6', value: '1.6' },

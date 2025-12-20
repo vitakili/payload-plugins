@@ -3,42 +3,50 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { allThemePresets } from '../index.js'
+import { allThemePresets, fetchThemeConfiguration } from '../index.js'
+import type { SiteThemeConfiguration } from '../payload-types.js'
 import type { ThemePreset } from '../presets.js'
+import type { FetchThemeConfigurationOptions } from '../types.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
 interface ThemeColorOption {
   value: string
-  label: string
+  label: string | { [key: string]: string | undefined }
   color: string
   description?: string
 }
 
 const FALLBACK_TOKENS: ThemeColorOption[] = [
-  { value: 'background', label: 'Theme background', color: 'var(--background)' },
-  { value: 'card', label: 'Card background', color: 'var(--card)' },
-  { value: 'muted', label: 'Muted surface', color: 'var(--muted)' },
-  { value: 'accent', label: 'Accent surface', color: 'var(--accent)' },
-  { value: 'secondary', label: 'Secondary surface', color: 'var(--secondary)' },
-  { value: 'primary', label: 'Primary surface', color: 'var(--primary)' },
+  {
+    value: 'background',
+    label: { en: 'Theme background', cs: 'Pozadí tématu' },
+    color: 'var(--background)',
+  },
+  { value: 'card', label: { en: 'Card background', cs: 'Pozadí karty' }, color: 'var(--card)' },
+  { value: 'muted', label: { en: 'Muted surface', cs: 'Tlumený povrch' }, color: 'var(--muted)' },
+  {
+    value: 'accent',
+    label: { en: 'Accent surface', cs: 'Akcentní povrch' },
+    color: 'var(--accent)',
+  },
+  {
+    value: 'secondary',
+    label: { en: 'Secondary surface', cs: 'Sekundární povrch' },
+    color: 'var(--secondary)',
+  },
+  {
+    value: 'primary',
+    label: { en: 'Primary surface', cs: 'Primární povrch' },
+    color: 'var(--primary)',
+  },
 ]
 
-async function fetchThemeConfiguration(): Promise<Record<string, unknown> | null> {
-  try {
-    const response = await fetch('/api/site-settings')
-    if (!response.ok) {
-      return null
-    }
-    const data = await response.json()
-    return data?.docs?.[0]?.themeConfiguration ?? null
-  } catch (error) {
-    console.warn('[ThemeTokenSelectField] Failed to fetch theme configuration:', error)
-    return null
-  }
-}
+// Use plugin-provided fetch helper which supports collection/global and options
+// This will use `collectionSlug`, `useGlobal`, tenant, locale, depth, draft, etc.
+// Accept fetch options from field.admin.custom to allow overrides in different setups.
 
 function buildOptionsFromConfiguration(
-  configuration: Record<string, unknown> | null,
+  configuration: SiteThemeConfiguration | Record<string, unknown> | null,
   themePresets: ThemePreset[],
 ): ThemeColorOption[] {
   if (!configuration) {
@@ -66,23 +74,23 @@ function buildOptionsFromConfiguration(
         return null
       }
 
-      const labelMap: Record<string, string> = {
-        background: 'Theme background',
-        card: 'Card background',
-        muted: 'Muted surface',
-        accent: 'Accent surface',
-        secondary: 'Secondary surface',
-        primary: 'Primary surface',
-        popover: 'Popover surface',
+      const labelMap: Record<string, { en: string; cs: string }> = {
+        background: { en: 'Theme background', cs: 'Pozadí tématu' },
+        card: { en: 'Card background', cs: 'Pozadí karty' },
+        muted: { en: 'Muted surface', cs: 'Tlumený povrch' },
+        accent: { en: 'Accent surface', cs: 'Akcentní povrch' },
+        secondary: { en: 'Secondary surface', cs: 'Sekundární povrch' },
+        primary: { en: 'Primary surface', cs: 'Primární povrch' },
+        popover: { en: 'Popover surface', cs: 'Popover povrch' },
       }
 
       return {
         value: key,
-        label: labelMap[key] ?? key,
+        label: labelMap[key] ?? { en: key, cs: key },
         color: value,
       }
     })
-    .filter((token): token is ThemeColorOption => Boolean(token))
+    .filter((token): token is NonNullable<typeof token> => token !== null)
 
   return tokens.length > 0 ? tokens : FALLBACK_TOKENS
 }
@@ -102,15 +110,67 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   useEffect(() => {
     let isMounted = true
 
-    fetchThemeConfiguration().then((configuration) => {
+    // Allow fields to override fetch options via admin.custom
+    const custom = (field.admin?.custom as any) ?? {}
+
+    const fetchOpts: FetchThemeConfigurationOptions | undefined =
+      custom.fetchThemeConfigurationOptions ??
+      custom.fetchOptions ??
+      (custom.collectionSlug || typeof custom.useGlobal !== 'undefined'
+        ? {
+            collectionSlug: custom.collectionSlug,
+            useGlobal: custom.useGlobal,
+            tenantSlug: custom.tenantSlug,
+            depth: custom.depth,
+            locale: custom.locale,
+            draft: custom.draft,
+            queryParams: custom.queryParams,
+          }
+        : undefined)
+
+    fetchThemeConfiguration(fetchOpts).then(async (configuration) => {
       if (!isMounted) return
+      if (configuration) {
+        setOptions(buildOptionsFromConfiguration(configuration, themePresets))
+        return
+      }
+
+      // If nothing found and fetchOpts didn't explicitly request global, try fallback to global
+      // This helps in setups where plugin created a standalone global (default slug 'appearance-settings')
+      const explicitlyRequestedGlobal = !!(
+        (fetchOpts as FetchThemeConfigurationOptions | undefined)?.useGlobal === true ||
+        (fetchOpts as FetchThemeConfigurationOptions | undefined)?.collectionSlug ===
+          'appearance-settings'
+      )
+
+      if (!explicitlyRequestedGlobal) {
+        try {
+          // Prefer custom.collectionSlug if provided, otherwise try the default standalone slug
+          const fallbackCollection = (custom && custom.collectionSlug) || 'appearance-settings'
+          const fallbackOpts: FetchThemeConfigurationOptions = {
+            useGlobal: true,
+            collectionSlug: fallbackCollection,
+          }
+          const fallbackConfig = await fetchThemeConfiguration(fallbackOpts)
+          if (!isMounted) return
+          if (fallbackConfig) {
+            // Found theme config in global, use it
+            setOptions(buildOptionsFromConfiguration(fallbackConfig, themePresets))
+            return
+          }
+        } catch (e) {
+          console.warn('[ThemeTokenSelectField] Fallback global fetch failed:', e)
+        }
+      }
+
+      // final fallback: use empty tokens
       setOptions(buildOptionsFromConfiguration(configuration, themePresets))
     })
 
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [themePresets, field.admin?.custom])
 
   const handleSelect = useCallback(
     (nextValue: string) => {
@@ -119,7 +179,8 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     [setValue],
   )
 
-  const label = typeof field.label === 'string' ? field.label : ''
+  const label =
+    typeof field.label === 'string' ? field.label : field.label?.en || field.label?.cs || ''
   let description = ''
   if (typeof field.admin?.description === 'string') {
     description = field.admin.description
@@ -129,6 +190,32 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     typeof field.admin.description.en === 'string'
   ) {
     description = field.admin.description.en
+  }
+
+  // Helper function to get label text from localized or string label
+  const getOptionLabel = (option: ThemeColorOption): string => {
+    if (typeof option.label === 'string') {
+      return option.label
+    }
+    // Prefer English, fallback to Czech, then any available language
+    return option.label.en || option.label.cs || Object.values(option.label)[0] || option.value
+  }
+
+  // Resolve CSS variable colors (e.g., 'var(--primary)') to their computed values when possible
+  const resolveCssColor = (color: string): string => {
+    if (typeof window === 'undefined' || !color || !color.trim().startsWith('var(')) {
+      return color
+    }
+
+    try {
+      const match = color.trim().match(/var\((--[^)]+)\)/)
+      if (!match) return color
+      const varName = match[1]
+      const computed = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+      return computed || color
+    } catch (e) {
+      return color
+    }
   }
 
   return (
@@ -192,13 +279,14 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
                   height: '32px',
                   borderRadius: '8px',
                   border: '1px solid rgba(15, 23, 42, 0.08)',
-                  background: option.color,
+                  backgroundColor: resolveCssColor(option.color),
+                  flexShrink: 0,
                 }}
               />
               <span
                 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--theme-elevation-800)' }}
               >
-                {option.label}
+                {getOptionLabel(option)}
               </span>
             </button>
           )
@@ -213,7 +301,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {getOptionLabel(option)}
           </option>
         ))}
       </select>

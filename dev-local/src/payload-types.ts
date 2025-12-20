@@ -1807,6 +1807,10 @@ export interface Header {
         id?: string | null
       }[]
     | null
+  /**
+   * Select the background color token for the header
+   */
+  themeToken?: string | null
   updatedAt?: string | null
   createdAt?: string | null
 }
@@ -2054,8 +2058,8 @@ export interface AppearanceSetting {
        * Provide full CSS font-family stack when using a custom heading font.
        */
       headingFontCustom?: string | null
-      baseFontSize?: ('14' | '15' | '16' | '17' | '18') | null
-      lineHeight?: ('1.4' | '1.5' | '1.6' | '1.7' | '1.8') | null
+      baseFontSize?: ('preset' | '14' | '15' | '16' | '17' | '18') | null
+      lineHeight?: ('preset' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8') | null
     }
     /**
      * Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.
@@ -2100,6 +2104,7 @@ export interface HeaderSelect<T extends boolean = true> {
             }
         id?: T
       }
+  themeToken?: T
   updatedAt?: T
   createdAt?: T
   globalType?: T

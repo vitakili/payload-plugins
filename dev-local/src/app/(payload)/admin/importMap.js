@@ -22,6 +22,7 @@ import { VariantOptionsSelector as VariantOptionsSelector_b91672ccd6e8b071c11142
 import { PriceCell as PriceCell_e27bf7b8cc50640dcdd584767b8eac3c } from '@payloadcms/plugin-ecommerce/client'
 import { PriceInput as PriceInput_b91672ccd6e8b071c11142ab941fedfb } from '@payloadcms/plugin-ecommerce/rsc'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { default as default_58bce6d963f55b41129662191194379a } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
 import { default as default_8f2883114fa2e4186f7d5253bf815ddc } from '@kilivi/payloadcms-theme-management/fields/ThemePreviewField'
 import { default as default_48001663b65131ccddf4637eb5f6fccf } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
 import { default as default_72023a29db4abb7a4753cdfae25e3ec4 } from '@kilivi/payloadcms-theme-management/fields/FontSelectField'
@@ -75,6 +76,8 @@ export const importMap = {
   '@payloadcms/plugin-ecommerce/rsc#PriceInput': PriceInput_b91672ccd6e8b071c11142ab941fedfb,
   '@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient':
     HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField#default':
+    default_58bce6d963f55b41129662191194379a,
   '@kilivi/payloadcms-theme-management/fields/ThemePreviewField#default':
     default_8f2883114fa2e4186f7d5253bf815ddc,
   '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField#default':

@@ -58,7 +58,7 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '100%',
+          width: '300px',
           padding: '10px 14px',
           borderRadius: '6px',
           border: '1px solid var(--theme-elevation-200)',
