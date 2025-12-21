@@ -3,9 +3,13 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientComponent } from 'payload'
 import { useEffect, useState } from 'react'
+import { getTranslations } from '../translations.js'
+import { getAdminLanguage } from '../utils/getAdminLanguage.js'
+
+type LocalizedLabel = Record<string, string>
 
 interface FontOption {
-  label: string
+  label: string | LocalizedLabel
   value: string
   fontFamily?: string
   category?: 'sans-serif' | 'serif' | 'monospace' | 'display'
@@ -17,6 +21,11 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
 
   const options = (field.options as FontOption[]) || []
   const selectedOption = options.find((opt) => opt.value === value)
+  const getOptionLabel = (opt: FontOption) => {
+    if (typeof opt.label === 'string') return opt.label
+    const lang = getAdminLanguage()
+    return opt.label[lang] || opt.label.en || opt.label.cs || 'Font'
+  }
 
   const handleSelect = (optionValue: string) => {
     setValue(optionValue)
@@ -37,8 +46,13 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
     }
   }, [isOpen])
 
+  const t = getTranslations(getAdminLanguage())
   const label =
-    typeof field.label === 'string' ? field.label : field.label?.en || field.label?.cs || 'Font'
+    typeof field.label === 'string'
+      ? field.label
+      : typeof field.label === 'object'
+        ? field.label?.en || field.label?.cs
+        : field.label || 'Font'
 
   return (
     <div className="font-select-container" style={{ position: 'relative', marginBottom: '12px' }}>
@@ -80,7 +94,9 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
           e.currentTarget.style.borderColor = 'var(--theme-elevation-200)'
         }}
       >
-        <span style={{ flex: 1 }}>{selectedOption?.label || 'Select font...'}</span>
+        <span style={{ flex: 1 }}>
+          {selectedOption ? getOptionLabel(selectedOption) : t.ui.selectFontPlaceholder}
+        </span>{' '}
         <svg
           width="12"
           height="12"
@@ -179,7 +195,7 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
                       />
                     </svg>
                   )}
-                  {option.label}
+                  {getOptionLabel(option)}
                 </div>
                 <div
                   style={{
@@ -190,9 +206,9 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
                   }}
                 >
                   {(() => {
-                    if (option.value === 'preset') return 'Use theme preset font'
-                    if (option.value === 'custom') return 'Specify custom font below'
-                    return 'The quick brown fox jumps over the lazy dog'
+                    if (option.value === 'preset') return t.ui.usePreset
+                    if (option.value === 'custom') return t.ui.specifyCustom
+                    return t.ui.sampleSentence
                   })()}
                 </div>
               </button>

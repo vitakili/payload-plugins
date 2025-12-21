@@ -12,6 +12,8 @@ import { resolveTypographyPreview } from '../components/typographyPreviewUtils.j
 import { allThemePresets } from '../index.js'
 import type { ThemePreset, ThemeTypographyPreset } from '../presets.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
+import { getTranslations } from '../translations.js'
+import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
 interface ColorModeColors {
@@ -48,13 +50,7 @@ interface ThemePresetDefinition {
 
 const colorKeys = Object.keys(lightModeDefaults) as (keyof ColorModeColors)[]
 
-const highlightSwatches: Array<{ key: keyof ColorModeColors; label: string }> = [
-  { key: 'primary', label: 'Primary' },
-  { key: 'secondary', label: 'Secondary' },
-  { key: 'accent', label: 'Accent' },
-  { key: 'background', label: 'Background' },
-  { key: 'foreground', label: 'Foreground' },
-]
+// translations and swatches will be computed inside the component to respect admin language at runtime
 
 interface ModePreviewProps {
   icon: string
@@ -69,6 +65,7 @@ interface ModePreviewProps {
 }
 
 function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModePreviewProps>) {
+  const t = getTranslations(getAdminLanguage())
   const background = colors.background ?? '#ffffff'
   const foreground = colors.foreground ?? '#0a0a0a'
   const borderColor = colors.border ?? 'rgba(148, 163, 184, 0.35)'
@@ -148,7 +145,7 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
             boxShadow: '0 6px 14px rgba(15, 23, 42, 0.15)',
           }}
         >
-          Primary Action
+          {t.ui.primaryAction}
         </button>
         <button
           type="button"
@@ -165,7 +162,7 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
             boxShadow: 'inset 0 0 0 1px rgba(15, 23, 42, 0.08)',
           }}
         >
-          Secondary
+          {t.ui.secondaryAction}
         </button>
       </div>
 
@@ -262,7 +259,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   // Fall back to legacy `admin.themePresets` for backwards compatibility, then to `allThemePresets`.
   const baseThemePresets =
     (field?.admin?.custom as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
-    (field?.admin as any)?.themePresets ??
+    (field?.admin as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
     allThemePresets
   const runtimeThemePresets = useMemo(() => {
     return (baseThemePresets as ThemePreset[]).reduce<Record<string, ThemePresetDefinition>>(
@@ -453,6 +450,16 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
     pill: borderRadiusCSS['--radius-xl'] ?? borderRadiusCSS['--radius-large'] ?? '999px',
   }
 
+  // Translate labels at runtime based on admin language
+  const t = getTranslations(getAdminLanguage())
+  const highlightSwatches = [
+    { key: 'primary', label: t.colors.primary },
+    { key: 'secondary', label: t.colors.secondary },
+    { key: 'accent', label: t.colors.accent },
+    { key: 'background', label: t.colors.background },
+    { key: 'foreground', label: t.colors.foreground },
+  ]
+
   const fieldLabel =
     typeof field.label === 'string' ? field.label : field.label?.en || field.label?.cs || 'Theme'
 
@@ -630,9 +637,10 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                 color: 'var(--theme-elevation-800)',
               }}
             >
-              <span>🎨 Live Preview</span>
+              {/* safe translations for preview header */}
+              <span>{getTranslations('en').livePreview.smallTitle}</span>
               <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
-                {activePreset ? activePreset.label : 'Custom palette'}
+                {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
               </span>
             </div>
 
@@ -644,14 +652,14 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             >
               <ModePreview
                 icon="☀️"
-                title="Light Mode"
+                title={getTranslations('en').ui.lightMode}
                 colors={lightModeColors}
                 typography={previewTypography}
                 radius={previewRadius}
               />
               <ModePreview
                 icon="🌙"
-                title="Dark Mode"
+                title={getTranslations('en').ui.darkMode}
                 colors={darkModeColors}
                 typography={previewTypography}
                 radius={previewRadius}

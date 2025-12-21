@@ -250,14 +250,16 @@ describe('FontPicker - Component Exports', () => {
 
     expect(ThemeSettings).toBeDefined()
     expect(ThemeSettings.slug).toBe('themeSettings')
-    expect(ThemeSettings.label).toBe('Theme Settings')
+    const labelOf = (l: any) => (typeof l === 'string' ? l : l?.en || l?.cs)
+    expect(labelOf(ThemeSettings.label)).toBe('Theme Settings')
   })
 
   it('should have correct field components registered', () => {
     const { ThemeSettings } = require('../../src/globals/ThemeSettings/config')
 
+    const labelOf = (l: any) => (typeof l === 'string' ? l : l?.en || l?.cs)
     const typographyTab = ThemeSettings.fields[0].tabs.find(
-      (tab: any) => tab.label === 'Typography',
+      (tab: any) => labelOf(tab.label) === 'Typography',
     )
     expect(typographyTab).toBeDefined()
 
@@ -272,7 +274,9 @@ describe('FontPicker - Component Exports', () => {
     const { ThemeSettings } = require('../../src/globals/ThemeSettings/config')
 
     const fontLoadingTab = ThemeSettings.fields[0].tabs.find(
-      (tab: any) => tab.label === 'Font Loading',
+      (tab: any) =>
+        (typeof tab.label === 'string' ? tab.label : tab.label?.en || tab.label?.cs) ===
+        'Font Loading',
     )
     expect(fontLoadingTab).toBeDefined()
   })

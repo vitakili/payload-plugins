@@ -1,9 +1,10 @@
-import type { CollectionConfig, Config, Field, Plugin, TabsField } from 'payload'
+import type { CollectionConfig, Config, Field, GlobalConfig, Plugin, TabsField } from 'payload'
 import { createThemeConfigurationField } from './fields/themeConfigurationField.js'
 import type { ThemeTab } from './fields/themeConfigurationField.js'
 import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
 import { allThemePresets } from './presets.js'
+import { getTranslations, translations } from './translations.js'
 import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } from './types.js'
 
 const THEME_FIELD_NAME = 'themeConfiguration'
@@ -35,12 +36,20 @@ const findTabsField = (fields: Field[] = []): TabsField | null => {
 const removeExistingThemeTab = (
   tabs: NonNullable<TabsField['tabs']>,
 ): NonNullable<TabsField['tabs']> => {
+  const knownLabels = Object.values(translations).map((t) => t.tabLabel)
   return tabs.filter((tab) => {
-    const labelEn =
-      typeof tab.label === 'object' && tab.label !== null
-        ? (tab.label as { en?: string }).en
-        : tab.label
-    return labelEn !== '🎨 Appearance Settings' && labelEn !== 'Appearance Settings'
+    // Normalize label to string (support localized object or plain string)
+    let labelValues: string[] = []
+    if (typeof tab.label === 'object' && tab.label !== null) {
+      labelValues = Object.values(tab.label as Record<string, string>)
+    } else if (typeof tab.label === 'string') {
+      labelValues = [tab.label]
+    }
+
+    // If any of the label values match a known plugin tab label, remove it
+    const matchesKnown = labelValues.some((v) => knownLabels.includes(v))
+
+    return !matchesKnown
   })
 }
 
@@ -104,7 +113,8 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       targetCollection = 'site-settings',
       useStandaloneCollection = false,
       standaloneCollectionSlug = 'appearance-settings',
-      standaloneCollectionLabel = 'Appearance Settings',
+      // Allow either string or localized object; default comes from plugin translations
+      standaloneCollectionLabel = getTranslations().standaloneCollectionLabel,
       themePresets = allThemePresets,
       defaultTheme = 'cool',
       includeColorModeToggle = true,
@@ -144,7 +154,17 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       /**
        * Hook to auto-populate lightMode and darkMode colors when theme changes
        */
-      const beforeChangeHook = async (args: any) => {
+      type BeforeChangeArgs = {
+        data?: {
+          themeConfiguration?: {
+            theme?: string
+            lightMode?: Record<string, unknown>
+            darkMode?: Record<string, unknown>
+          }
+        }
+      }
+
+      const beforeChangeHook = async (args: BeforeChangeArgs) => {
         const { data } = args
 
         // If theme is being changed, auto-populate color modes
@@ -178,18 +198,22 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         return data
       }
 
-      const standaloneGlobal: any = {
+      const standaloneGlobal: GlobalConfig = {
         slug: standaloneCollectionSlug,
         label: standaloneCollectionLabel,
         admin: {
           group: 'Settings',
         },
-        access: {
-          read: () => true,
-          create: ({ req }: { req?: any }) => !!req?.user,
-          update: ({ req }: { req?: any }) => !!req?.user,
-          delete: ({ req }: { req?: any }) => !!req?.user,
-        },
+        // Provide a broad access object but cast to GlobalConfig['access'] to satisfy types
+        access: ((): GlobalConfig['access'] => {
+          const accessObj = {
+            read: () => true,
+            create: ({ req }: { req?: { user?: unknown } }) => !!req?.user,
+            update: ({ req }: { req?: { user?: unknown } }) => !!req?.user,
+            delete: ({ req }: { req?: { user?: unknown } }) => !!req?.user,
+          } as unknown as GlobalConfig['access']
+          return accessObj
+        })(),
         fields: tabFields,
         hooks: {
           beforeChange: [beforeChangeHook],
@@ -397,5 +421,13 @@ export {
 export const ThemeManagementPlugin = themeManagementPlugin
 /** @deprecated use {@link themeManagementPlugin} */
 export const themeConfigurationPlugin = themeManagementPlugin
+
+// Export plugin translations for consumers to merge into their payload translations
+export {
+  translations,
+  getTranslations,
+  registerTranslations,
+  availableLanguages,
+} from './translations.js'
 
 export default themeManagementPlugin

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef } from 'react'
 import type { GoogleFont } from '../../../app/api/google-fonts/route'
+import { getTranslations } from '../../../translations.js'
+import { getAdminLanguage } from '../../../utils/getAdminLanguage.js'
 
 export type PreviewVariant =
   | 'h1'
@@ -88,6 +90,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
       `
 
       let content: HTMLElement
+      const t = getTranslations(getAdminLanguage())
 
       switch (variant) {
         case 'h1':
@@ -173,7 +176,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
               line-height: 1.8;
               margin: 4px 0;
             `
-            line.textContent = `${weight} - The quick brown fox jumps over the lazy dog`
+            line.textContent = `${weight} - ${t.ui.sampleSentence}`
             content.appendChild(line)
           })
           break
@@ -200,9 +203,9 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
             font-weight: 400;
             line-height: 1.5;
             margin: 0;
-            color: var(--theme-text-secondary, #6b7280);
+            color: var(--theme-text-secondary, #6b7280); // visual only (no text change)
           `
-          description.textContent = text || 'The quick brown fox jumps over the lazy dog'
+          description.textContent = text || t.ui.sampleSentence
           content.appendChild(title)
           content.appendChild(description)
           break
@@ -230,7 +233,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
             flex: 1;
             opacity: 0.7;
           `
-          sampleSpan.textContent = text || 'The quick brown fox jumps over the lazy dog'
+          sampleSpan.textContent = text || t.ui.sampleSentence
           content.appendChild(nameSpan)
           content.appendChild(sampleSpan)
           break

@@ -9,9 +9,9 @@ import type { GlobalConfig } from 'payload'
  */
 export const ThemeSettings: GlobalConfig = {
   slug: 'themeSettings',
-  label: 'Theme Settings',
+  label: { en: 'Theme Settings', cs: 'Nastavení témat' },
   admin: {
-    group: 'Settings',
+    group: { en: 'Settings', cs: 'Nastavení' },
   },
   access: {
     read: () => true,
@@ -25,15 +25,18 @@ export const ThemeSettings: GlobalConfig = {
       type: 'tabs',
       tabs: [
         {
-          label: 'Typography',
+          label: { en: 'Typography', cs: 'Typografie' },
           fields: [
             {
               name: 'activeFont',
               type: 'text',
-              label: 'Active Font Family',
+              label: { en: 'Active Font Family', cs: 'Aktivní rodina písem' },
               defaultValue: 'Inter',
               admin: {
-                description: 'The currently active font family for your website',
+                description: {
+                  en: 'The currently active font family for your website',
+                  cs: 'Aktuální rodina písem pro váš web',
+                },
                 components: {
                   Field: '@kilivi/payloadcms-theme-management/globals/ThemeSettings/FontPicker',
                 },
@@ -42,13 +45,16 @@ export const ThemeSettings: GlobalConfig = {
             {
               name: 'googleFontsApiKey',
               type: 'text',
-              label: 'Google Fonts API Key',
+              label: { en: 'Google Fonts API Key', cs: 'Google Fonts API klíč' },
               admin: {
-                description:
-                  "Optional: Add your Google Fonts API key to access the full library of 1400+ fonts. Without this, you'll have access to 35 popular fonts.",
+                description: {
+                  en: "Optional: Add your Google Fonts API key to access the full library of 1400+ fonts. Without this, you'll have access to 35 popular fonts.",
+                  cs: 'Volitelné: přidejte svůj Google Fonts API klíč pro přístup k plné knihovně 1400+ písem. Bez něj máte k dispozici 35 populárních písem.',
+                },
                 placeholder: 'AIzaSy...',
               },
             },
+
             {
               type: 'row',
               fields: [
@@ -101,7 +107,7 @@ export const ThemeSettings: GlobalConfig = {
           ],
         },
         {
-          label: 'Font Loading',
+          label: { en: 'Font Loading', cs: 'Načítání písem' },
           fields: [
             {
               type: 'ui',

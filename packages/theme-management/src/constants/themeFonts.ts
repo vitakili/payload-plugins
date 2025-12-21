@@ -1,90 +1,90 @@
 // Theme font constants for the plugin
 export const BODY_FONT_OPTIONS = [
-  { label: 'Use theme preset', value: 'preset' },
+  { label: { en: 'Use theme preset', cs: 'Použít výchozí' }, value: 'preset' },
   {
-    label: 'System',
+    label: { en: 'System', cs: 'Systémové' },
     value: 'system-ui',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Inter',
+    label: { en: 'Inter', cs: 'Inter' },
     value: 'Inter',
     fontFamily: '"Inter", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Roboto',
+    label: { en: 'Roboto', cs: 'Roboto' },
     value: 'Roboto',
     fontFamily: '"Roboto", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Open Sans',
+    label: { en: 'Open Sans', cs: 'Open Sans' },
     value: 'Open Sans',
     fontFamily: '"Open Sans", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Lato',
+    label: { en: 'Lato', cs: 'Lato' },
     value: 'Lato',
     fontFamily: '"Lato", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Montserrat',
+    label: { en: 'Montserrat', cs: 'Montserrat' },
     value: 'Montserrat',
     fontFamily: '"Montserrat", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Poppins',
+    label: { en: 'Poppins', cs: 'Poppins' },
     value: 'Poppins',
     fontFamily: '"Poppins", sans-serif',
     category: 'sans-serif' as const,
   },
-  { label: 'Custom font...', value: 'custom' },
+  { label: { en: 'Custom font...', cs: 'Vlastní písmo...' }, value: 'custom' },
 ] as const
 
 export const HEADING_FONT_OPTIONS = [
-  { label: 'Use theme preset', value: 'preset' },
+  { label: { en: 'Use theme preset', cs: 'Použít výchozí' }, value: 'preset' },
   {
-    label: 'System',
+    label: { en: 'System', cs: 'Systémové' },
     value: 'system-ui',
     fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Inter',
+    label: { en: 'Inter', cs: 'Inter' },
     value: 'Inter',
     fontFamily: '"Inter", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Playfair Display',
+    label: { en: 'Playfair Display', cs: 'Playfair Display' },
     value: 'Playfair Display',
     fontFamily: '"Playfair Display", serif',
     category: 'serif' as const,
   },
   {
-    label: 'Merriweather',
+    label: { en: 'Merriweather', cs: 'Merriweather' },
     value: 'Merriweather',
     fontFamily: '"Merriweather", serif',
     category: 'serif' as const,
   },
   {
-    label: 'Montserrat',
+    label: { en: 'Montserrat', cs: 'Montserrat' },
     value: 'Montserrat',
     fontFamily: '"Montserrat", sans-serif',
     category: 'sans-serif' as const,
   },
   {
-    label: 'Raleway',
+    label: { en: 'Raleway', cs: 'Raleway' },
     value: 'Raleway',
     fontFamily: '"Raleway", sans-serif',
     category: 'sans-serif' as const,
   },
-  { label: 'Custom font...', value: 'custom' },
+  { label: { en: 'Custom font...', cs: 'Vlastní písmo...' }, value: 'custom' },
 ] as const
 
 export const BASE_FONT_SIZE_OPTIONS = [

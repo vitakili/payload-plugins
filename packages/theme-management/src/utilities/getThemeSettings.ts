@@ -20,8 +20,14 @@ export async function getThemeSettings(payload?: Payload): Promise<ThemeSettings
   if (!payload) {
     // If no payload instance provided, try to get it from the global scope
     // This is useful in server components where payload might be available globally
-    if (typeof window === 'undefined' && (global as any).payload) {
-      payload = (global as any).payload
+    if (typeof window === 'undefined') {
+      const g = global as unknown as { payload?: Payload }
+      if (g.payload) {
+        payload = g.payload
+      } else {
+        console.warn('getThemeSettings: No payload instance available')
+        return null
+      }
     } else {
       console.warn('getThemeSettings: No payload instance available')
       return null

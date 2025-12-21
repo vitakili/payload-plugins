@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui'
 import React, { useMemo } from 'react'
 import { allThemePresets } from '../presets.js'
 import { themeIsValid } from '../providers/Theme/types.js'
+import { getTranslations } from '../translations.js'
+import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 const DEFAULT_THEME_KEY = 'cool'
 const basePresetMap = allThemePresets.reduce<Record<string, (typeof allThemePresets)[number]>>(
@@ -70,6 +72,8 @@ export default function ThemePreview() {
     [primaryColor, accentColor, backgroundColor, textColor, themeColors],
   )
 
+  const t = getTranslations(getAdminLanguage())
+
   return (
     <div className="theme-preview" style={{ marginTop: '20px' }}>
       <div
@@ -80,7 +84,7 @@ export default function ThemePreview() {
           color: '#374151',
         }}
       >
-        🎨 Live Theme Preview
+        {t.livePreview.largeTitle}
       </div>
 
       <div
@@ -105,12 +109,12 @@ export default function ThemePreview() {
             alignItems: 'center',
           }}
         >
-          <div style={{ fontSize: '20px', fontWeight: '700' }}>Your Website</div>
+          <div style={{ fontSize: '20px', fontWeight: '700' }}>{t.preview.siteTitle}</div>
           <nav style={{ display: 'flex', gap: '24px', fontSize: '14px' }}>
-            <span>Home</span>
-            <span>About</span>
-            <span>Services</span>
-            <span>Contact</span>
+            <span>{t.preview.nav.home}</span>
+            <span>{t.preview.nav.about}</span>
+            <span>{t.preview.nav.services}</span>
+            <span>{t.preview.nav.contact}</span>
           </nav>
         </div>
 
@@ -124,7 +128,7 @@ export default function ThemePreview() {
               color: currentColors.text,
             }}
           >
-            Welcome to Your Site
+            {t.preview.welcomeTitle}
           </h1>
 
           <p
@@ -136,12 +140,9 @@ export default function ThemePreview() {
               opacity: 0.8,
             }}
           >
-            This is how your content will look with the selected theme. The colors and styling will
-            be applied across your entire website.
+            {t.preview.welcomeCopy}
           </p>
-
-          {/* Buttons */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
             <button
               style={{
                 backgroundColor: currentColors.primary,
@@ -199,7 +200,7 @@ export default function ThemePreview() {
                 color: currentColors.text,
               }}
             >
-              Sample Card
+              {t.preview.sampleCardTitle}
             </h3>
             <p
               style={{
@@ -224,7 +225,7 @@ export default function ThemePreview() {
             marginTop: 'auto',
           }}
         >
-          © 2025 Your Website. Powered by PayloadCMS.
+          {t.preview.footer}
         </div>
       </div>
 

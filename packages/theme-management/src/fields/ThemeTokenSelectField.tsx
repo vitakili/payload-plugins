@@ -111,13 +111,25 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     let isMounted = true
 
     // Allow fields to override fetch options via admin.custom
-    const custom = (field.admin?.custom as any) ?? {}
+    type CustomAdmin = {
+      fetchThemeConfigurationOptions?: FetchThemeConfigurationOptions
+      fetchOptions?: FetchThemeConfigurationOptions
+      collectionSlug?: string
+      useGlobal?: boolean
+      tenantSlug?: string
+      depth?: number
+      locale?: string
+      draft?: boolean
+      queryParams?: Record<string, unknown>
+    }
+
+    const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
 
     const fetchOpts: FetchThemeConfigurationOptions | undefined =
       custom.fetchThemeConfigurationOptions ??
       custom.fetchOptions ??
       (custom.collectionSlug || typeof custom.useGlobal !== 'undefined'
-        ? {
+        ? ({
             collectionSlug: custom.collectionSlug,
             useGlobal: custom.useGlobal,
             tenantSlug: custom.tenantSlug,
@@ -125,7 +137,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
             locale: custom.locale,
             draft: custom.draft,
             queryParams: custom.queryParams,
-          }
+          } as unknown as FetchThemeConfigurationOptions)
         : undefined)
 
     fetchThemeConfiguration(fetchOpts).then(async (configuration) => {
