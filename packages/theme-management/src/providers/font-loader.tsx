@@ -207,7 +207,7 @@ export function ThemeFontProvider({
   bodyFontCustom,
   headingFontCustom,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode | any
   bodyFont?: string
   headingFont?: string
   bodyFontCustom?: string
