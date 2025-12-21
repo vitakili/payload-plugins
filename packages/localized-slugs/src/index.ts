@@ -1,6 +1,8 @@
 import type { Config, Plugin } from 'payload'
 import { createLocalizedSlugField } from './fields/localizedSlugField.js'
 import { createPopulateLocalizedSlugsHook } from './hooks/populateLocalizedSlugs.js'
+import { getTranslations } from './translations.js'
+import { getAdminLanguage } from './utils/getAdminLanguage.js'
 
 export interface LocalizedSlugsCollectionConfig {
   /** Collection slug */
@@ -37,17 +39,17 @@ export const localizedSlugsPlugin = (options: LocalizedSlugsPluginOptions): Plug
     }
 
     if (enableLogging) {
+      const t = getTranslations(getAdminLanguage())
       // eslint-disable-next-line no-console
-      console.log('🌐 Localized Slugs Plugin: Initializing with options:', {
+      console.log(`${t.pluginName}: Initializing with options:`, {
         locales,
         collections: collections.map((c) => (typeof c === 'string' ? c : c.collection)),
       })
     }
 
     if (!locales?.length) {
-      throw new Error(
-        '🌐 Localized Slugs Plugin: No locales provided. Please specify at least one locale.',
-      )
+      const t = getTranslations('en')
+      throw new Error(t.errors.noLocalesProvided)
     }
 
     // Enhance collections with localized slug fields and hooks
@@ -115,6 +117,7 @@ export default localizedSlugsPlugin
 
 export * from './utils/index.js'
 export { createLocalizedSlugField } from './fields/localizedSlugField.js'
+export { getTranslations, registerTranslations, availableLanguages } from './translations.js'
 // Export providers with explicit .js extension so compiled output points to the correct runtime file
 // Note: providers are client-only components and are exported via the package subpath
 // (see package.json './providers' export). Do NOT re-export providers from the

@@ -452,7 +452,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
 
   // Translate labels at runtime based on admin language
   const t = getTranslations(getAdminLanguage())
-  const highlightSwatches = [
+  // Explicitly type keys as `keyof ColorModeColors` to satisfy TypeScript when indexing `lightMode`/`darkMode`
+  const highlightSwatches: { key: keyof ColorModeColors; label: string }[] = [
     { key: 'primary', label: t.colors.primary },
     { key: 'secondary', label: t.colors.secondary },
     { key: 'accent', label: t.colors.accent },
