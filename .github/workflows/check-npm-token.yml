@@ -12,12 +12,26 @@ permissions:
 jobs:
   check-token:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout (for issue context)
         uses: actions/checkout@v4
 
       - name: Configure .npmrc
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        run: |
+          printf "//registry.npmjs.org/:_authToken=%s" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Verify .npmrc has _authToken (safe)
+        run: |
+          if grep -q "_authToken=" ~/.npmrc && [ -s ~/.npmrc ]; then
+            echo "NPM_TOKEN present in ~/.npmrc"
+          else
+            echo "NPM_TOKEN is missing or empty in ~/.npmrc" >&2
+            ls -la ~/.npmrc || true
+            sed -n '1p' ~/.npmrc | sed -E 's/(:).*$/\1[REDACTED]/'
+            exit 1
+          fi
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq

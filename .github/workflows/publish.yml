@@ -26,6 +26,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     
     steps:
       - name: Checkout code
@@ -38,6 +40,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          always-auth: true
 
       - name: Enable Corepack
         run: corepack enable
@@ -110,13 +113,28 @@ jobs:
 
       - name: Configure temporary .npmrc for authentication
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          # write token to a temp npmrc (avoid extra newline)
+          printf "//registry.npmjs.org/:_authToken=%s" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Verify .npmrc has _authToken (safe)
+        run: |
+          if grep -q "_authToken=" ~/.npmrc && [ -s ~/.npmrc ]; then
+            echo "NPM_TOKEN present in ~/.npmrc"
+          else
+            echo "NPM_TOKEN is missing or empty in ~/.npmrc" >&2
+            ls -la ~/.npmrc || true
+            # print only first line masked to avoid leaking token
+            sed -n '1p' ~/.npmrc | sed -E 's/(:).*$/\1[REDACTED]/'
+            exit 1
+          fi
 
       - name: Validate NPM token
         run: |
           set -e
           echo "Validating NPM token by running 'npm whoami'"
           npm whoami --registry=https://registry.npmjs.org || (echo "NPM auth failed: check repository secret 'NPM_TOKEN' and token permissions" && exit 1)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Check NPM token expiry (optional)
         run: |
