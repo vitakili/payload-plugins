@@ -21,10 +21,37 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
 
   const options = (field.options as FontOption[]) || []
   const selectedOption = options.find((opt) => opt.value === value)
+  const [loadedFonts, setLoadedFonts] = useState<Set<string>>(new Set())
+
   const getOptionLabel = (opt: FontOption) => {
     if (typeof opt.label === 'string') return opt.label
     const lang = getAdminLanguage()
     return opt.label[lang] || opt.label.en || opt.label.cs || 'Font'
+  }
+
+  const ensureFontLoaded = (fontValue: string | undefined) => {
+    if (!fontValue || ['preset', 'custom', 'system-ui'].includes(fontValue)) return
+    // Avoid duplicate loads
+    if (loadedFonts.has(fontValue)) return
+
+    if (typeof document === 'undefined') return
+
+    const linkId = `font-${fontValue.replace(/\s+/g, '-')}`
+    if (document.getElementById(linkId)) {
+      setLoadedFonts((prev) => new Set(prev).add(fontValue))
+      return
+    }
+
+    const weights = '400;700' // reasonable default weights
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
+      fontValue,
+    )}:wght@${weights}&display=swap`
+    const link = document.createElement('link')
+    link.id = linkId
+    link.rel = 'stylesheet'
+    link.href = fontUrl
+    link.onload = () => setLoadedFonts((prev) => new Set(prev).add(fontValue))
+    document.head.appendChild(link)
   }
 
   const handleSelect = (optionValue: string) => {
@@ -169,6 +196,8 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
                   if (!isSelected) {
                     e.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
                   }
+                  // Lazy-load a preview font when hovering
+                  ensureFontLoaded(option.value)
                 }}
                 onMouseLeave={(e) => {
                   if (!isSelected) {
@@ -203,6 +232,7 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
                     color: 'var(--theme-elevation-600)',
                     fontStyle:
                       option.value === 'preset' || option.value === 'custom' ? 'italic' : 'normal',
+                    fontFamily: option.fontFamily || undefined,
                   }}
                 >
                   {(() => {

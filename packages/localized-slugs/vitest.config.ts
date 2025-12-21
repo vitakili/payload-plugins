@@ -1,9 +1,9 @@
 import react from '@vitejs/plugin-react'
-import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [react() as unknown as Plugin],
+  // Vite types can differ across workspace deps; cast to `any` to avoid cross-version type conflicts
+  plugins: [react() as unknown as any],
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],

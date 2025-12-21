@@ -279,7 +279,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const fallbackTheme = baseThemePresets[0]?.name ?? 'cool'
   const { value: selectedTheme, setValue } = useField<string>({ path })
   const { dispatchFields } = useForm()
-  const formFields = useFormFields(([formState]) => formState)
+  const formFields = useFormFields(([formState]: any) => formState)
   const hasAppliedInitialPresetRef = useRef(false)
 
   const applyPreset = useCallback(
