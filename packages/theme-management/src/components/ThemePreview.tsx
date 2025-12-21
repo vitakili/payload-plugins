@@ -192,7 +192,7 @@ export default function ThemePreview() {
               opacity: 0.1,
             }}
           >
-            <h3
+            <h2
               style={{
                 fontSize: '18px',
                 fontWeight: '600',
@@ -201,7 +201,7 @@ export default function ThemePreview() {
               }}
             >
               {t.preview.sampleCardTitle}
-            </h3>
+            </h2>
             <p
               style={{
                 fontSize: '14px',

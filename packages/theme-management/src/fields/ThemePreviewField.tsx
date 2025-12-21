@@ -498,8 +498,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             {Object.entries(runtimeThemePresets).map(([key, preset]) => {
               const isSelected = key === selectedTheme
               const swatches = highlightSwatches
-                .map(({ key: colorKey }) => preset.lightMode[colorKey])
-                .filter((color): color is string => Boolean(color))
+                .map(({ key: colorKey }) => preset.lightMode[colorKey] as string | undefined)
+                .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
 
               return (
                 <button
