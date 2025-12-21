@@ -11,7 +11,7 @@ type SlugAction = {
   payload: Record<string, string>
 }
 
-const SlugContext = createContext<{
+export const SlugContext = createContext<{
   state: SlugState
   dispatch: React.Dispatch<SlugAction>
 } | null>(null)

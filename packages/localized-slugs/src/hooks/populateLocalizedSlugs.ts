@@ -186,9 +186,9 @@ export const createPopulateLocalizedSlugsHook = (
             id: docId,
             locale: currentLocale,
             overrideAccess: true,
-            data: {
-              localizedSlugs,
-            } as any,
+            data: { localizedSlugs } as {
+              localizedSlugs: Record<string, { slug?: string; fullPath?: string }>
+            },
             context: {
               skipLocalizedSlugHook: true,
             },
@@ -203,9 +203,9 @@ export const createPopulateLocalizedSlugsHook = (
                   id: docId,
                   locale,
                   overrideAccess: true,
-                  data: {
-                    localizedSlugs,
-                  } as any,
+                  data: { localizedSlugs } as {
+                    localizedSlugs: Record<string, { slug?: string; fullPath?: string }>
+                  },
                   context: {
                     skipLocalizedSlugHook: true,
                   },
