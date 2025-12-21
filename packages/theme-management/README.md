@@ -227,6 +227,10 @@ The plugin automatically adds a **Live Preview** page to your admin panel at `/a
 
 The preview automatically watches your `themeConfiguration` field and displays real-time updates without any additional setup.
 
+## Translations / i18n
+
+Extend or override translations at runtime with `registerTranslations`. The plugin merges your translations with English defaults, so missing keys fall back to English. See `docs/TRANSLATIONS.md` for details and examples.
+
 ## API Reference
 
 ### Main Entry Point
