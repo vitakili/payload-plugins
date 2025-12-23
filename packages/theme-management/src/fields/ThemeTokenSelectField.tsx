@@ -142,12 +142,14 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
     const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
 
-    // Prefer tenant from the current form (`formTenant`) first since it is populated by the editor.
+    // Prefer tenant ID from the current form (`formTenant`) first since editor fills the relation id.
+    // If the relation is an object, prefer `id` over `slug` to avoid passing a human-readable slug when an id is available.
     // Then respect an explicit `admin.custom.tenantSlug` override, otherwise fall back to other heuristics.
     const tenantFromForm = (() => {
       if (typeof formTenant === 'string' && formTenant.trim()) return formTenant
       if (formTenant && typeof formTenant === 'object') {
-        return (formTenant.slug ?? formTenant.id ?? formTenant.value) as string | undefined
+        // Prefer id first
+        return (formTenant.id ?? formTenant.slug ?? formTenant.value) as string | undefined
       }
       return undefined
     })()
@@ -158,21 +160,29 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     // Determine admin language to pass as `locale` to fetch, if not provided
     const adminLang = getAdminLanguage()
 
-    const fetchOpts: FetchThemeConfigurationOptions | undefined =
-      custom.fetchThemeConfigurationOptions ??
-      custom.fetchOptions ??
+    // Normalize fetch options so that even when callers provide an empty object ("{}"),
+    // we still ensure `tenantSlug` and `locale` are set to sensible defaults (inferred/form/adminLang).
+    const rawFetchOpts = custom.fetchThemeConfigurationOptions ?? custom.fetchOptions ??
       (custom.collectionSlug || typeof custom.useGlobal !== 'undefined'
         ? ({
             collectionSlug: custom.collectionSlug,
             useGlobal: custom.useGlobal,
-            tenantSlug: inferredTenant,
             depth: custom.depth,
-            // prefer explicit custom.locale, otherwise use admin language
-            locale: custom.locale ?? adminLang,
+            locale: custom.locale,
             draft: custom.draft,
             queryParams: custom.queryParams,
           } as unknown as FetchThemeConfigurationOptions)
         : undefined)
+
+    const fetchOpts: FetchThemeConfigurationOptions | undefined = rawFetchOpts
+      ? ({
+          ...rawFetchOpts,
+          // Ensure we pass a tenantSlug when one isn't explicitly provided in the custom options
+          tenantSlug: (rawFetchOpts as FetchThemeConfigurationOptions).tenantSlug ?? inferredTenant,
+          // Ensure locale defaults to admin language when not explicitly set
+          locale: (rawFetchOpts as FetchThemeConfigurationOptions).locale ?? adminLang,
+        } as FetchThemeConfigurationOptions)
+      : undefined
 
     fetchThemeConfiguration(fetchOpts).then(async (configuration) => {
       if (!isMounted) return

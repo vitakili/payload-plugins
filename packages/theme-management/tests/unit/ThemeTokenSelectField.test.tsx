@@ -125,6 +125,8 @@ describe('ThemeTokenSelectField', () => {
         admin: {
           custom: {
             collectionSlug: 'header',
+            // simulate empty object provided by consumer
+            fetchThemeConfigurationOptions: {},
           },
         },
       },
@@ -142,6 +144,7 @@ describe('ThemeTokenSelectField', () => {
       true,
     )
   })
+
 
   it('prefers tenant from form relation object (id) over cookie', async () => {
     jest.resetAllMocks()
@@ -200,5 +203,64 @@ describe('ThemeTokenSelectField', () => {
     const { fetchThemeConfiguration } = await import('../../src/index.js')
     const calledWith = (fetchThemeConfiguration as jest.Mock).mock.calls[0][0]
     expect(calledWith.tenantSlug === 'tenant-123').toBe(true)
+  })
+
+  it('prefers form tenant id over slug when both present', async () => {
+    jest.resetAllMocks()
+    // re-set index mocks after resetAllMocks
+    const indexMock = require('../../src/index.js')
+    indexMock.fetchThemeConfiguration = jest.fn(async (opts: any) => ({
+      lightMode: {
+        primary: '#112233',
+        background: '#ffffff',
+      },
+    }))
+    indexMock.allThemePresets = [
+      {
+        name: 'cool',
+        label: 'Cool & Professional',
+        borderRadius: 'medium',
+        lightMode: {
+          primary: '#112233',
+          secondary: '#223344',
+          accent: '#334455',
+          background: '#ffffff',
+          foreground: '#000000',
+        },
+        darkMode: {},
+      },
+    ]
+
+    const useFieldMock = require('@payloadcms/ui').useField as jest.Mock
+    useFieldMock.mockImplementation(({ path }: { path: string }) => {
+      if (path === 'themeConfiguration') return { value: null }
+      if (path === 'tenant') return { value: { id: 'tenant-456', slug: 'my-slug' } }
+      return { value: undefined, setValue: mockSetValue }
+    })
+
+    const props = {
+      path: 'header.tokens',
+      field: {
+        name: 'tokens',
+        label: 'Theme Tokens',
+        type: 'select' as const,
+        options: [],
+        admin: {
+          custom: {
+            collectionSlug: 'header',
+          },
+        },
+      },
+    } as unknown as SelectFieldClientProps
+
+    render(<ThemeTokenSelectField {...props} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+    })
+
+    const { fetchThemeConfiguration: fetch2 } = await import('../../src/index.js')
+    const calledWith2 = (fetch2 as jest.Mock).mock.calls[0][0]
+    expect(calledWith2.tenantSlug === 'tenant-456').toBe(true)
   })
 })
