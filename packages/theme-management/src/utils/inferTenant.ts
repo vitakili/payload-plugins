@@ -51,6 +51,27 @@ export function inferTenantFromGlobal(): string | undefined {
   }
 }
 
+export function inferTenantFromDomAttr(): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  try {
+    // Look for common attributes placed on parent elements in the admin UI
+    const el = document.querySelector('[data-selected-tenant-id], [data-selected-tenant-slug]')
+    if (!el) return undefined
+    const value =
+      el.getAttribute('data-selected-tenant-id') ?? el.getAttribute('data-selected-tenant-slug')
+    return value && value.length > 0 ? value : undefined
+  } catch (e) {
+    return undefined
+  }
+}
+
 export function inferTenant(customTenant?: string): string | undefined {
-  return customTenant ?? inferTenantFromUrl() ?? inferTenantFromGlobal() ?? inferTenantFromCookie()
+  // Order: explicit override -> URL params -> global runtime -> DOM attribute -> cookie
+  return (
+    customTenant ??
+    inferTenantFromUrl() ??
+    inferTenantFromGlobal() ??
+    inferTenantFromDomAttr() ??
+    inferTenantFromCookie()
+  )
 }
