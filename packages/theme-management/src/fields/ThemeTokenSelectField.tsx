@@ -140,7 +140,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       queryParams?: Record<string, unknown>
     }
 
-    const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
+    const custom = field.admin?.custom as unknown as CustomAdmin
 
     // Prefer tenant ID from the current form (`formTenant`) first since editor fills the relation id.
     // If the relation is an object, prefer `id` over `slug` to avoid passing a human-readable slug when an id is available.
@@ -162,8 +162,10 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
     // Normalize fetch options so that even when callers provide an empty object ("{}"),
     // we still ensure `tenantSlug` and `locale` are set to sensible defaults (inferred/form/adminLang).
-    const rawFetchOpts = custom.fetchThemeConfigurationOptions ?? custom.fetchOptions ??
-      (custom.collectionSlug || typeof custom.useGlobal !== 'undefined'
+    const rawFetchOpts =
+      custom?.fetchThemeConfigurationOptions ??
+      custom?.fetchOptions ??
+      (custom?.collectionSlug || typeof custom?.useGlobal !== 'undefined'
         ? ({
             collectionSlug: custom.collectionSlug,
             useGlobal: custom.useGlobal,
