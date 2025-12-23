@@ -7,6 +7,8 @@ import { allThemePresets, fetchThemeConfiguration } from '../index.js'
 import type { SiteThemeConfiguration } from '../payload-types.js'
 import type { ThemePreset } from '../presets.js'
 import type { FetchThemeConfigurationOptions } from '../types.js'
+import { getAdminLanguage } from '../utils/getAdminLanguage.js'
+import { inferTenant } from '../utils/inferTenant.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
 interface ThemeColorOption {
@@ -98,6 +100,11 @@ function buildOptionsFromConfiguration(
 export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   const { path, field } = props
   const { value, setValue } = useField<string>({ path })
+  // Try to read themeConfiguration from the active form (Site Settings) first
+  const { value: formThemeConfiguration } = useField<SiteThemeConfiguration | null>({
+    path: 'themeConfiguration',
+  })
+
   const [options, setOptions] = useState<ThemeColorOption[]>(FALLBACK_TOKENS)
   const selectedValue = value || 'background'
 
@@ -108,6 +115,12 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   }, [field.admin?.custom])
 
   useEffect(() => {
+    // If the active form contains themeConfiguration (e.g., editing Site Settings), prefer it
+    if (formThemeConfiguration) {
+      setOptions(buildOptionsFromConfiguration(formThemeConfiguration, themePresets))
+      return
+    }
+
     let isMounted = true
 
     // Allow fields to override fetch options via admin.custom
@@ -125,6 +138,12 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
     const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
 
+    // Use helper to infer tenant from different sources (custom override, URL params, global runtime, cookies)
+    const inferredTenant = inferTenant(custom.tenantSlug)
+
+    // Determine admin language to pass as `locale` to fetch, if not provided
+    const adminLang = getAdminLanguage()
+
     const fetchOpts: FetchThemeConfigurationOptions | undefined =
       custom.fetchThemeConfigurationOptions ??
       custom.fetchOptions ??
@@ -132,9 +151,10 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
         ? ({
             collectionSlug: custom.collectionSlug,
             useGlobal: custom.useGlobal,
-            tenantSlug: custom.tenantSlug,
+            tenantSlug: inferredTenant,
             depth: custom.depth,
-            locale: custom.locale,
+            // prefer explicit custom.locale, otherwise use admin language
+            locale: custom.locale ?? adminLang,
             draft: custom.draft,
             queryParams: custom.queryParams,
           } as unknown as FetchThemeConfigurationOptions)
@@ -162,6 +182,8 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
           const fallbackOpts: FetchThemeConfigurationOptions = {
             useGlobal: true,
             collectionSlug: fallbackCollection,
+            tenantSlug: inferredTenant,
+            locale: custom.locale ?? adminLang,
           }
           const fallbackConfig = await fetchThemeConfiguration(fallbackOpts)
           if (!isMounted) return
@@ -182,7 +204,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     return () => {
       isMounted = false
     }
-  }, [themePresets, field.admin?.custom])
+  }, [themePresets, field.admin?.custom, formThemeConfiguration])
 
   const handleSelect = useCallback(
     (nextValue: string) => {
@@ -191,17 +213,38 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     [setValue],
   )
 
+  // Make admin language reactive so switching admin UI language updates labels
+  const initialAdminLang = getAdminLanguage()
+  const [adminLang, setAdminLang] = useState<string>(initialAdminLang)
+
+  useEffect(() => {
+    if (typeof document === 'undefined' || !('MutationObserver' in window)) return
+    const el = document.documentElement
+    const obs = new MutationObserver(() => {
+      const next = getAdminLanguage()
+      if (next !== adminLang) setAdminLang(next)
+    })
+    obs.observe(el, { attributes: true, attributeFilter: ['lang'] })
+    return () => obs.disconnect()
+  }, [adminLang])
+
   const label =
-    typeof field.label === 'string' ? field.label : field.label?.en || field.label?.cs || ''
+    typeof field.label === 'string'
+      ? field.label
+      : (field.label && (field.label as Record<string, string>)[adminLang]) ||
+        field.label?.en ||
+        field.label?.cs ||
+        ''
+
   let description = ''
   if (typeof field.admin?.description === 'string') {
     description = field.admin.description
-  } else if (
-    field.admin?.description &&
-    typeof field.admin.description === 'object' &&
-    typeof field.admin.description.en === 'string'
-  ) {
-    description = field.admin.description.en
+  } else if (field.admin?.description && typeof field.admin.description === 'object') {
+    description =
+      (field.admin.description as Record<string, string>)[adminLang] ||
+      (field.admin.description as Record<string, string>).en ||
+      (field.admin.description as Record<string, string>).cs ||
+      ''
   }
 
   // Helper function to get label text from localized or string label
@@ -209,8 +252,14 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     if (typeof option.label === 'string') {
       return option.label
     }
-    // Prefer English, fallback to Czech, then any available language
-    return option.label.en || option.label.cs || Object.values(option.label)[0] || option.value
+    // Prefer current admin language, fallback to English/Czech, then any available language
+    return (
+      (option.label as Record<string, string>)[adminLang] ||
+      option.label.en ||
+      option.label.cs ||
+      Object.values(option.label)[0] ||
+      option.value
+    )
   }
 
   // Resolve CSS variable colors (e.g., 'var(--primary)') to their computed values when possible

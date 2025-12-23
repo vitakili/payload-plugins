@@ -129,7 +129,7 @@ export interface Config {
   db: {
     defaultIDType: number
   }
-  fallbackLocale: null
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('cs' | 'en') | ('cs' | 'en')[]
   globals: {
     header: Header
     footer: Footer
@@ -140,7 +140,7 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>
     'appearance-settings': AppearanceSettingsSelect<false> | AppearanceSettingsSelect<true>
   }
-  locale: null
+  locale: 'cs' | 'en'
   user: User & {
     collection: 'users'
   }
