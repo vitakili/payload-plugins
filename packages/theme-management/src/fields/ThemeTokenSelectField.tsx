@@ -154,8 +154,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       return undefined
     })()
 
-    const explicitTenant = custom.tenantSlug
-    const inferredTenant = tenantFromForm ?? explicitTenant ?? inferTenant()
+    const inferredTenant = tenantFromForm ?? custom?.tenantSlug ?? inferTenant()
 
     // Determine admin language to pass as `locale` to fetch, if not provided
     const adminLang = getAdminLanguage()
