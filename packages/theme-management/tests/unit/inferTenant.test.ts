@@ -7,6 +7,8 @@ describe('inferTenant utils', () => {
       writable: true,
       value: '',
     })
+    // clear DOM
+    document.body.innerHTML = ''
   })
 
   it('reads payload-tenant from cookie', () => {
@@ -27,5 +29,22 @@ describe('inferTenant utils', () => {
 
     const tenant = inferTenant('MyExplicit')
     expect(tenant).toBe('MyExplicit')
+  })
+
+  it('reads data-selected-tenant-id from DOM attribute', () => {
+    document.body.innerHTML = '<span data-selected-tenant-id="Silverigo"></span>'
+    const tenant = inferTenant()
+    expect(tenant).toBe('Silverigo')
+  })
+
+  it('prefers DOM attribute over cookie when both present', () => {
+    Object.defineProperty(document, 'cookie', {
+      writable: true,
+      value: 'payload-tenant=OtherTenant; other=1',
+    })
+    document.body.innerHTML = '<div><span data-selected-tenant-id="Silverigo"></span></div>'
+
+    const tenant = inferTenant()
+    expect(tenant).toBe('Silverigo')
   })
 })
