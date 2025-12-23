@@ -145,7 +145,6 @@ describe('ThemeTokenSelectField', () => {
     )
   })
 
-
   it('prefers tenant from form relation object (id) over cookie', async () => {
     jest.resetAllMocks()
     // re-set index mocks after resetAllMocks
@@ -262,5 +261,63 @@ describe('ThemeTokenSelectField', () => {
     const { fetchThemeConfiguration: fetch2 } = await import('../../src/index.js')
     const calledWith2 = (fetch2 as jest.Mock).mock.calls[0][0]
     expect(calledWith2.tenantSlug === 'tenant-456').toBe(true)
+  })
+
+  it('applies inferred tenant when custom.fetchThemeConfigurationOptions is an empty object', async () => {
+    jest.resetAllMocks()
+    const indexMock = require('../../src/index.js')
+    indexMock.fetchThemeConfiguration = jest.fn(async (opts: any) => ({
+      lightMode: {
+        primary: '#112233',
+        background: '#ffffff',
+      },
+    }))
+    indexMock.allThemePresets = [
+      {
+        name: 'cool',
+        label: 'Cool & Professional',
+        borderRadius: 'medium',
+        lightMode: {
+          primary: '#112233',
+          secondary: '#223344',
+          accent: '#334455',
+          background: '#ffffff',
+          foreground: '#000000',
+        },
+        darkMode: {},
+      },
+    ]
+
+    const useFieldMock = require('@payloadcms/ui').useField as jest.Mock
+    useFieldMock.mockImplementation(({ path }: { path: string }) => {
+      if (path === 'themeConfiguration') return { value: null }
+      if (path === 'tenant') return { value: 'FormTenant' }
+      return { value: undefined, setValue: mockSetValue }
+    })
+
+    const props = {
+      path: 'header.tokens',
+      field: {
+        name: 'tokens',
+        label: 'Theme Tokens',
+        type: 'select' as const,
+        options: [],
+        admin: {
+          custom: {
+            fetchThemeConfigurationOptions: {},
+          },
+        },
+      },
+    } as unknown as SelectFieldClientProps
+
+    render(<ThemeTokenSelectField {...props} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+    })
+
+    const { fetchThemeConfiguration: fetch3 } = await import('../../src/index.js')
+    const calledWith3 = (fetch3 as jest.Mock).mock.calls[0][0]
+    expect(calledWith3.tenantSlug === 'FormTenant').toBe(true)
   })
 })

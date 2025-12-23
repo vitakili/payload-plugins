@@ -175,15 +175,13 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
           } as unknown as FetchThemeConfigurationOptions)
         : undefined)
 
-    const fetchOpts: FetchThemeConfigurationOptions | undefined = rawFetchOpts
-      ? ({
-          ...rawFetchOpts,
-          // Ensure we pass a tenantSlug when one isn't explicitly provided in the custom options
-          tenantSlug: (rawFetchOpts as FetchThemeConfigurationOptions).tenantSlug ?? inferredTenant,
-          // Ensure locale defaults to admin language when not explicitly set
-          locale: (rawFetchOpts as FetchThemeConfigurationOptions).locale ?? adminLang,
-        } as FetchThemeConfigurationOptions)
-      : undefined
+    // Always build a fetch options object so we can inject sensible defaults (tenantSlug, locale)
+    // even when callers passed an empty object or no options at all.
+    const fetchOpts: FetchThemeConfigurationOptions = {
+      ...(rawFetchOpts ?? {}),
+      tenantSlug: rawFetchOpts?.tenantSlug ?? inferredTenant,
+      locale: rawFetchOpts?.locale ?? adminLang,
+    }
 
     fetchThemeConfiguration(fetchOpts).then(async (configuration) => {
       if (!isMounted) return
