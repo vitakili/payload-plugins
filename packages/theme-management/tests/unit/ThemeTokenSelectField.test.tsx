@@ -63,7 +63,7 @@ describe('ThemeTokenSelectField', () => {
           },
         },
       },
-    } as Partial<SelectFieldClientProps> as SelectFieldClientProps
+    } as unknown as SelectFieldClientProps
 
     render(<ThemeTokenSelectField {...props} />)
 
