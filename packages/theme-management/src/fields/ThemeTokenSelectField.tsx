@@ -105,11 +105,9 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     path: 'themeConfiguration',
   })
 
-  // Read common tenant fields from the current form (sibling data) where present
-  // Some collections store tenant as 'tenant', 'tenantId' (object) or 'tenantSlug', so try common paths
-  const { value: formTenantSlug } = useField<string>({ path: 'tenantSlug' })
+  // Read tenant from the current form (sibling data) where present.
+  // Prefer `tenant` field as it is populated correctly in most setups.
   const { value: formTenant } = useField<any>({ path: 'tenant' })
-  const { value: formTenantId } = useField<any>({ path: 'tenantId' })
 
   const [options, setOptions] = useState<ThemeColorOption[]>(FALLBACK_TOKENS)
   const selectedValue = value || 'background'
@@ -144,21 +142,18 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
     const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
 
-    // Prefer explicit admin.custom.tenantSlug, then look for tenant values in the current form ("sibling" fields),
-    // otherwise fall back to the global/url/dom/cookie inference helper.
+    // Prefer tenant from the current form (`formTenant`) first since it is populated by the editor.
+    // Then respect an explicit `admin.custom.tenantSlug` override, otherwise fall back to other heuristics.
     const tenantFromForm = (() => {
-      if (typeof formTenantSlug === 'string' && formTenantSlug.trim()) return formTenantSlug
       if (typeof formTenant === 'string' && formTenant.trim()) return formTenant
       if (formTenant && typeof formTenant === 'object') {
         return (formTenant.slug ?? formTenant.id ?? formTenant.value) as string | undefined
       }
-      if (typeof formTenantId === 'string' && formTenantId.trim()) return formTenantId
-      if (formTenantId && typeof formTenantId === 'object') return formTenantId.id ?? undefined
       return undefined
     })()
 
     const explicitTenant = custom.tenantSlug
-    const inferredTenant = explicitTenant ?? tenantFromForm ?? inferTenant()
+    const inferredTenant = tenantFromForm ?? explicitTenant ?? inferTenant()
 
     // Determine admin language to pass as `locale` to fetch, if not provided
     const adminLang = getAdminLanguage()
@@ -223,7 +218,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     return () => {
       isMounted = false
     }
-  }, [themePresets, field.admin?.custom, formThemeConfiguration])
+  }, [themePresets, field.admin?.custom, formThemeConfiguration, formTenant])
 
   const handleSelect = useCallback(
     (nextValue: string) => {
