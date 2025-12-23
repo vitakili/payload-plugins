@@ -14,6 +14,9 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { cs } from '@payloadcms/translations/languages/cs'
+import { en } from '@payloadcms/translations/languages/en'
+
 import { Categories } from '@/collections/Categories'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
@@ -26,6 +29,14 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  i18n: {
+    supportedLanguages: { en, cs },
+  },
+  localization: {
+    locales: ['cs', 'en'],
+    defaultLocale: 'cs',
+    fallback: true,
+  },
   admin: {
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
