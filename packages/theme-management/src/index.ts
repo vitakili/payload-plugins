@@ -303,9 +303,11 @@ export const fetchThemeConfiguration = async (
       const params = new URLSearchParams()
 
       if (typeof depth === 'number') params.set('depth', String(depth))
-      if (tenantSlug) params.set('tenant', tenantSlug)
-      if (locale) params.set('locale', locale)
-      if (draft) params.set('draft', 'true')
+      // For globals, keep tenant param for backwards compatibility, and also add where[...] filter
+      if (tenantSlug) {
+        params.set('tenant', tenantSlug)
+        params.set('where[tenant][equals]', String(tenantSlug))
+      }
 
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value === undefined) return
@@ -330,7 +332,8 @@ export const fetchThemeConfiguration = async (
       const params = new URLSearchParams({ limit: '1' })
 
       if (typeof depth === 'number') params.set('depth', String(depth))
-      if (tenantSlug) params.set('tenant', tenantSlug)
+      // For collections, use a where[tenant][equals] filter so Payload's find endpoint applies tenant scoping
+      if (tenantSlug) params.set('where[tenant][equals]', String(tenantSlug))
       if (locale) params.set('locale', locale)
       if (draft) params.set('draft', 'true')
 
