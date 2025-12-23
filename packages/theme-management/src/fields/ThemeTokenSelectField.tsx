@@ -105,6 +105,12 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     path: 'themeConfiguration',
   })
 
+  // Read common tenant fields from the current form (sibling data) where present
+  // Some collections store tenant as 'tenant', 'tenantId' (object) or 'tenantSlug', so try common paths
+  const { value: formTenantSlug } = useField<string>({ path: 'tenantSlug' })
+  const { value: formTenant } = useField<any>({ path: 'tenant' })
+  const { value: formTenantId } = useField<any>({ path: 'tenantId' })
+
   const [options, setOptions] = useState<ThemeColorOption[]>(FALLBACK_TOKENS)
   const selectedValue = value || 'background'
 
@@ -138,8 +144,21 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
     const custom = (field.admin?.custom as unknown as CustomAdmin) ?? {}
 
-    // Use helper to infer tenant from different sources (custom override, URL params, global runtime, cookies)
-    const inferredTenant = inferTenant(custom.tenantSlug)
+    // Prefer explicit admin.custom.tenantSlug, then look for tenant values in the current form ("sibling" fields),
+    // otherwise fall back to the global/url/dom/cookie inference helper.
+    const tenantFromForm = (() => {
+      if (typeof formTenantSlug === 'string' && formTenantSlug.trim()) return formTenantSlug
+      if (typeof formTenant === 'string' && formTenant.trim()) return formTenant
+      if (formTenant && typeof formTenant === 'object') {
+        return (formTenant.slug ?? formTenant.id ?? formTenant.value) as string | undefined
+      }
+      if (typeof formTenantId === 'string' && formTenantId.trim()) return formTenantId
+      if (formTenantId && typeof formTenantId === 'object') return formTenantId.id ?? undefined
+      return undefined
+    })()
+
+    const explicitTenant = custom.tenantSlug
+    const inferredTenant = explicitTenant ?? tenantFromForm ?? inferTenant()
 
     // Determine admin language to pass as `locale` to fetch, if not provided
     const adminLang = getAdminLanguage()
