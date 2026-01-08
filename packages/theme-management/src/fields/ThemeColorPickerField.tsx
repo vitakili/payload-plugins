@@ -1,6 +1,7 @@
 'use client'
 
 import { useField } from '@payloadcms/ui'
+import Color from 'color'
 import type { TextFieldClientComponent } from 'payload'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -33,69 +34,7 @@ function resolveLocalizedValue(value: unknown, fallback: string) {
 function toHex(color: string): string {
   if (!color) return '#000000'
 
-  // Already hex
-  if (color.startsWith('#')) return color
-
-  // OKLCH format - extract hue and convert to approximate hex
-  if (color.startsWith('oklch')) {
-    // For now, return a default - proper conversion requires color-conversion library
-    return '#3b82f6' // blue-500 as default
-  }
-
-  // HSL format
-  if (color.startsWith('hsl')) {
-    const regex = /hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/
-    const match = regex.exec(color)
-    if (match) {
-      const [, h, s, l] = match.map(Number)
-      return hslToHex(h, s, l)
-    }
-  }
-
-  return '#000000'
-}
-
-/**
- * Convert HSL to HEX
- */
-function hslToHex(h: number, s: number, l: number): string {
-  s /= 100
-  l /= 100
-
-  const c = (1 - Math.abs(2 * l - 1)) * s
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
-  const m = l - c / 2
-
-  let r = 0
-  let g = 0
-  let b = 0
-
-  if (h >= 0 && h < 60) {
-    r = c
-    g = x
-  } else if (h >= 60 && h < 120) {
-    r = x
-    g = c
-  } else if (h >= 120 && h < 180) {
-    g = c
-    b = x
-  } else if (h >= 180 && h < 240) {
-    g = x
-    b = c
-  } else if (h >= 240 && h < 300) {
-    r = x
-    b = c
-  } else if (h >= 300 && h < 360) {
-    r = c
-    b = x
-  }
-
-  const toHex = (n: number) => {
-    const hex = Math.round((n + m) * 255).toString(16)
-    return hex.length === 1 ? '0' + hex : hex
-  }
-
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+  return Color(color).hex().toString()
 }
 
 const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
