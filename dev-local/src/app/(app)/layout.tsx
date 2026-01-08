@@ -15,6 +15,7 @@ import './globals.css'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { resolveThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { unstable_cache } from 'next/cache'
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
@@ -43,15 +44,26 @@ const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : 
     }),
 } */
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
-  const payload = await getPayload({ config: configPromise })
-  // Fetch from standalone collection
-  const appearanceSettings = await payload.findGlobal({
-    slug: 'appearance-settings',
-  })
-  const themeConfig = resolveThemeConfiguration(appearanceSettings?.themeConfiguration)
+// Create cached theme fetcher with automatic invalidation
+const getCachedTheme = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    const appearanceSettings = await payload.findGlobal({
+      slug: 'appearance-settings',
+    })
+    return resolveThemeConfiguration(appearanceSettings?.themeConfiguration)
+  },
+  ['appearance-settings-theme'],
+  {
+    tags: ['global_appearance-settings'], // Matches the auto-invalidation tag from plugin
+    revalidate: 3600, // Optional: revalidate every hour as fallback
+  },
+)
 
-  console.log('Appearance Settings Global:', themeConfig)
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const themeConfig = await getCachedTheme()
+
+  console.log('Appearance Settings Global (cached):', themeConfig)
   return (
     <html
       className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}

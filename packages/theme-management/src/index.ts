@@ -217,6 +217,32 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         fields: tabFields,
         hooks: {
           beforeChange: [beforeChangeHook],
+          afterChange: [
+            async ({ doc, req }) => {
+              // Invalidate cache after appearance settings change
+              if (!req?.context?.disableRevalidate) {
+                try {
+                  const cacheTag = `global_${standaloneCollectionSlug}`
+                  // Import revalidateTag dynamically to avoid issues in non-Next.js environments
+                  const { revalidateTag } = await import('next/cache')
+                  revalidateTag(cacheTag)
+                  if (enableLogging) {
+                    req.payload.logger.info(
+                      `🎨 Theme Management Plugin: cache invalidated for tag "${cacheTag}"`,
+                    )
+                  }
+                } catch (error) {
+                  if (enableLogging) {
+                    req.payload.logger.error(
+                      '🎨 Theme Management Plugin: cache invalidation failed:',
+                      error,
+                    )
+                  }
+                }
+              }
+              return doc
+            },
+          ],
         },
       }
 

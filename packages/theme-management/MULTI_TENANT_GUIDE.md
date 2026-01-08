@@ -1,41 +1,19 @@
 # Multi-Tenant Guide for Theme Management Plugin
 
-This guide explains how to use the theme-management plugin in multi-tenant Payload CMS applications.
+This guide explains how to use the theme-management plugin in multi-tenant Payload CMS v3 applications.
 
 ## Overview
 
-The theme-management plugin supports two multi-tenant scenarios:
+The theme-management plugin works seamlessly with Payload CMS v3's multi-tenant features. You can configure it for:
 
-1. **Shared Theme** - All tenants use the same appearance settings (using `isGlobal: true`)
-2. **Per-Tenant Theme** - Each tenant has its own appearance settings (using `isGlobal: false`, default)
+1. **Shared Theme** - All tenants use the same appearance settings (single global for the entire application)
+2. **Per-Tenant Theme** - Each tenant has its own appearance settings (isolated globals via Payload's multi-tenant support)
 
-## Shared Theme Configuration (All Tenants)
+## Configuration
 
-Use this when you want all tenants to share the same theme:
+### Shared Theme (All Tenants Use Same Theme)
 
-```typescript
-// payload.config.ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
-import { buildConfig } from 'payload'
-
-export default buildConfig({
-  plugins: [
-    themeManagementPlugin({
-      useStandaloneCollection: true,
-      standaloneCollectionSlug: 'appearance-settings',
-      standaloneCollectionLabel: 'Appearance Settings',
-      enableLogging: true,
-    }),
-  ],
-  // Your multi-tenant configuration...
-})
-```
-
-The plugin will automatically create a global that respects your multi-tenant setup. When you need the global to be shared across all tenants, Payload's `isGlobal: true` flag handles this automatically.
-
-## Per-Tenant Theme Configuration (Each Tenant)
-
-Use this when each tenant should have its own theme settings:
+Use this configuration when all tenants should share a consistent brand theme:
 
 ```typescript
 // payload.config.ts
@@ -43,219 +21,462 @@ import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
+  // ... your multi-tenant config
   plugins: [
     themeManagementPlugin({
+      enabled: true,
       useStandaloneCollection: true,
       standaloneCollectionSlug: 'appearance-settings',
       standaloneCollectionLabel: 'Appearance Settings',
+      defaultTheme: 'cool',
       enableLogging: true,
-      // By default, each tenant has its own settings
     }),
   ],
-  // Your multi-tenant configuration...
 })
 ```
 
-Each tenant gets its own isolated appearance settings global.
+The plugin creates a single global that all tenants share and can access.
+
+### Per-Tenant Theme (Each Tenant Has Own Theme)
+
+Use this when each tenant can customize their own appearance:
+
+```typescript
+// payload.config.ts
+import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { buildConfig } from 'payload'
+
+export default buildConfig({
+  // ... your multi-tenant config (with tenantField enabled)
+  plugins: [
+    themeManagementPlugin({
+      enabled: true,
+      useStandaloneCollection: true,
+      standaloneCollectionSlug: 'appearance-settings',
+      standaloneCollectionLabel: 'Appearance Settings',
+      defaultTheme: 'cool',
+      enableLogging: true,
+    }),
+  ],
+})
+```
+
+Payload CMS automatically creates tenant-isolated globals. Each tenant gets its own `appearance-settings` record.
 
 ## Fetching Theme in Multi-Tenant Context
 
-### Server-Side Fetching
+### 1. Shared Theme (Single Global)
 
-```typescript
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
-
-// Get current tenant from context (example)
-const tenantId = getRequestContext().tenantId
-
-// Fetch theme for specific tenant
-const theme = await fetchThemeConfiguration({
-  tenantSlug: tenantId,
-  collectionSlug: 'appearance-settings',
-  useGlobal: true,
-})
-```
-
-### Direct Payload API
+When all tenants use the same theme, fetch it once:
 
 ```typescript
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 
-const payload = await getPayload({ config: configPromise })
+// Create cached theme fetcher with automatic invalidation
+const getCachedTheme = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
 
-// Fetch global for specific tenant
-const appearanceSettings = await payload.globals.findBySlug({
-  slug: 'appearance-settings',
-  // If per-tenant theme:
-  where: {
-    tenant: { equals: 'tenant-id' },
+    const appearanceSettings = await payload.findGlobal({
+      slug: 'appearance-settings',
+    })
+
+    return appearanceSettings?.themeConfiguration
   },
-})
+  ['appearance-settings-shared'],
+  {
+    tags: ['global_appearance-settings'],
+    revalidate: 3600,
+  },
+)
 
-const theme = appearanceSettings?.themeConfiguration
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeConfiguration = await getCachedTheme()
+  // Use themeConfiguration across all tenants...
+}
 ```
 
-## Layout.tsx with Multi-Tenant
+### 2. Per-Tenant Theme (Using `payload.find` for Multi-Tenant)
 
-```tsx
-// app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+When each tenant has isolated appearance settings, fetch by tenant:
+
+```typescript
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { headers } from 'next/headers'
+import { unstable_cache } from 'next/cache'
 
-// Helper to get tenant from request
-function getTenantId() {
+// Get tenant ID from request context
+function getTenantId(): string {
   const headersList = headers()
-  // Adjust based on how you store tenant ID
-  // (could be from subdomain, path, or custom header)
-  return headersList.get('x-tenant-id') || undefined
+  // Adjust based on your multi-tenant setup (subdomain, path, header, etc.)
+  return headersList.get('x-tenant-id') || 'default-tenant'
 }
+
+// Cache per tenant using tenant ID
+const getCachedTenantTheme = (tenantId: string) =>
+  unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
+
+      // For per-tenant globals, use payload.find with tenantId
+      const { docs } = await payload.find({
+        collection: 'globals',
+        where: {
+          slug: { equals: 'appearance-settings' },
+          tenantId: { equals: tenantId }, // Filter by tenant
+        },
+        limit: 1,
+      })
+
+      return docs[0]?.themeConfiguration
+    },
+    [`appearance-settings-${tenantId}`],
+    {
+      tags: [`global_appearance-settings_${tenantId}`], // Per-tenant cache tag
+      revalidate: 3600,
+    }
+  )
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const tenantId = getTenantId()
-  const payload = await getPayload({ config: configPromise })
+  const themeConfiguration = await getCachedTenantTheme(tenantId)()
 
-  try {
-    const appearanceSettings = await payload.globals.findBySlug({
-      slug: 'appearance-settings',
-      ...(tenantId && { where: { tenant: { equals: tenantId } } }),
-    })
-
-    const themeConfiguration = appearanceSettings?.themeConfiguration
-    return (
-      <html lang="en">
-        <head>
-          <ServerThemeInjector themeConfiguration={themeConfiguration} />
-        </head>
-        <body>{children}</body>
-      </html>
-    )
-  } catch (error) {
-    console.warn('Failed to fetch theme configuration:', error)
-    // Fallback to default theme
-    return (
-      <html lang="en">
-        <head>
-          <ServerThemeInjector />
-        </head>
-        <body>{children}</body>
-      </html>
-    )
-  }
+  return (
+    <html lang="en">
+      <head>
+        <ServerThemeInjector themeConfiguration={themeConfiguration} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
 }
 ```
 
-## Admin Panel Multi-Tenant Considerations
+## Cache Invalidation with Multi-Tenant
 
-### Accessing Tenant-Specific Settings
+The plugin automatically invalidates cache when appearance settings are updated. For per-tenant setups, cache is invalidated per tenant:
 
-When admin users view appearance settings, they should only see their own tenant's settings:
+- **Shared Theme**: Cache tag `global_appearance-settings` is invalidated globally
+- **Per-Tenant**: Cache tag `global_appearance-settings_{tenantId}` is invalidated per tenant
+
+This means when an admin updates tenant A's theme, only tenant A's cache is refreshed. Other tenants' caches remain valid.
 
 ```typescript
-// This is handled automatically by Payload's multi-tenant access control
-// The plugin respects the global's existing access configuration
+// The plugin's afterChange hook handles this automatically:
+hooks: {
+  afterChange: [
+    async ({ doc, req }) => {
+      // Automatically invalidates the appropriate cache tag
+      revalidateTag(`global_${standaloneCollectionSlug}${tenantId ? `_${tenantId}` : ''}`)
+      return doc
+    },
+  ],
+}
+```
 
-// Custom access control (if needed):
-const appearanceGlobal = {
+## Server-Side Theme Injection
+
+Use `ServerThemeInjector` from the `/server` entry point:
+
+```tsx
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const payload = await getPayload({ config: configPromise })
+
+  // For shared theme:
+  const appearanceSettings = await payload.findGlobal({
+    slug: 'appearance-settings',
+  })
+
+  // For per-tenant theme:
+  // const { docs } = await payload.find({
+  //   collection: 'globals',
+  //   where: {
+  //     slug: { equals: 'appearance-settings' },
+  //     tenantId: { equals: currentTenantId },
+  //   },
+  // })
+  // const appearanceSettings = docs[0]
+
+  return (
+    <html lang="en">
+      <head>
+        <ServerThemeInjector themeConfiguration={appearanceSettings?.themeConfiguration} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+## Admin Panel Access Control
+
+### Shared Theme
+
+All admins see and can edit the same global:
+
+```typescript
+// Access control is already configured by the plugin
+// All authenticated users with admin role can view/edit
+```
+
+### Per-Tenant Theme
+
+Admins should only access their own tenant's settings. Use Payload's access control:
+
+```typescript
+// This is handled automatically by Payload's multi-tenant isolation
+// Each tenant's admin only sees their own appearance-settings global
+```
+
+If you need custom access rules:
+
+```typescript
+import type { GlobalConfig } from 'payload'
+
+const appearanceGlobal: GlobalConfig = {
   slug: 'appearance-settings',
   access: {
     read: async ({ req }) => {
-      // Only allow reading own tenant's settings
-      return req.user?.tenant === req.headers['x-tenant-id']
+      // Allow if user belongs to the same tenant
+      return req.user?.tenant === req.tenant?.id
     },
     update: async ({ req }) => {
-      return req.user?.role === 'admin' && req.user?.tenant === req.headers['x-tenant-id']
+      // Only admins can update their tenant's settings
+      return req.user?.role === 'admin' && req.user?.tenant === req.tenant?.id
     },
   },
-  fields: [
-    /* theme fields */
+  // ... fields
+}
+```
+
+## Practical Examples
+
+### Example 1: SaaS App with Per-Tenant Themes
+
+Each customer can customize their brand theme:
+
+```typescript
+// payload.config.ts
+export default buildConfig({
+  multiTenant: {
+    enabled: true,
+    tenantFieldName: 'tenantId',
+  },
+  plugins: [
+    themeManagementPlugin({
+      useStandaloneCollection: true,
+      enableLogging: true,
+    }),
   ],
+  collections: [/* ... */],
+})
+
+// app/layout.tsx
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const tenantId = getTenantIdFromRequest()
+  const payload = await getPayload({ config: configPromise })
+
+  const { docs } = await payload.find({
+    collection: 'globals',
+    where: {
+      slug: { equals: 'appearance-settings' },
+      tenantId: { equals: tenantId },
+    },
+    limit: 1,
+  })
+
+  const themeConfig = docs[0]?.themeConfiguration
+
+  return (
+    <html>
+      <head>
+        <ServerThemeInjector themeConfiguration={themeConfig} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### Example 2: White-Label Platform with Shared Theme
+
+Multiple customers share one corporate theme:
+
+```typescript
+// payload.config.ts
+export default buildConfig({
+  multiTenant: {
+    enabled: true,
+  },
+  plugins: [
+    themeManagementPlugin({
+      useStandaloneCollection: true,
+      standaloneCollectionSlug: 'appearance-settings',
+      // Single global for all tenants
+    }),
+  ],
+})
+
+// app/layout.tsx
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const payload = await getPayload({ config: configPromise })
+
+  // Single global shared by all tenants
+  const appearanceSettings = await payload.findGlobal({
+    slug: 'appearance-settings',
+  })
+
+  return (
+    <html>
+      <head>
+        <ServerThemeInjector themeConfiguration={appearanceSettings?.themeConfiguration} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
 }
 ```
 
 ## Best Practices
 
-### 1. Use Shared Theme for Brand Consistency
+### 1. Always Use Cache for Performance
 
-If your organization wants a consistent brand across all customer tenants:
-
-```typescript
-// All tenants share one theme
-// Configure once, apply everywhere
-themeManagementPlugin({
-  useStandaloneCollection: true,
-  // Default: shared across all tenants
-})
-```
-
-### 2. Use Per-Tenant Theme for Customization
-
-If each customer can customize their own theme:
+Fetching theme on every request is unnecessary. Use `unstable_cache`:
 
 ```typescript
-// Each tenant has their own settings
-themeManagementPlugin({
-  useStandaloneCollection: true,
-  // By default: each tenant isolated
-})
+// ✅ Good: Cached and auto-invalidated
+const getCachedTheme = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    return payload.findGlobal({ slug: 'appearance-settings' })
+  },
+  ['appearance-settings'],
+  { tags: ['global_appearance-settings'] },
+)
+
+// ❌ Avoid: Fetches every time
+async function getTheme() {
+  const payload = await getPayload({ config: configPromise })
+  return payload.findGlobal({ slug: 'appearance-settings' })
+}
 ```
 
-### 3. Document Tenant Fetching
+### 2. Be Explicit About Tenant Context
 
-Always be explicit about tenant context in your code:
+Always know which tenant's theme you're fetching:
 
 ```typescript
 // ✅ Good: Clear tenant context
-const theme = await fetchThemeConfiguration({
-  tenantSlug: currentTenant.id,
-  useGlobal: true,
+const tenantId = getTenantIdFromRequest()
+const theme = await payload.find({
+  collection: 'globals',
+  where: {
+    slug: { equals: 'appearance-settings' },
+    tenantId: { equals: tenantId },
+  },
 })
 
-// ❌ Avoid: Ambiguous tenant context
-const theme = await fetchThemeConfiguration()
+// ❌ Bad: Ambiguous tenant context
+const theme = await payload.findGlobal({
+  slug: 'appearance-settings',
+})
 ```
 
-### 4. Handle Fallbacks
+### 3. Handle Missing Configuration
 
-Always handle missing theme configuration gracefully:
+Always provide fallbacks:
 
 ```typescript
 try {
-  const theme = await fetchThemeConfiguration({
-    tenantSlug,
-    useGlobal: true,
+  const appearanceSettings = await payload.findGlobal({
+    slug: 'appearance-settings',
   })
-  return theme || DEFAULT_THEME
+  return appearanceSettings?.themeConfiguration || DEFAULT_THEME
 } catch (error) {
-  console.warn('Failed to fetch tenant theme, using default')
+  console.warn('Failed to fetch theme, using default', error)
   return DEFAULT_THEME
 }
 ```
 
+### 4. Use `findGlobal` vs `find` Correctly
+
+- **`payload.findGlobal({ slug: '...' })`** - For single shared global
+- **`payload.find({ collection: 'globals', where: { ... } })`** - For querying with filters (multi-tenant)
+
+```typescript
+// Shared global
+const shared = await payload.findGlobal({
+  slug: 'appearance-settings',
+})
+
+// Per-tenant global with filters
+const { docs } = await payload.find({
+  collection: 'globals',
+  where: {
+    slug: { equals: 'appearance-settings' },
+    tenantId: { equals: tenantId },
+  },
+})
+const perTenant = docs[0]
+```
+
+### 5. Document Cache Tags in Your App
+
+Keep track of cache tags you're using:
+
+```typescript
+// constants/cacheTags.ts
+export const CACHE_TAGS = {
+  SHARED_THEME: 'global_appearance-settings',
+  TENANT_THEME: (tenantId: string) => `global_appearance-settings_${tenantId}`,
+  SHARED_HEADER: 'global_header',
+  TENANT_HEADER: (tenantId: string) => `global_header_${tenantId}`,
+} as const
+```
+
 ## Troubleshooting
 
-### Theme Not Appearing for Tenant
+### Theme Not Appearing for Specific Tenant
 
-Check that:
+1. Verify the `tenantId` filter is correct:
 
-1. The global was created successfully in admin
-2. The correct `tenantSlug` is being passed to `fetchThemeConfiguration`
-3. The tenant's appearance settings global exists in the database
+   ```typescript
+   const { docs } = await payload.find({
+     collection: 'globals',
+     where: {
+       slug: { equals: 'appearance-settings' },
+       tenantId: { equals: tenantId }, // Check this value
+     },
+   })
+   ```
+
+2. Confirm the global exists in admin panel for that tenant
+
+3. Check that cache tags are tenant-specific:
+   ```typescript
+   tags: [`global_appearance-settings_${tenantId}`]
+   ```
+
+### Cache Not Invalidating for Per-Tenant
+
+The plugin automatically uses the tenant context. Ensure:
+
+1. Tenant is correctly identified when updating in admin
+2. Cache tags include tenant ID: `global_appearance-settings_{tenantId}`
+3. `enableLogging: true` to see invalidation messages
 
 ### Access Denied Errors
 
 Verify:
 
-1. User has appropriate permissions for the tenant
-2. Access control rules allow read/write for the tenant
-3. Multi-tenant middleware is properly configured
-
-### Mixing Themes Between Tenants
-
-If themes are crossing tenant boundaries:
-
-1. Ensure `tenantSlug` parameter is always passed
-2. Check that each tenant has its own isolated database records
-3. Verify Payload's multi-tenant isolation is working
+1. User belongs to the correct tenant
+2. User has appropriate role (admin, editor, etc.)
+3. Payload's multi-tenant access control is properly configured
+4. Custom access rules don't block the user

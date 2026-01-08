@@ -2,12 +2,12 @@
 
 A comprehensive theme management plugin for Payload CMS v3 that provides powerful theming capabilities with SSR support, preventing FOUC (Flash of Unstyled Content).
 
-## 🎉 Version 0.6.0 - New Features!
+## 🎉 Version 1.0.2 - Production Ready!
 
 - **✅ Standalone Global Support** - Create separate appearance settings as a global
 - **✅ Auto-Populate Light/Dark Colors** - Theme selection hook automatically fills color fields
-- **✅ Multi-Tenant Ready** - Full support for multi-tenant applications
-- **✅ Cleaner Data Structure** - Fixed nesting issues for better API integration
+- **✅ Multi-Tenant Ready** - Full support for multi-tenant applications with isolated themes
+- **✅ Cache Invalidation** - Automatic cache invalidation after saving appearance settings
 - **✅ Live Theme Preview** - Real-time theme preview in admin panel at `/admin/theme-preview`
 - **✅ Professional Color Picker** - Enhanced color picker with react-colorful library
 - **✅ shadcn/ui Compatible** - Works with https://ui.shadcn.com/themes
@@ -147,7 +147,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const payload = await getPayload({ config: configPromise })
 
   // Fetch from standalone global
-  const appearanceSettings = await payload.globals.findBySlug({
+  const appearanceSettings = await payload.findGlobal({
     slug: 'appearance-settings', // Your standalone global slug
   })
 
@@ -161,6 +161,62 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   )
 }
 ```
+
+#### Cache Optimization with Next.js
+
+When using standalone global, the plugin automatically invalidates cache after saving appearance settings using the tag `global_appearance-settings` (or `global_{your-slug}` if you use a custom slug).
+
+You can optimize your theme fetching by adding cache tags to your layout:
+
+```tsx
+// app/layout.tsx
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
+
+// Create cached theme fetcher with automatic invalidation
+const getCachedTheme = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    const appearanceSettings = await payload.findGlobal({
+      slug: 'appearance-settings',
+    })
+    return appearanceSettings?.themeConfiguration
+  },
+  ['appearance-settings-theme'],
+  {
+    tags: ['global_appearance-settings'], // Matches the auto-invalidation tag from plugin
+    revalidate: 3600, // Optional: revalidate every hour as fallback
+  },
+)
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeConfiguration = await getCachedTheme()
+
+  return (
+    <html lang="en">
+      <head>
+        <ServerThemeInjector themeConfiguration={themeConfiguration} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+**Benefits:**
+
+- ⚡ Theme settings are cached and reused across requests
+- 🔄 Cache automatically invalidates when you save appearance settings in admin
+- 🚀 Reduces database queries and improves performance
+
+**Cache Tag Format:**
+
+- Default: `global_appearance-settings`
+- Custom slug: `global_{standaloneCollectionSlug}`
+
+> **Note:** The cache invalidation hook is only available for standalone global mode. When using the tab mode (default), implement your own caching strategy based on your collection structure.
 
 ### 3. Use Theme Variables in Your CSS
 
@@ -196,7 +252,9 @@ Or with Tailwind CSS:
 | `includeCustomCSS`          | `boolean`                          | `true`                  | Allow custom CSS injection                                        |
 | `includeBrandIdentity`      | `boolean`                          | `false`                 | Show brand identity fields                                        |
 | `enableAdvancedFeatures`    | `boolean`                          | `true`                  | Enable advanced customization                                     |
-| `enableLogging`             | `boolean`                          | `false`                 | Log plugin actions to console                                     |
+| `enableLogging`             | `boolean`                          | `false`                 | Log plugin actions to console (includes cache invalidation logs)  |
+
+**Cache Invalidation Note:** When using `useStandaloneCollection: true`, the plugin automatically invalidates the cache tag `global_{standaloneCollectionSlug}` after saving appearance settings. Use `unstable_cache` with matching tags for optimal performance.
 
 ## Available Theme Presets
 
@@ -720,36 +778,51 @@ export default {
 
 ### Fetching Theme Configuration
 
+The recommended way to fetch theme configuration is using Payload's native API with Next.js caching:
+
+```typescript
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
+
+// Cached theme fetcher with automatic invalidation
+const getCachedTheme = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    const global = await payload.findGlobal({
+      slug: 'appearance-settings', // or 'your-global-slug'
+    })
+    return global?.themeConfiguration
+  },
+  ['appearance-settings'],
+  {
+    tags: ['global_appearance-settings'],
+    revalidate: 3600, // Revalidate every hour
+  },
+)
+
+// Use in your layout
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeConfiguration = await getCachedTheme()
+  // Use themeConfiguration...
+}
+```
+
+**Legacy Helper (still available):**
+
+If you need the helper function, `fetchThemeConfiguration` is still exported:
+
 ```typescript
 import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
 
-// Default: fetch from 'site-settings' collection
-const theme = await fetchThemeConfiguration()
-
-// Fetch from standalone global
+// Simple fetch without caching
 const theme = await fetchThemeConfiguration({
-  collectionSlug: 'appearance-settings', // Your standalone global slug
-  useGlobal: true, // Set to true when using standalone global
-  depth: 2,
-  locale: 'en',
-})
-
-// With multi-tenant support
-const theme = await fetchThemeConfiguration({
-  tenantSlug: 'tenant-123', // Optional: tenant identifier
   collectionSlug: 'appearance-settings',
   useGlobal: true,
-  depth: 2,
-})
-
-// From collection (default behavior)
-const theme = await fetchThemeConfiguration({
-  collectionSlug: 'site-settings', // Collection slug
-  useGlobal: false, // Use collection endpoint
-  depth: 2,
-  locale: 'en',
 })
 ```
+
+However, prefer the native Payload API + `unstable_cache` approach for better performance and automatic invalidation support.
 
 ### Custom Theme Preset
 
@@ -906,7 +979,15 @@ Created for Payload CMS v3 applications.
 
 ## Changelog
 
-### v0.6.0 (Latest)
+### v1.0.2 (Latest)
+
+- ✅ **Added:** Automatic cache invalidation for standalone globals
+- ✅ **Fixed:** Correct Payload CMS v3 API usage (findGlobal instead of non-existent findBySlug)
+- ✅ **Improved:** Multi-tenant documentation with proper examples
+- ✅ **Improved:** Cache optimization examples with unstable_cache
+- ✅ **Updated:** README and Multi-Tenant guide with accurate API methods
+
+### v1.0.0
 
 - ✅ **Added:** Standalone Global Support — create separate appearance settings as a global
 - ✅ **Added:** Auto-populate Light/Dark colors when selecting a theme
@@ -916,20 +997,10 @@ Created for Payload CMS v3 applications.
 - ✅ **Added:** Professional color picker (react-colorful)
 - ✅ **Improved:** shadcn/ui and TweakCN compatibility
 - ✅ **Improved:** SSR theme injection, zero FOUC, and performance optimizations
-- ✅ **Updated:** Documentation and examples
-
-### v0.1.9
-
-- ✅ **Fixed:** Server/client component separation
+- ✅ **Added:** Server/client component separation
 - ✅ **Added:** `server-only` package to prevent bundling errors
 - ✅ **Changed:** `ServerThemeInjector` now exported from `/server` entry
-- ✅ **Added:** Comprehensive documentation
 
-### v0.1.7
+### v0.6.0
 
-- ✅ **Fixed:** ESM import resolution with `.js` extensions
-- ✅ **Added:** SWC + TypeScript build pipeline
-
-### v0.1.5
-
-- Initial release with theme management features
+- Initial release with core theming functionality
