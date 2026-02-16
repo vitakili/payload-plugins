@@ -201,12 +201,12 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       if (!explicitlyRequestedGlobal) {
         try {
           // Prefer custom.collectionSlug if provided, otherwise try the default standalone slug
-          const fallbackCollection = (custom && custom.collectionSlug) || 'appearance-settings'
+          const fallbackCollection = custom?.collectionSlug || 'appearance-settings'
           const fallbackOpts: FetchThemeConfigurationOptions = {
             useGlobal: true,
             collectionSlug: fallbackCollection,
             tenantSlug: inferredTenant,
-            locale: custom.locale ?? adminLang,
+            locale: custom?.locale ?? adminLang,
           }
           const fallbackConfig = await fetchThemeConfiguration(fallbackOpts)
           if (!isMounted) return
