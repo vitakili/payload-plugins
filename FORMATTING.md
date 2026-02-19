@@ -5,6 +5,7 @@ Abychom zajistili, že se kód automaticky formátuje při uložení, prosímte 
 ## 1. Doporučené Extensions
 
 Nainstalujte si tyto extensions v VS Code (měli by se vám doporučit automaticky):
+
 - **Prettier** (`esbenp.prettier-vscode`) - Code formatter
 - **ESLint** (`dbaeumer.vscode-eslint`) - Linting & auto-fix
 - **EditorConfig** (`EditorConfig.EditorConfig`) - Universal editor settings
@@ -56,6 +57,7 @@ Tím se zabrání situacím, kdy se kód nekonzistentně formátuje následně p
 ## Ověření
 
 Zkusit si formát:
+
 1. Otevřete libovolný TypeScript soubor
 2. Uložte ho (`Ctrl+S`)
 3. Měl by se automaticky naformátovat podle Prettier pravidel

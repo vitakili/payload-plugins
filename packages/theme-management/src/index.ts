@@ -483,10 +483,14 @@ const executeThemeRevalidation = async (options: {
 
 const readQueryStringFromRequest = (req: unknown, paramName: string): string | undefined => {
   const reqRecord = asRecord(req)
-  
+
   // Try URLSearchParams from native fetch/Node.js
   const queryValue = reqRecord?.query
-  if (queryValue && typeof URLSearchParams !== 'undefined' && queryValue instanceof URLSearchParams) {
+  if (
+    queryValue &&
+    typeof URLSearchParams !== 'undefined' &&
+    queryValue instanceof URLSearchParams
+  ) {
     return pickString(queryValue.get(paramName))
   }
 
@@ -543,7 +547,11 @@ const createLivePreviewEndpoint = (options: {
       const tenantSlug = readQueryStringFromRequest(req, 'tenant')
 
       // Redirect to the actual client page (standard Payload live preview behavior)
-      const destination = buildDefaultPreviewPath(pageSlug, tenantSlug, livePreview.tenantQueryParam)
+      const destination = buildDefaultPreviewPath(
+        pageSlug,
+        tenantSlug,
+        livePreview.tenantQueryParam,
+      )
 
       if (enableLogging) {
         console.log('🎨 Theme Management Plugin: live preview redirect', destination)
