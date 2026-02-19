@@ -42,6 +42,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
   const [localValue, setLocalValue] = useState(value || '')
   const [showPicker, setShowPicker] = useState(false)
   const [hexValue, setHexValue] = useState(toHex(value || ''))
+  const [isDragging, setIsDragging] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,23 +64,30 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
     }
   }, [showPicker])
 
-  const handleHexChange = useCallback(
-    (hex: string) => {
-      setHexValue(hex)
-      setLocalValue(hex)
-      setValue(hex)
-    },
-    [setValue],
-  )
+  // Only update parent setValue when drag completes
+  useEffect(() => {
+    if (!isDragging) {
+      setValue(localValue)
+    }
+  }, [isDragging, localValue, setValue])
 
-  const handleTextChange = useCallback(
-    (nextValue: string) => {
-      setLocalValue(nextValue)
-      setValue(nextValue)
-      setHexValue(toHex(nextValue))
-    },
-    [setValue],
-  )
+  const handleHexChange = useCallback((hex: string) => {
+    setHexValue(hex)
+    setLocalValue(hex)
+  }, [])
+
+  const handleTextChange = useCallback((nextValue: string) => {
+    setLocalValue(nextValue)
+    setHexValue(toHex(nextValue))
+  }, [])
+
+  const handlePickerMouseDown = useCallback(() => {
+    setIsDragging(true)
+  }, [])
+
+  const handlePickerMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
 
   const fieldName = path.split('.').pop() || ''
   const label = resolveLocalizedValue(field.label, fieldName)
@@ -112,7 +120,13 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
         </div>
 
         {showPicker && (
-          <div ref={pickerRef} className="color-picker-popover">
+          <div
+            ref={pickerRef}
+            className="color-picker-popover"
+            onMouseDown={handlePickerMouseDown}
+            onMouseUp={handlePickerMouseUp}
+            onMouseLeave={handlePickerMouseUp}
+          >
             <div className="picker-header">
               <span className="picker-title">Color Picker</span>
               <button
@@ -157,7 +171,10 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
                   <button
                     key={color}
                     type="button"
-                    onClick={() => handleHexChange(color)}
+                    onClick={() => {
+                      handleHexChange(color)
+                      setValue(color)
+                    }}
                     className={`swatch-btn ${hexValue.toLowerCase() === color.toLowerCase() ? 'selected' : ''}`}
                     style={{ backgroundColor: color }}
                     aria-label={`Select ${color}`}
