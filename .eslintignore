@@ -7,3 +7,5 @@ build
 
 # Ignore local-only development package
 dev-local/*
+# Ignore generated skill templates and test files under .github
+.github/skills/**

@@ -51,7 +51,14 @@ const getCachedTheme = unstable_cache(
     const appearanceSettings = await payload.findGlobal({
       slug: 'appearance-settings',
     })
-    return resolveThemeConfiguration(appearanceSettings?.themeConfiguration)
+    const resolvedThemeConfiguration = resolveThemeConfiguration(
+      appearanceSettings?.themeConfiguration,
+    )
+
+    return {
+      appearanceSettings,
+      resolvedThemeConfiguration,
+    }
   },
   ['appearance-settings-theme'],
   {
@@ -61,9 +68,9 @@ const getCachedTheme = unstable_cache(
 )
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const themeConfig = await getCachedTheme()
+  const { appearanceSettings, resolvedThemeConfiguration } = await getCachedTheme()
 
-  console.log('Appearance Settings Global (cached):', themeConfig)
+  console.log('Appearance Settings Global (cached):', resolvedThemeConfiguration)
   return (
     <html
       className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
@@ -72,14 +79,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     >
       <head>
         {/* <InitTheme /> */}
-        <ServerThemeInjector themeConfiguration={themeConfig} />
+        <ServerThemeInjector themeConfiguration={resolvedThemeConfiguration} />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
-        <Providers themeConfiguration={themeConfig}>
+        <Providers themeConfiguration={resolvedThemeConfiguration}>
           <AdminBar />
-          <LivePreviewListener />
+          <LivePreviewListener
+            initialData={(appearanceSettings as unknown as Record<string, unknown>) ?? {}}
+          />
 
           <Header />
           <main>{children}</main>

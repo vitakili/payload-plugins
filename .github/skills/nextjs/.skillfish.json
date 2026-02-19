@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "nextjs",
+  "owner": "secondsky",
+  "repo": "claude-skills",
+  "path": "plugins/nextjs/skills/nextjs",
+  "branch": "main",
+  "sha": "05cae2d5a7efb052329c38384d79ed0415fa5541",
+  "source": "manual"
+}

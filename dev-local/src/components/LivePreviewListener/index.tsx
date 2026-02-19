@@ -1,13 +1,15 @@
 'use client'
-import { RefreshRouteOnSave as PayloadLivePreview } from '@payloadcms/live-preview-react'
-import { useRouter } from 'next/navigation'
+import { ThemeLivePreviewSync } from '@kilivi/payloadcms-theme-management/components/ThemeLivePreviewSync'
 import React from 'react'
 
-export const LivePreviewListener: React.FC = () => {
-  const router = useRouter()
+type LivePreviewListenerProps = {
+  initialData: Record<string, unknown>
+}
+
+export const LivePreviewListener: React.FC<LivePreviewListenerProps> = ({ initialData }) => {
   return (
-    <PayloadLivePreview
-      refresh={router.refresh}
+    <ThemeLivePreviewSync
+      initialData={initialData}
       serverURL={process.env.NEXT_PUBLIC_SERVER_URL || ''}
     />
   )

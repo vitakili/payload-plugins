@@ -1,0 +1,2 @@
+# Ignore generated skill templates and test files under .github
+.github/skills/**

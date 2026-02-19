@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "payload",
+  "owner": "microck",
+  "repo": "ordinary-claude-skills",
+  "path": "skills_all/payload",
+  "branch": "main",
+  "sha": "2e2493068b3d121520c8c91d97bddfb08e54108f",
+  "source": "manual"
+}

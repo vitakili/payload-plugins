@@ -5,7 +5,12 @@ import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
 import { allThemePresets } from './presets.js'
 import { getTranslations, translations } from './translations.js'
-import type { FetchThemeConfigurationOptions, ThemeManagementPluginOptions } from './types.js'
+import type {
+  FetchThemeConfigurationOptions,
+  ThemeManagementLivePreviewOptions,
+  ThemeManagementLivePreviewUrlArgs,
+  ThemeManagementPluginOptions,
+} from './types.js'
 
 const THEME_FIELD_NAME = 'themeConfiguration'
 
@@ -106,6 +111,444 @@ const injectThemeTab = (
 const ensureCollectionsArray = (collections: Config['collections']): CollectionConfig[] =>
   Array.isArray(collections) ? collections : []
 
+const ensureEndpointsArray = (endpoints: Config['endpoints']): NonNullable<Config['endpoints']> =>
+  Array.isArray(endpoints) ? endpoints : []
+
+type NormalizedLivePreviewOptions = {
+  enabled: boolean
+  pageCollection: string
+  pageSlug: string
+  fallbackToFirstPage: boolean
+  tenantField: string
+  tenantQueryParam: string
+  breakpoints?: ThemeManagementLivePreviewOptions['breakpoints']
+  url?: ThemeManagementLivePreviewOptions['url']
+}
+
+type NormalizedCacheRevalidationOptions = {
+  enabled: boolean
+  injectRoute: boolean
+  routePath: string
+  secret?: string
+  tags: string[]
+  paths: string[]
+}
+
+type MinimalPayloadRequest = ThemeManagementLivePreviewUrlArgs['req']
+
+const normalizeLivePreviewOptions = (
+  livePreview: ThemeManagementPluginOptions['livePreview'],
+): NormalizedLivePreviewOptions => {
+  if (livePreview === false) {
+    return {
+      enabled: false,
+      pageCollection: 'pages',
+      pageSlug: 'home',
+      fallbackToFirstPage: true,
+      tenantField: 'tenant',
+      tenantQueryParam: 'tenant',
+      breakpoints: undefined,
+    }
+  }
+
+  const raw = typeof livePreview === 'object' && livePreview ? livePreview : {}
+
+  return {
+    enabled: raw.enabled ?? true,
+    pageCollection: raw.pageCollection ?? 'pages',
+    pageSlug: raw.pageSlug ?? 'home',
+    fallbackToFirstPage: raw.fallbackToFirstPage ?? true,
+    tenantField: raw.tenantField ?? 'tenant',
+    tenantQueryParam: raw.tenantQueryParam ?? 'tenant',
+    breakpoints: raw.breakpoints,
+    url: raw.url,
+  }
+}
+
+const dedupeStrings = (values: (string | undefined)[]): string[] => [
+  ...new Set(
+    values.filter((value): value is string => typeof value === 'string' && value.trim().length > 0),
+  ),
+]
+
+const normalizeRoutePath = (path: string | undefined): string => {
+  if (!path || !path.trim()) {
+    return '/theme/revalidate'
+  }
+
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+const normalizeCacheRevalidationOptions = (args: {
+  cacheRevalidation: ThemeManagementPluginOptions['cacheRevalidation']
+  standaloneCollectionSlug: string
+  useStandaloneCollection: boolean
+}): NormalizedCacheRevalidationOptions => {
+  const { cacheRevalidation, standaloneCollectionSlug, useStandaloneCollection } = args
+
+  if (cacheRevalidation === false) {
+    return {
+      enabled: false,
+      injectRoute: false,
+      routePath: '/theme/revalidate',
+      tags: [],
+      paths: [],
+    }
+  }
+
+  const raw = typeof cacheRevalidation === 'object' && cacheRevalidation ? cacheRevalidation : {}
+  const defaultTag = `global_${standaloneCollectionSlug}`
+
+  return {
+    enabled: raw.enabled ?? useStandaloneCollection,
+    injectRoute: raw.injectRoute ?? true,
+    routePath: normalizeRoutePath(raw.routePath),
+    secret: raw.secret,
+    tags: dedupeStrings([defaultTag, ...(raw.tags ?? [])]),
+    paths: dedupeStrings(raw.paths ?? []),
+  }
+}
+
+const asRecord = (value: unknown): Record<string, unknown> | undefined => {
+  if (value && typeof value === 'object') {
+    return value as Record<string, unknown>
+  }
+  return undefined
+}
+
+const pickString = (value: unknown): string | undefined => {
+  if (typeof value === 'string' && value.trim()) return value
+  return undefined
+}
+
+const extractTenantValue = (value: unknown): string | undefined => {
+  if (!value) return undefined
+  if (typeof value === 'string') return pickString(value)
+
+  const tenantRecord = asRecord(value)
+  if (!tenantRecord) return undefined
+
+  return (
+    pickString(tenantRecord.id) ??
+    pickString(tenantRecord.slug) ??
+    pickString(tenantRecord.value) ??
+    pickString(tenantRecord.tenant)
+  )
+}
+
+const resolveTenantSlug = (
+  req: MinimalPayloadRequest,
+  tenantField: string,
+  data?: Record<string, unknown>,
+): string | undefined => {
+  const fromData = extractTenantValue(data?.[tenantField])
+  if (fromData) return fromData
+
+  const query = req.query
+  if (query && typeof URLSearchParams !== 'undefined' && query instanceof URLSearchParams) {
+    return (
+      pickString(query.get('tenant')) ??
+      pickString(query.get('tenantSlug')) ??
+      pickString(query.get('tenantId'))
+    )
+  }
+
+  const queryRecord = asRecord(query)
+  const fromQuery =
+    extractTenantValue(queryRecord?.tenant) ??
+    extractTenantValue(queryRecord?.tenantSlug) ??
+    extractTenantValue(queryRecord?.tenantId)
+  if (fromQuery) return fromQuery
+
+  const userRecord = asRecord(req.user)
+  const fromUser =
+    extractTenantValue(userRecord?.[tenantField]) ??
+    extractTenantValue(userRecord?.tenant) ??
+    extractTenantValue(userRecord?.tenantSlug)
+  if (fromUser) return fromUser
+
+  const headers = req.headers
+  if (headers && typeof Headers !== 'undefined' && headers instanceof Headers) {
+    return (
+      pickString(headers.get('x-tenant-id')) ??
+      pickString(headers.get('x-tenant')) ??
+      pickString(headers.get('payload-tenant'))
+    )
+  }
+
+  const headerRecord = asRecord(headers)
+  return (
+    extractTenantValue(headerRecord?.['x-tenant-id']) ??
+    extractTenantValue(headerRecord?.['x-tenant']) ??
+    extractTenantValue(headerRecord?.['payload-tenant'])
+  )
+}
+
+const buildDefaultPreviewPath = (
+  pageSlug: string,
+  tenantSlug: string | undefined,
+  tenantQueryParam: string,
+): string => {
+  const normalizedSlug = pageSlug === 'home' ? '' : pageSlug
+  const basePath = normalizedSlug ? `/${normalizedSlug}` : '/'
+
+  if (!tenantSlug) {
+    return basePath
+  }
+
+  const separator = basePath.includes('?') ? '&' : '?'
+  return `${basePath}${separator}${tenantQueryParam}=${encodeURIComponent(tenantSlug)}`
+}
+
+const resolveLivePreviewUrl = async (args: {
+  req: MinimalPayloadRequest
+  data?: Record<string, unknown>
+  livePreview: NormalizedLivePreviewOptions
+  enableLogging: boolean
+}): Promise<string> => {
+  const { req, data, livePreview, enableLogging } = args
+
+  const tenantSlug = resolveTenantSlug(req, livePreview.tenantField, data)
+
+  const tenantWhere = tenantSlug
+    ? {
+        [livePreview.tenantField]: {
+          equals: tenantSlug,
+        },
+      }
+    : undefined
+
+  const homeWhere = {
+    and: [
+      {
+        slug: {
+          equals: livePreview.pageSlug,
+        },
+      },
+      ...(tenantWhere ? [tenantWhere] : []),
+    ],
+  }
+
+  try {
+    const preferredPageResponse = await req.payload.find({
+      collection: livePreview.pageCollection,
+      where: homeWhere,
+      depth: 0,
+      draft: true,
+      limit: 1,
+      overrideAccess: true,
+      pagination: false,
+    })
+
+    let page = preferredPageResponse?.docs?.[0]
+
+    if (!page && livePreview.fallbackToFirstPage) {
+      const fallbackResponse = await req.payload.find({
+        collection: livePreview.pageCollection,
+        where: tenantWhere,
+        depth: 0,
+        draft: true,
+        limit: 1,
+        overrideAccess: true,
+        pagination: false,
+      })
+
+      page = fallbackResponse?.docs?.[0]
+    }
+
+    const pageRecord = asRecord(page)
+    const resolvedPageSlug = pickString(pageRecord?.slug) ?? livePreview.pageSlug
+
+    if (livePreview.url) {
+      return await livePreview.url({
+        page: pageRecord,
+        pageSlug: resolvedPageSlug,
+        tenantSlug,
+        req,
+      })
+    }
+
+    return buildDefaultPreviewPath(resolvedPageSlug, tenantSlug, livePreview.tenantQueryParam)
+  } catch (error) {
+    if (enableLogging) {
+      req.payload.logger?.warn?.(
+        '🎨 Theme Management Plugin: live preview URL fallback used',
+        error,
+      )
+    }
+
+    return buildDefaultPreviewPath(livePreview.pageSlug, tenantSlug, livePreview.tenantQueryParam)
+  }
+}
+
+const createPreviewAdminConfig = (
+  normalizedLivePreview: NormalizedLivePreviewOptions,
+  enableLogging: boolean,
+) => {
+  if (!normalizedLivePreview.enabled) {
+    return {}
+  }
+
+  return {
+    livePreview: {
+      breakpoints: normalizedLivePreview.breakpoints,
+      url: ({ data, req }: { data?: unknown; req: unknown }) =>
+        resolveLivePreviewUrl({
+          req: req as MinimalPayloadRequest,
+          data: asRecord(data),
+          livePreview: normalizedLivePreview,
+          enableLogging,
+        }),
+    },
+    preview: (data: Record<string, unknown>, options: { req?: unknown }) => {
+      const req = options?.req
+      if (!req) return null
+
+      return resolveLivePreviewUrl({
+        req: req as MinimalPayloadRequest,
+        data,
+        livePreview: normalizedLivePreview,
+        enableLogging,
+      })
+    },
+  }
+}
+
+const readSecretFromRequest = async (req: unknown): Promise<string | undefined> => {
+  const requestRecord = asRecord(req)
+  const headersValue = requestRecord?.headers
+
+  if (headersValue && typeof Headers !== 'undefined' && headersValue instanceof Headers) {
+    return (
+      pickString(headersValue.get('x-theme-revalidate-secret')) ??
+      pickString(headersValue.get('x-revalidate-secret'))
+    )
+  }
+
+  const headerRecord = asRecord(headersValue)
+  const fromHeaders =
+    pickString(headerRecord?.['x-theme-revalidate-secret']) ??
+    pickString(headerRecord?.['x-revalidate-secret'])
+  if (fromHeaders) {
+    return fromHeaders
+  }
+
+  const requestWithJson = req as { json?: () => Promise<unknown> }
+  const body =
+    typeof requestWithJson?.json === 'function' ? await requestWithJson.json() : undefined
+  const bodyRecord = asRecord(body)
+  const fromBody = pickString(bodyRecord?.secret)
+  if (fromBody) {
+    return fromBody
+  }
+
+  const queryRecord = asRecord(requestRecord?.query)
+  return pickString(queryRecord?.secret)
+}
+
+const executeThemeRevalidation = async (options: {
+  tags: string[]
+  paths: string[]
+  enableLogging: boolean
+  logger?: { info?: (...args: unknown[]) => void; error?: (...args: unknown[]) => void }
+}): Promise<{ tags: string[]; paths: string[] }> => {
+  const { tags, paths, enableLogging, logger } = options
+
+  try {
+    const { revalidatePath, revalidateTag } = await import('next/cache')
+
+    tags.forEach((tag) => revalidateTag(tag))
+    paths.forEach((path) => revalidatePath(path))
+
+    if (enableLogging) {
+      logger?.info?.(
+        `🎨 Theme Management Plugin: revalidated cache tags=[${tags.join(', ')}] paths=[${paths.join(', ')}]`,
+      )
+    }
+  } catch (error) {
+    if (enableLogging) {
+      logger?.error?.('🎨 Theme Management Plugin: cache invalidation failed:', error)
+    }
+    throw error
+  }
+
+  return { tags, paths }
+}
+
+const createCacheRevalidationEndpoint = (options: {
+  cacheRevalidation: NormalizedCacheRevalidationOptions
+  enableLogging: boolean
+}) => {
+  const { cacheRevalidation, enableLogging } = options
+
+  if (!cacheRevalidation.enabled || !cacheRevalidation.injectRoute) {
+    return null
+  }
+
+  return {
+    path: cacheRevalidation.routePath,
+    method: 'post',
+    handler: async (req: unknown) => {
+      const reqRecord = asRecord(req)
+      const payload = asRecord(reqRecord?.payload)
+      const logger = payload?.logger as
+        | { info?: (...args: unknown[]) => void; error?: (...args: unknown[]) => void }
+        | undefined
+
+      if (cacheRevalidation.secret) {
+        const providedSecret = await readSecretFromRequest(req)
+        if (providedSecret !== cacheRevalidation.secret) {
+          return jsonResponse({ error: 'Unauthorized' }, 401)
+        }
+      }
+
+      try {
+        const result = await executeThemeRevalidation({
+          tags: cacheRevalidation.tags,
+          paths: cacheRevalidation.paths,
+          enableLogging,
+          logger,
+        })
+
+        return jsonResponse({ ok: true, revalidated: result })
+      } catch {
+        return jsonResponse({ ok: false, error: 'Revalidation failed' }, 500)
+      }
+    },
+  }
+}
+
+const mergeEndpoint = (
+  endpoints: NonNullable<Config['endpoints']>,
+  endpoint: ReturnType<typeof createCacheRevalidationEndpoint>,
+): NonNullable<Config['endpoints']> => {
+  if (!endpoint) {
+    return endpoints
+  }
+
+  const withoutExisting = endpoints.filter((candidate) => {
+    const record = candidate as unknown as { path?: string; method?: string }
+    return !(
+      record?.path === endpoint.path &&
+      typeof record.method === 'string' &&
+      record.method.toLowerCase() === endpoint.method
+    )
+  })
+
+  return [...withoutExisting, endpoint as unknown as NonNullable<Config['endpoints']>[number]]
+}
+
+const jsonResponse = (body: Record<string, unknown>, status = 200): unknown => {
+  if (typeof Response !== 'undefined' && typeof Response.json === 'function') {
+    return Response.json(body, { status })
+  }
+
+  return {
+    status,
+    json: async () => body,
+  }
+}
+
 export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}): Plugin => {
   return (config: Config): Config => {
     const {
@@ -122,7 +565,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       includeBrandIdentity = false,
       enableAdvancedFeatures = true,
       enableLogging = false,
+      livePreview = true,
+      cacheRevalidation,
     } = options
+
+    const normalizedLivePreview = normalizeLivePreviewOptions(livePreview)
+    const normalizedCacheRevalidation = normalizeCacheRevalidationOptions({
+      cacheRevalidation,
+      standaloneCollectionSlug,
+      useStandaloneCollection,
+    })
 
     if (!enabled) {
       if (enableLogging) {
@@ -138,6 +590,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       includeCustomCSS,
       includeBrandIdentity: includeBrandIdentity ?? false,
       enableAdvancedFeatures,
+      useThemePreviewField: !normalizedLivePreview.enabled,
     })
 
     // If using standalone collection, create a new global
@@ -203,6 +656,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         label: standaloneCollectionLabel,
         admin: {
           group: 'Settings',
+          ...createPreviewAdminConfig(normalizedLivePreview, enableLogging),
         },
         // Provide a broad access object but cast to GlobalConfig['access'] to satisfy types
         access: ((): GlobalConfig['access'] => {
@@ -220,24 +674,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
           afterChange: [
             async ({ doc, req }) => {
               // Invalidate cache after appearance settings change
-              if (!req?.context?.disableRevalidate) {
+              if (!req?.context?.disableRevalidate && normalizedCacheRevalidation.enabled) {
                 try {
-                  const cacheTag = `global_${standaloneCollectionSlug}`
-                  // Import revalidateTag dynamically to avoid issues in non-Next.js environments
-                  const { revalidateTag } = await import('next/cache')
-                  revalidateTag(cacheTag)
-                  if (enableLogging) {
-                    req.payload.logger.info(
-                      `🎨 Theme Management Plugin: cache invalidated for tag "${cacheTag}"`,
-                    )
-                  }
-                } catch (error) {
-                  if (enableLogging) {
-                    req.payload.logger.error(
-                      '🎨 Theme Management Plugin: cache invalidation failed:',
-                      error,
-                    )
-                  }
+                  await executeThemeRevalidation({
+                    tags: normalizedCacheRevalidation.tags,
+                    paths: normalizedCacheRevalidation.paths,
+                    enableLogging,
+                    logger: req?.payload?.logger,
+                  })
+                } catch {
+                  // no-op: logging is handled in executeThemeRevalidation
                 }
               }
               return doc
@@ -260,8 +706,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         return config
       }
 
+      const currentEndpoints = ensureEndpointsArray(config.endpoints)
+      const cacheEndpoint = createCacheRevalidationEndpoint({
+        cacheRevalidation: normalizedCacheRevalidation,
+        enableLogging,
+      })
+      const endpoints = mergeEndpoint(currentEndpoints, cacheEndpoint)
+
       return {
         ...config,
+        endpoints,
         globals: [...globals, standaloneGlobal],
       }
     }
@@ -284,9 +738,15 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
       const fields = injectThemeTab(existingFields, themeTab, enableLogging)
 
+      const admin = {
+        ...collection.admin,
+        ...createPreviewAdminConfig(normalizedLivePreview, enableLogging),
+      }
+
       return {
         ...collection,
         fields,
+        admin,
       }
     })
 
@@ -299,8 +759,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       return config
     }
 
+    const currentEndpoints = ensureEndpointsArray(config.endpoints)
+    const cacheEndpoint = createCacheRevalidationEndpoint({
+      cacheRevalidation: normalizedCacheRevalidation,
+      enableLogging,
+    })
+    const endpoints = mergeEndpoint(currentEndpoints, cacheEndpoint)
+
     return {
       ...config,
+      endpoints,
       collections,
     }
   }
@@ -414,7 +882,13 @@ export {
   createUseExtendedTheme,
   getTailwindVarReferences,
 } from './utils/extendedThemeHelpers.js'
-export type { ThemeManagementPluginOptions, FetchThemeConfigurationOptions } from './types.js'
+export type {
+  ThemeManagementPluginOptions,
+  ThemeManagementCacheRevalidationOptions,
+  FetchThemeConfigurationOptions,
+  ThemeManagementLivePreviewOptions,
+  ThemeManagementLivePreviewUrlArgs,
+} from './types.js'
 export {
   DEFAULT_THEME_CONFIGURATION,
   resolveThemeConfiguration,

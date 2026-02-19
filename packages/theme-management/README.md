@@ -162,34 +162,31 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 ```
 
-#### Cache Optimization with Next.js
+#### Cache Optimization with Next.js (Out of the Box)
 
 When using standalone global, the plugin automatically invalidates cache after saving appearance settings using the tag `global_appearance-settings` (or `global_{your-slug}` if you use a custom slug).
 
-You can optimize your theme fetching by adding cache tags to your layout:
+You can optimize your theme fetching by using the built-in server helper:
 
 ```tsx
 // app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import {
+  createCachedThemeFetcher,
+  ServerThemeInjector,
+} from '@kilivi/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { unstable_cache } from 'next/cache'
 
-// Create cached theme fetcher with automatic invalidation
-const getCachedTheme = unstable_cache(
-  async () => {
+const getCachedTheme = createCachedThemeFetcher({
+  globalSlug: 'appearance-settings',
+  revalidate: 3600,
+  loadAppearanceSettings: async () => {
     const payload = await getPayload({ config: configPromise })
-    const appearanceSettings = await payload.findGlobal({
+    return payload.findGlobal({
       slug: 'appearance-settings',
     })
-    return appearanceSettings?.themeConfiguration
   },
-  ['appearance-settings-theme'],
-  {
-    tags: ['global_appearance-settings'], // Matches the auto-invalidation tag from plugin
-    revalidate: 3600, // Optional: revalidate every hour as fallback
-  },
-)
+})
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const themeConfiguration = await getCachedTheme()
@@ -216,6 +213,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 - Default: `global_appearance-settings`
 - Custom slug: `global_{standaloneCollectionSlug}`
 
+#### Injected Revalidation Route
+
+The plugin now injects a Payload endpoint (default: `POST /api/theme/revalidate`) that triggers the same tag/path invalidation logic used by live preview saves.
+
+```ts
+themeManagementPlugin({
+  useStandaloneCollection: true,
+  cacheRevalidation: {
+    routePath: '/theme/revalidate',
+    secret: process.env.THEME_REVALIDATE_SECRET,
+    tags: ['tenant:default'],
+    paths: ['/'],
+  },
+})
+```
+
+Set `cacheRevalidation.injectRoute` to `false` if you want to keep only automatic hook-based invalidation.
+
 > **Note:** The cache invalidation hook is only available for standalone global mode. When using the tab mode (default), implement your own caching strategy based on your collection structure.
 
 ### 3. Use Theme Variables in Your CSS
@@ -239,22 +254,24 @@ Or with Tailwind CSS:
 
 ## Plugin Configuration Options
 
-| Option                      | Type                               | Default                 | Description                                                       |
-| --------------------------- | ---------------------------------- | ----------------------- | ----------------------------------------------------------------- |
-| `enabled`                   | `boolean`                          | `true`                  | Enable/disable the plugin                                         |
-| `targetCollection`          | `string`                           | `'site-settings'`       | Collection slug to add theme field to (when not using standalone) |
-| `useStandaloneCollection`   | `boolean`                          | `false`                 | Create a separate global instead of adding as a tab               |
-| `standaloneCollectionSlug`  | `string`                           | `'appearance-settings'` | Slug for the standalone global                                    |
-| `standaloneCollectionLabel` | `string \| Record<string, string>` | `'Appearance Settings'` | Label for the standalone global (supports i18n)                   |
-| `themePresets`              | `ThemePreset[]`                    | Built-in presets        | Custom theme presets                                              |
-| `defaultTheme`              | `string`                           | `'cool'`                | Default theme preset name                                         |
-| `includeColorModeToggle`    | `boolean`                          | `true`                  | Show light/dark mode toggle                                       |
-| `includeCustomCSS`          | `boolean`                          | `true`                  | Allow custom CSS injection                                        |
-| `includeBrandIdentity`      | `boolean`                          | `false`                 | Show brand identity fields                                        |
-| `enableAdvancedFeatures`    | `boolean`                          | `true`                  | Enable advanced customization                                     |
-| `enableLogging`             | `boolean`                          | `false`                 | Log plugin actions to console (includes cache invalidation logs)  |
+| Option                      | Type                                  | Default                 | Description                                                          |
+| --------------------------- | ------------------------------------- | ----------------------- | -------------------------------------------------------------------- |
+| `enabled`                   | `boolean`                             | `true`                  | Enable/disable the plugin                                            |
+| `targetCollection`          | `string`                              | `'site-settings'`       | Collection slug to add theme field to (when not using standalone)    |
+| `useStandaloneCollection`   | `boolean`                             | `false`                 | Create a separate global instead of adding as a tab                  |
+| `standaloneCollectionSlug`  | `string`                              | `'appearance-settings'` | Slug for the standalone global                                       |
+| `standaloneCollectionLabel` | `string \| Record<string, string>`    | `'Appearance Settings'` | Label for the standalone global (supports i18n)                      |
+| `themePresets`              | `ThemePreset[]`                       | Built-in presets        | Custom theme presets                                                 |
+| `defaultTheme`              | `string`                              | `'cool'`                | Default theme preset name                                            |
+| `includeColorModeToggle`    | `boolean`                             | `true`                  | Show light/dark mode toggle                                          |
+| `includeCustomCSS`          | `boolean`                             | `true`                  | Allow custom CSS injection                                           |
+| `includeBrandIdentity`      | `boolean`                             | `false`                 | Show brand identity fields                                           |
+| `enableAdvancedFeatures`    | `boolean`                             | `true`                  | Enable advanced customization                                        |
+| `enableLogging`             | `boolean`                             | `false`                 | Log plugin actions to console (includes cache invalidation logs)     |
+| `livePreview`               | `boolean \| LivePreviewOptions`       | `true`                  | Enable/administer live preview URL resolution (`home` → fallback)    |
+| `cacheRevalidation`         | `boolean \| CacheRevalidationOptions` | `standalone: true`      | Configure injected route + tags/paths for Next.js cache invalidation |
 
-**Cache Invalidation Note:** When using `useStandaloneCollection: true`, the plugin automatically invalidates the cache tag `global_{standaloneCollectionSlug}` after saving appearance settings. Use `unstable_cache` with matching tags for optimal performance.
+**Cache Invalidation Note:** In standalone mode, the plugin revalidates `global_{standaloneCollectionSlug}` automatically and injects `POST /api/theme/revalidate` by default. Pair it with `createCachedThemeFetcher` from `@kilivi/payloadcms-theme-management/server` for a zero-boilerplate setup.
 
 ## Available Theme Presets
 

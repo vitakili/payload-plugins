@@ -2062,7 +2062,7 @@ export interface AppearanceSetting {
       lineHeight?: ('preset' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8') | null
     }
     /**
-     * Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors. You can configure import behavior via `admin.importOptions` (accept, allowUrl, strict).
+     * Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.
      */
     customThemePresets?:
       | {

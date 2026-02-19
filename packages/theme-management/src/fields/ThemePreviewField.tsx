@@ -252,6 +252,9 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
 
 export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
+  const showPreviewPanel =
+    (field?.admin?.custom as unknown as { useThemePreviewField?: boolean })?.useThemePreviewField ??
+    true
   // If the plugin provided theme presets via admin config, prefer those;
   // support both `field.admin.themePresets` (legacy) and `field.admin.custom.themePresets`
   // otherwise fallback to `allThemePresets`.
@@ -606,68 +609,70 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           )}
         </div>
 
-        <div
-          style={{
-            flex: '1 1 420px',
-            minWidth: '320px',
-            position: 'sticky',
-            top: '96px',
-            alignSelf: 'flex-start',
-          }}
-        >
+        {showPreviewPanel && (
           <div
             style={{
-              width: '100%',
-              borderRadius: '16px',
-              border: '1px solid var(--theme-elevation-200)',
-              backgroundColor: 'var(--theme-elevation-25)',
-              padding: '20px',
-              display: 'grid',
-              gap: '18px',
-              maxHeight: 'calc(100vh - 140px)',
-              overflowY: 'auto',
+              flex: '1 1 420px',
+              minWidth: '320px',
+              position: 'sticky',
+              top: '96px',
+              alignSelf: 'flex-start',
             }}
           >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontWeight: 600,
-                fontSize: '13px',
-                color: 'var(--theme-elevation-800)',
-              }}
-            >
-              {/* safe translations for preview header */}
-              <span>{getTranslations('en').livePreview.smallTitle}</span>
-              <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
-                {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
-              </span>
-            </div>
-
-            <div
-              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid var(--theme-elevation-200)',
+                backgroundColor: 'var(--theme-elevation-25)',
+                padding: '20px',
                 display: 'grid',
-                gap: '16px',
+                gap: '18px',
+                maxHeight: 'calc(100vh - 140px)',
+                overflowY: 'auto',
               }}
             >
-              <ModePreview
-                icon="☀️"
-                title={getTranslations('en').ui.lightMode}
-                colors={lightModeColors}
-                typography={previewTypography}
-                radius={previewRadius}
-              />
-              <ModePreview
-                icon="🌙"
-                title={getTranslations('en').ui.darkMode}
-                colors={darkModeColors}
-                typography={previewTypography}
-                radius={previewRadius}
-              />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  color: 'var(--theme-elevation-800)',
+                }}
+              >
+                {/* safe translations for preview header */}
+                <span>{getTranslations('en').livePreview.smallTitle}</span>
+                <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
+                  {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gap: '16px',
+                }}
+              >
+                <ModePreview
+                  icon="☀️"
+                  title={getTranslations('en').ui.lightMode}
+                  colors={lightModeColors}
+                  typography={previewTypography}
+                  radius={previewRadius}
+                />
+                <ModePreview
+                  icon="🌙"
+                  title={getTranslations('en').ui.darkMode}
+                  colors={darkModeColors}
+                  typography={previewTypography}
+                  radius={previewRadius}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

@@ -15,11 +15,13 @@ interface ThemeConfigurationFieldOptions {
   includeCustomCSS: boolean
   includeBrandIdentity: boolean
   enableAdvancedFeatures?: boolean
+  useThemePreviewField?: boolean
 }
 
 // Type for admin.custom property to avoid ts-expect-error
 interface ThemeAdminCustom {
   themePresets?: ThemePreset[]
+  useThemePreviewField?: boolean
 }
 
 // Type for a single tab (not the full TabsField)
@@ -36,6 +38,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     includeColorModeToggle,
     includeCustomCSS,
     enableAdvancedFeatures = true,
+    useThemePreviewField = true,
   } = options
 
   const fields: Field[] = [
@@ -64,6 +67,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
         custom: {
           themePresets,
+          useThemePreviewField,
         } as ThemeAdminCustom,
       },
     },
