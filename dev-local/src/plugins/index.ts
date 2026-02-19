@@ -98,20 +98,16 @@ export const plugins: Plugin[] = [
     includeCustomCSS: true,
     livePreview: {
       enabled: true,
+      injectRoute: true,
+      routePath: '/theme/preview',
+      pageCollection: 'pages',
+      pageSlug: 'home',
+      fallbackToFirstPage: true,
       breakpoints: [
         { name: 'tablet', label: 'Tablet', width: 1024, height: 768 },
         { name: 'desktop', label: 'Desktop', width: 1440, height: 900 },
         { name: 'wide', label: 'Wide', width: 1920, height: 1080 },
       ],
-      pageCollection: 'pages',
-      pageSlug: 'home',
-      fallbackToFirstPage: true,
-      url: ({ pageSlug, req }: { pageSlug: string; req: any }) =>
-        generatePreviewPath({
-          slug: pageSlug,
-          collection: 'pages',
-          req,
-        }),
     },
   } as any),
 ]

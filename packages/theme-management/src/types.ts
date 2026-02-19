@@ -24,6 +24,10 @@ export interface ThemeManagementLivePreviewUrlArgs {
 export interface ThemeManagementLivePreviewOptions {
   /** Enable Payload admin live preview for the target config (default: true) */
   enabled?: boolean
+  /** Inject a Payload endpoint for live preview (enables `/api/theme/preview`) (default: false) */
+  injectRoute?: boolean
+  /** Endpoint path under Payload API (default: '/theme/preview') */
+  routePath?: string
   /** Collection slug containing preview pages (default: 'pages') */
   pageCollection?: string
   /** Preferred page slug for preview (default: 'home') */

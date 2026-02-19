@@ -116,6 +116,8 @@ const ensureEndpointsArray = (endpoints: Config['endpoints']): NonNullable<Confi
 
 type NormalizedLivePreviewOptions = {
   enabled: boolean
+  injectRoute: boolean
+  routePath: string
   pageCollection: string
   pageSlug: string
   fallbackToFirstPage: boolean
@@ -142,6 +144,8 @@ const normalizeLivePreviewOptions = (
   if (livePreview === false) {
     return {
       enabled: false,
+      injectRoute: false,
+      routePath: '/theme/preview',
       pageCollection: 'pages',
       pageSlug: 'home',
       fallbackToFirstPage: true,
@@ -155,6 +159,8 @@ const normalizeLivePreviewOptions = (
 
   return {
     enabled: raw.enabled ?? true,
+    injectRoute: raw.injectRoute ?? false,
+    routePath: normalizeRoutePath(raw.routePath),
     pageCollection: raw.pageCollection ?? 'pages',
     pageSlug: raw.pageSlug ?? 'home',
     fallbackToFirstPage: raw.fallbackToFirstPage ?? true,
@@ -475,6 +481,84 @@ const executeThemeRevalidation = async (options: {
   return { tags, paths }
 }
 
+const readQueryStringFromRequest = (req: unknown, paramName: string): string | undefined => {
+  const reqRecord = asRecord(req)
+  
+  // Try URLSearchParams from native fetch/Node.js
+  const queryValue = reqRecord?.query
+  if (queryValue && typeof URLSearchParams !== 'undefined' && queryValue instanceof URLSearchParams) {
+    return pickString(queryValue.get(paramName))
+  }
+
+  // Try object form (common in Payload)
+  const queryRecord = asRecord(queryValue)
+  if (queryRecord) {
+    const rawValue = queryRecord[paramName]
+    if (Array.isArray(rawValue)) {
+      return pickString(rawValue[0])
+    }
+    return pickString(rawValue)
+  }
+
+  // Try manual URL parsing as fallback
+  const urlValue = pickString(reqRecord?.url) ?? pickString(reqRecord?.originalUrl)
+  if (urlValue) {
+    try {
+      const url = new URL(urlValue, 'http://localhost')
+      return pickString(url.searchParams.get(paramName))
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  return undefined
+}
+
+const createLivePreviewEndpoint = (options: {
+  livePreview: NormalizedLivePreviewOptions
+  enableLogging: boolean
+}) => {
+  const { livePreview, enableLogging } = options
+
+  if (!livePreview.enabled || !livePreview.injectRoute) {
+    return null
+  }
+
+  return {
+    path: livePreview.routePath,
+    method: 'get',
+    handler: async (req: unknown) => {
+      const previewSecret = process.env.PREVIEW_SECRET ?? process.env.PAYLOAD_PREVIEW_SECRET
+
+      if (previewSecret) {
+        const providedSecret =
+          readQueryStringFromRequest(req, 'previewSecret') ??
+          readQueryStringFromRequest(req, 'preview')
+        if (providedSecret !== previewSecret) {
+          return jsonResponse({ error: 'Unauthorized' }, 401)
+        }
+      }
+
+      const pageSlug = readQueryStringFromRequest(req, 'pageSlug') ?? livePreview.pageSlug
+      const tenantSlug = readQueryStringFromRequest(req, 'tenant')
+
+      // Redirect to the actual client page (standard Payload live preview behavior)
+      const destination = buildDefaultPreviewPath(pageSlug, tenantSlug, livePreview.tenantQueryParam)
+
+      if (enableLogging) {
+        console.log('🎨 Theme Management Plugin: live preview redirect', destination)
+      }
+
+      return {
+        status: 307,
+        headers: {
+          Location: destination,
+        },
+      }
+    },
+  }
+}
+
 const createCacheRevalidationEndpoint = (options: {
   cacheRevalidation: NormalizedCacheRevalidationOptions
   enableLogging: boolean
@@ -520,18 +604,21 @@ const createCacheRevalidationEndpoint = (options: {
 
 const mergeEndpoint = (
   endpoints: NonNullable<Config['endpoints']>,
-  endpoint: ReturnType<typeof createCacheRevalidationEndpoint>,
+  endpoint: unknown,
 ): NonNullable<Config['endpoints']> => {
   if (!endpoint) {
     return endpoints
   }
 
+  const record = endpoint as unknown as { path?: string; method?: string }
+
   const withoutExisting = endpoints.filter((candidate) => {
-    const record = candidate as unknown as { path?: string; method?: string }
+    const candidateRecord = candidate as unknown as { path?: string; method?: string }
     return !(
-      record?.path === endpoint.path &&
+      candidateRecord?.path === record?.path &&
+      typeof candidateRecord.method === 'string' &&
       typeof record.method === 'string' &&
-      record.method.toLowerCase() === endpoint.method
+      candidateRecord.method.toLowerCase() === record.method.toLowerCase()
     )
   })
 
@@ -707,11 +794,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       }
 
       const currentEndpoints = ensureEndpointsArray(config.endpoints)
+      const livePreviewEndpoint = createLivePreviewEndpoint({
+        livePreview: normalizedLivePreview,
+        enableLogging,
+      })
+      let endpoints = mergeEndpoint(currentEndpoints, livePreviewEndpoint)
       const cacheEndpoint = createCacheRevalidationEndpoint({
         cacheRevalidation: normalizedCacheRevalidation,
         enableLogging,
       })
-      const endpoints = mergeEndpoint(currentEndpoints, cacheEndpoint)
+      endpoints = mergeEndpoint(endpoints, cacheEndpoint)
 
       return {
         ...config,
@@ -760,11 +852,16 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     }
 
     const currentEndpoints = ensureEndpointsArray(config.endpoints)
+    const livePreviewEndpoint = createLivePreviewEndpoint({
+      livePreview: normalizedLivePreview,
+      enableLogging,
+    })
+    let endpoints = mergeEndpoint(currentEndpoints, livePreviewEndpoint)
     const cacheEndpoint = createCacheRevalidationEndpoint({
       cacheRevalidation: normalizedCacheRevalidation,
       enableLogging,
     })
-    const endpoints = mergeEndpoint(currentEndpoints, cacheEndpoint)
+    endpoints = mergeEndpoint(endpoints, cacheEndpoint)
 
     return {
       ...config,
