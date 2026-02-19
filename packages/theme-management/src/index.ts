@@ -450,7 +450,7 @@ const executeThemeRevalidation = async (options: {
   tags: string[]
   paths: string[]
   enableLogging: boolean
-  logger?: { info?: (...args: unknown[]) => void; error?: (...args: unknown[]) => void }
+  logger?: { info?: (...args: any[]) => void; error?: (...args: any[]) => void }
 }): Promise<{ tags: string[]; paths: string[] }> => {
   const { tags, paths, enableLogging, logger } = options
 
@@ -492,7 +492,7 @@ const createCacheRevalidationEndpoint = (options: {
       const reqRecord = asRecord(req)
       const payload = asRecord(reqRecord?.payload)
       const logger = payload?.logger as
-        | { info?: (...args: unknown[]) => void; error?: (...args: unknown[]) => void }
+        | { info?: (...args: any[]) => void; error?: (...args: any[]) => void }
         | undefined
 
       if (cacheRevalidation.secret) {
