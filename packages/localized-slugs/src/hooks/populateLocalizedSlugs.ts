@@ -13,7 +13,9 @@ export interface PopulateLocalizedSlugsOptions {
  * Simple slug generation from title
  */
 function slugify(str: string): string {
-  return str
+  const normalized = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+  return normalized
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')

@@ -114,4 +114,31 @@ describe('Hook Edge Cases', () => {
     expect(result.path).toEqual({ en: '/custom-path' })
     expect(result.localizedSlugs).toEqual({ en: { slug: 'custom-slug', fullPath: '/custom-path' } })
   })
+
+  test('generates Czech slug from title with diacritics', async () => {
+    const hook = createPopulateLocalizedSlugsHook({
+      locales: ['cs'],
+      slugField: 'slug',
+      fullPathField: 'path',
+      generateFromTitle: true,
+      titleField: 'title',
+      enableLogging: false,
+    })
+
+    const sample = {
+      title: { cs: 'O mně' },
+      localizedSlugs: {},
+      _status: 'published',
+    }
+
+    const result = await hook({
+      doc: sample,
+      operation: 'create',
+      req: {},
+      collection: { slug: 'pages' },
+    })
+
+    expect(result.localizedSlugs.cs.slug).toBe('o-mne')
+    expect(result.localizedSlugs.cs.fullPath).toBe('/o-mne')
+  })
 })
