@@ -16,6 +16,13 @@ interface ThemeConfigurationFieldOptions {
   includeBrandIdentity: boolean
   enableAdvancedFeatures?: boolean
   useThemePreviewField?: boolean
+  customThemeConfigurationFields?: Field[]
+  customThemeConfigurationSections?: Array<{
+    label: string | Record<string, string>
+    fields: Field[]
+    initCollapsed?: boolean
+    description?: string | Record<string, string>
+  }>
 }
 
 // Type for admin.custom property to avoid ts-expect-error
@@ -39,6 +46,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     includeCustomCSS,
     enableAdvancedFeatures = true,
     useThemePreviewField = true,
+    customThemeConfigurationFields,
+    customThemeConfigurationSections,
   } = options
 
   const fields: Field[] = [
@@ -379,6 +388,24 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   }
 
   fields.push(customPresetsField)
+
+  if (customThemeConfigurationFields?.length) {
+    fields.push(...customThemeConfigurationFields)
+  }
+
+  if (customThemeConfigurationSections?.length) {
+    customThemeConfigurationSections.forEach((section) => {
+      fields.push({
+        type: 'collapsible',
+        label: section.label,
+        admin: {
+          initCollapsed: section.initCollapsed ?? true,
+          description: section.description,
+        },
+        fields: section.fields,
+      })
+    })
+  }
 
   // Advanced Settings (when using extended theme configuration)
   if (enableAdvancedFeatures) {

@@ -1,4 +1,8 @@
-import { BODY_FONT_OPTIONS, FONT_VALUE_TO_CSS, HEADING_FONT_OPTIONS } from '../constants/themeFonts.js'
+import {
+  BODY_FONT_OPTIONS,
+  FONT_VALUE_TO_CSS,
+  HEADING_FONT_OPTIONS,
+} from '../constants/themeFonts.js'
 import { defaultThemePresets } from '../presets.js'
 
 export interface TypographySelection {
@@ -24,11 +28,18 @@ const fallbackPreset =
   defaultThemePresets.find((preset) => preset.name === FALLBACK_THEME) ?? defaultThemePresets[0]
 
 const FONT_VAR_FALLBACK: Record<string, string> = {
+  'var(--font-inter)': '"Inter", system-ui, sans-serif',
   'var(--font-geist-sans)': '"Geist Sans", system-ui, sans-serif',
   'var(--font-geist-mono)': '"Geist Mono", SFMono-Regular, ui-monospace, monospace',
-  'var(--font-inter)': '"Inter", system-ui, sans-serif',
+  'var(--font-roboto)': '"Roboto", system-ui, sans-serif',
+  'var(--font-open-sans)': '"Open Sans", system-ui, sans-serif',
+  'var(--font-lato)': '"Lato", system-ui, sans-serif',
+  'var(--font-montserrat)': '"Montserrat", system-ui, sans-serif',
+  'var(--font-poppins)': '"Poppins", system-ui, sans-serif',
   'var(--font-outfit)': '"Outfit", system-ui, sans-serif',
   'var(--font-playfair)': '"Playfair Display", "Times New Roman", serif',
+  'var(--font-merriweather)': '"Merriweather", "Times New Roman", serif',
+  'var(--font-raleway)': '"Raleway", system-ui, sans-serif',
   'var(--font-lora)': '"Lora", "Times New Roman", serif',
   'var(--font-manrope)': '"Manrope", system-ui, sans-serif',
   'var(--font-urbanist)': '"Urbanist", system-ui, sans-serif',

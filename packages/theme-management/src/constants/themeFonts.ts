@@ -107,13 +107,13 @@ export const LINE_HEIGHT_OPTIONS = [
 
 export const FONT_VALUE_TO_CSS: Record<string, string> = {
   'system-ui': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  Inter: '"Inter", sans-serif',
-  Roboto: '"Roboto", sans-serif',
-  'Open Sans': '"Open Sans", sans-serif',
-  Lato: '"Lato", sans-serif',
-  Montserrat: '"Montserrat", sans-serif',
-  Poppins: '"Poppins", sans-serif',
-  'Playfair Display': '"Playfair Display", serif',
-  Merriweather: '"Merriweather", serif',
-  Raleway: '"Raleway", sans-serif',
+  Inter: 'var(--font-inter, var(--font-geist-sans), "Inter", sans-serif)',
+  Roboto: 'var(--font-roboto, "Roboto", sans-serif)',
+  'Open Sans': 'var(--font-open-sans, "Open Sans", sans-serif)',
+  Lato: 'var(--font-lato, "Lato", sans-serif)',
+  Montserrat: 'var(--font-montserrat, "Montserrat", sans-serif)',
+  Poppins: 'var(--font-poppins, "Poppins", sans-serif)',
+  'Playfair Display': 'var(--font-playfair, "Playfair Display", serif)',
+  Merriweather: 'var(--font-merriweather, "Merriweather", serif)',
+  Raleway: 'var(--font-raleway, "Raleway", sans-serif)',
 }

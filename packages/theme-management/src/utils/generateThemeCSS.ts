@@ -318,7 +318,7 @@ function toKebab(token: string): string {
 
 function getDefaultTypography(): NonNullable<ThemePreset['typography']> {
   return {
-    fontFamily: 'var(--font-geist-sans)',
+    fontFamily: 'var(--font-inter, var(--font-geist-sans), system-ui, sans-serif)',
     headingFamily: 'var(--font-outfit)',
     baseFontSize: '16px',
     lineHeight: '1.75',

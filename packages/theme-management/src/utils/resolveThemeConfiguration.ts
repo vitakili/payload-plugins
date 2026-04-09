@@ -245,8 +245,10 @@ function mergeTypography(
   }
 
   const result: ThemeTypographyPreset = {
-    fontFamily: base?.fontFamily ?? 'var(--font-geist-sans)',
-    headingFamily: base?.headingFamily ?? 'var(--font-geist-sans)',
+    fontFamily:
+      base?.fontFamily ?? 'var(--font-inter, var(--font-geist-sans), system-ui, sans-serif)',
+    headingFamily:
+      base?.headingFamily ?? 'var(--font-outfit, var(--font-geist-sans), system-ui, sans-serif)',
     baseFontSize: base?.baseFontSize ?? '16px',
     lineHeight: base?.lineHeight ?? '1.6',
     fontWeights: { ...(base?.fontWeights ?? {}) },

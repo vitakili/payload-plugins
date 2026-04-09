@@ -1,3 +1,4 @@
+import type { Field } from 'payload'
 import type { ThemePreset } from './presets.js'
 
 export interface ThemeManagementLivePreviewUrlArgs {
@@ -89,6 +90,15 @@ export interface ThemeManagementPluginOptions {
   includeColorModeToggle?: boolean
   /** Expose custom CSS editor */
   includeCustomCSS?: boolean
+  /** Additional custom fields appended inside `themeConfiguration` group */
+  customThemeConfigurationFields?: Field[]
+  /** Additional custom collapsible sections appended inside `themeConfiguration` group */
+  customThemeConfigurationSections?: Array<{
+    label: string | Record<string, string>
+    fields: Field[]
+    initCollapsed?: boolean
+    description?: string | Record<string, string>
+  }>
   /** Reserved for future use, keeps API parity */
   includeBrandIdentity?: boolean
   /** Enable advanced controls such as animation level */
