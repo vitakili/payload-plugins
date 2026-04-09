@@ -11,9 +11,9 @@ To fix the `Module not found: Can't resolve 'fs/promises'` error, **server-only 
 ### 1. Update Package Version
 
 ```bash
-pnpm update @kilivi/payloadcms-theme-management@latest
+pnpm update @kilivi-dev/payloadcms-theme-management@latest
 # or
-pnpm add @kilivi/payloadcms-theme-management@0.1.9
+pnpm add @kilivi-dev/payloadcms-theme-management@0.1.9
 ```
 
 ### 2. Update Server Component Imports
@@ -21,13 +21,13 @@ pnpm add @kilivi/payloadcms-theme-management@0.1.9
 **BEFORE (❌ OLD - Will cause errors):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management'
 ```
 
 **AFTER (✅ NEW - Correct):**
 
 ```typescript
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 ```
 
 ### 3. Clear Next.js Cache
@@ -46,7 +46,7 @@ pnpm dev
 
 ### Server-Only Exports (Now in `/server`)
 
-These exports are now **only available** from `@kilivi/payloadcms-theme-management/server`:
+These exports are now **only available** from `@kilivi-dev/payloadcms-theme-management/server`:
 
 - `ServerThemeInjector` - Server component for SSR theme injection
 - `getThemeCriticalCSS()` - Generate critical CSS dynamically for a theme
@@ -59,7 +59,7 @@ These exports are now **only available** from `@kilivi/payloadcms-theme-manageme
 
 ### Client-Safe Exports (Still in main entry)
 
-These remain available from `@kilivi/payloadcms-theme-management`:
+These remain available from `@kilivi-dev/payloadcms-theme-management`:
 
 - `themeManagementPlugin` - Payload plugin
 - `ThemeProvider` - Client component
@@ -73,17 +73,17 @@ These remain available from `@kilivi/payloadcms-theme-management`:
 
 These continue to work as before:
 
-- `@kilivi/payloadcms-theme-management/fields/*`
-- `@kilivi/payloadcms-theme-management/components/*`
-- `@kilivi/payloadcms-theme-management/utils/*`
-- `@kilivi/payloadcms-theme-management/providers/*`
+- `@kilivi-dev/payloadcms-theme-management/fields/*`
+- `@kilivi-dev/payloadcms-theme-management/components/*`
+- `@kilivi-dev/payloadcms-theme-management/utils/*`
+- `@kilivi-dev/payloadcms-theme-management/providers/*`
 
 ## Example: Correct Usage in Next.js
 
 ### Server Component (layout.tsx)
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -111,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 ```tsx
 'use client'
 
-import { generateThemeColorsCss, ThemeProvider } from '@kilivi/payloadcms-theme-management'
+import { generateThemeColorsCss, ThemeProvider } from '@kilivi-dev/payloadcms-theme-management'
 
 export function MyClientComponent() {
   const css = generateThemeColorsCss({
@@ -157,10 +157,10 @@ By moving server-only code to a separate entry point (`/server`):
 2. Verify you're importing from `/server`:
 
    ```bash
-   grep -r "from '@kilivi/payloadcms-theme-management'" src/
+   grep -r "from '@kilivi-dev/payloadcms-theme-management'" src/
    # Should NOT see ServerThemeInjector in results
 
-   grep -r "from '@kilivi/payloadcms-theme-management/server'" src/
+   grep -r "from '@kilivi-dev/payloadcms-theme-management/server'" src/
    # Should see ServerThemeInjector here
    ```
 

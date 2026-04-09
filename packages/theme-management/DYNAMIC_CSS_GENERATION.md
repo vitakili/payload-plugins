@@ -74,7 +74,7 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
 ### Get CSS for One Theme
 
 ```typescript
-import { getThemeDynamicCSS } from '@kilivi/payloadcms-theme-management'
+import { getThemeDynamicCSS } from '@kilivi-dev/payloadcms-theme-management'
 
 const css = getThemeDynamicCSS('blue')
 // Returns ~135 lines of CSS
@@ -83,7 +83,7 @@ const css = getThemeDynamicCSS('blue')
 ### Get CSS for All Themes
 
 ```typescript
-import { getAllDynamicThemesCSS } from '@kilivi/payloadcms-theme-management'
+import { getAllDynamicThemesCSS } from '@kilivi-dev/payloadcms-theme-management'
 
 const allCSS = getAllDynamicThemesCSS()
 // Returns CSS for all 28 themes (~3780 lines total)
@@ -92,8 +92,8 @@ const allCSS = getAllDynamicThemesCSS()
 ### Generate Custom Theme CSS
 
 ```typescript
-import { generatePresetCSS } from '@kilivi/payloadcms-theme-management'
-import type { ThemePreset } from '@kilivi/payloadcms-theme-management'
+import { generatePresetCSS } from '@kilivi-dev/payloadcms-theme-management'
+import type { ThemePreset } from '@kilivi-dev/payloadcms-theme-management'
 
 const customPreset: ThemePreset = {
   name: 'custom',

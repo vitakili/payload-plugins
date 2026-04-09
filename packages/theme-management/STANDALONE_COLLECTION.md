@@ -18,7 +18,7 @@ As of version 0.6.0, the Theme Management Plugin supports creating a **standalon
 ### Basic Setup
 
 ```typescript
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -56,7 +56,7 @@ themeManagementPlugin({
 When using standalone collection, update your fetch calls:
 
 ```typescript
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 // Specify your standalone collection slug
 const theme = await fetchThemeConfiguration({
@@ -70,7 +70,7 @@ Update your layout to fetch from the standalone collection:
 
 ```tsx
 // app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 

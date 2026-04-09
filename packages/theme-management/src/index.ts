@@ -1028,7 +1028,7 @@ export {
 
 // Note: Do NOT re-export client components from the root entry to avoid
 // server-side evaluation during `payload generate:importmap`.
-// If needed, import directly from subpath: `@kilivi/payloadcms-theme-management/fields/ThemeLivePreview`
+// If needed, import directly from subpath: `@kilivi-dev/payloadcms-theme-management/fields/ThemeLivePreview`
 
 export const ThemeManagementPlugin = themeManagementPlugin
 /** @deprecated use {@link themeManagementPlugin} */

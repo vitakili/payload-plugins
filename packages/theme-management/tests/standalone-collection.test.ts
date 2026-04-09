@@ -262,7 +262,7 @@ describe('Theme Management Plugin - Standalone Global', () => {
 
     expect(themeField).toBeDefined()
     expect(themeField?.admin?.components?.Field).toBe(
-      '@kilivi/payloadcms-theme-management/fields/ThemePreviewField',
+      '@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField',
     )
   })
 
@@ -279,7 +279,7 @@ describe('Theme Management Plugin - Standalone Global', () => {
 
     expect(themeField).toBeDefined()
     expect(themeField?.admin?.components?.Field).toBe(
-      '@kilivi/payloadcms-theme-management/fields/ThemePreviewField',
+      '@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField',
     )
   })
 

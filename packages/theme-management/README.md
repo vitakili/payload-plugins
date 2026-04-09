@@ -1,8 +1,10 @@
-# @kilivi/payloadcms-theme-management
+# @kilivi-dev/payloadcms-theme-management
 
 Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, standalone appearance settings, cache revalidation, and Live Preview support.
 
-## Version 2.0.0
+> **Note:** This package was previously published under `@kilivi/payloadcms-theme-management`. It is now maintained under the `@kilivi-dev` scope starting from v1.0.0.
+
+## Version 1.0.0
 
 ### Highlights
 
@@ -10,17 +12,19 @@ Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, stand
 - Optional injected preview endpoint (`GET /api/theme/preview`)
 - Optional injected revalidation endpoint (`POST /api/theme/revalidate`)
 - Standalone global mode with automatic theme cache invalidation
-- Professional color picker and extended preset/token support
+- ThemeTokenSelectField: CSS variable preview swatch resolves computed colors correctly
+- Robust fetching: fallback to standalone global if collection returns no config
+- Professional color picker and extended preset/token support (60+ themes)
 - Full TypeScript support and server/client-safe exports
 
 ## Installation
 
 ```bash
-pnpm add @kilivi/payloadcms-theme-management
+pnpm add @kilivi-dev/payloadcms-theme-management
 # or
-npm i @kilivi/payloadcms-theme-management
+npm i @kilivi-dev/payloadcms-theme-management
 # or
-yarn add @kilivi/payloadcms-theme-management
+yarn add @kilivi-dev/payloadcms-theme-management
 ```
 
 ## Quick Start
@@ -30,7 +34,7 @@ yarn add @kilivi/payloadcms-theme-management
 #### A) Inject as tab into existing collection (default)
 
 ```ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -53,7 +57,7 @@ export default buildConfig({
 #### B) Create standalone appearance global
 
 ```ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -72,7 +76,7 @@ export default buildConfig({
 ### 2) Inject theme variables in Next.js layout
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -251,7 +255,7 @@ themeManagementPlugin({
 import {
   createCachedThemeFetcher,
   ServerThemeInjector,
-} from '@kilivi/payloadcms-theme-management/server'
+} from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -283,7 +287,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 Single-tenant:
 
 ```ts
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 const themeConfiguration = await fetchThemeConfiguration({
   useGlobal: true,
@@ -294,7 +298,7 @@ const themeConfiguration = await fetchThemeConfiguration({
 Multi-tenant:
 
 ```ts
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 const tenantThemeConfiguration = await fetchThemeConfiguration({
   useGlobal: true,
@@ -363,7 +367,7 @@ import {
   resolveThemeConfiguration,
   themeManagementPlugin,
   ThemeProvider,
-} from '@kilivi/payloadcms-theme-management'
+} from '@kilivi-dev/payloadcms-theme-management'
 ```
 
 ### Server package
@@ -376,12 +380,12 @@ import {
   getThemeCSS,
   revalidateThemeCache,
   ServerThemeInjector,
-} from '@kilivi/payloadcms-theme-management/server'
+} from '@kilivi-dev/payloadcms-theme-management/server'
 ```
 
 ## Notes
 
-- For server components, always import server-only helpers from `@kilivi/payloadcms-theme-management/server`.
+- For server components, always import server-only helpers from `@kilivi-dev/payloadcms-theme-management/server`.
 - If your team uses strict preview security, set `PREVIEW_SECRET` and enable `livePreview.injectRoute`.
 - For multi-tenant apps, use `tenantField` + `tenantQueryParam` to keep preview URLs tenant-aware.
 

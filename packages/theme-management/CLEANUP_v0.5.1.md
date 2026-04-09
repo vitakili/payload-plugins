@@ -307,7 +307,7 @@ if (trimmed.includes('var(--') && trimmed.includes(',') && !trimmed.endsWith(';'
 
 ```bash
 cd your-project
-pnpm add @kilivi/payloadcms-theme-management@0.5.1
+pnpm add @kilivi-dev/payloadcms-theme-management@0.5.1
 ```
 
 ### What Changed for Users

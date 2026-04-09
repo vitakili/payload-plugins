@@ -22,7 +22,7 @@ A comprehensive Google Fonts picker with advanced features for Payload CMS theme
 The Font Picker is included in the theme-management plugin. Import the ThemeSettings global:
 
 ```typescript
-import { ThemeSettings } from '@kilivi/payloadcms-theme-management'
+import { ThemeSettings } from '@kilivi-dev/payloadcms-theme-management'
 
 export default buildConfig({
   // ... other config
@@ -68,7 +68,7 @@ For optimal performance with Next.js:
 ```typescript
 // app/layout.tsx
 import { Inter, Nunito, Montserrat } from 'next/font/google'
-import { getThemeSettings } from '@kilivi/payloadcms-theme-management'
+import { getThemeSettings } from '@kilivi-dev/payloadcms-theme-management'
 
 // Pre-import popular fonts
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -127,7 +127,7 @@ For simpler setups:
 
 ```typescript
 // app/layout.tsx
-import { getThemeSettings, getGoogleFontUrl } from '@kilivi/payloadcms-theme-management'
+import { getThemeSettings, getGoogleFontUrl } from '@kilivi-dev/payloadcms-theme-management'
 
 export default async function RootLayout({ children }) {
   const themeSettings = await getThemeSettings(payload)
@@ -171,7 +171,7 @@ These 8 popular fonts are recommended for `next/font/google` optimization:
 Use `isPreImportedFont()` to check if a font should use next/font:
 
 ```typescript
-import { isPreImportedFont } from '@kilivi/payloadcms-theme-management'
+import { isPreImportedFont } from '@kilivi-dev/payloadcms-theme-management'
 
 if (isPreImportedFont(activeFont)) {
   // Use next/font/google import

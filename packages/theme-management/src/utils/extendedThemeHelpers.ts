@@ -7,7 +7,7 @@ import type { ExtendedThemePreset, ShadcnColorTokens } from '../extended-presets
  *
  * @example
  * ```tsx
- * import { extendedThemePresets, applyExtendedTheme } from '@kilivi/payloadcms-theme-management'
+ * import { extendedThemePresets, applyExtendedTheme } from '@kilivi-dev/payloadcms-theme-management'
  *
  * // In a client component or hook
  * function useExtendedTheme() {
@@ -43,7 +43,7 @@ export function applyExtendedTheme(
  *
  * @example
  * ```tsx
- * import { extendedThemePresets, generateExtendedThemeCSS } from '@kilivi/payloadcms-theme-management'
+ * import { extendedThemePresets, generateExtendedThemeCSS } from '@kilivi-dev/payloadcms-theme-management'
  *
  * // Generate CSS for cool-extended theme
  * const css = generateExtendedThemeCSS(extendedThemePresets['cool-extended'])
@@ -77,7 +77,7 @@ export function generateExtendedThemeCSS(theme: ExtendedThemePreset): string {
  *
  * @example
  * ```tsx
- * import { resetExtendedTheme } from '@kilivi/payloadcms-theme-management'
+ * import { resetExtendedTheme } from '@kilivi-dev/payloadcms-theme-management'
  *
  * // Remove all extended theme variables
  * resetExtendedTheme()
@@ -128,7 +128,7 @@ export function resetExtendedTheme(): void {
  *
  * @example
  * ```tsx
- * import { extendedThemePresets, getExtendedThemeTokens } from '@kilivi/payloadcms-theme-management'
+ * import { extendedThemePresets, getExtendedThemeTokens } from '@kilivi-dev/payloadcms-theme-management'
  *
  * const chartColors = getExtendedThemeTokens(
  *   extendedThemePresets['cool-extended'],
@@ -160,7 +160,7 @@ export function getExtendedThemeTokens<K extends keyof ShadcnColorTokens>(
  *
  * @example
  * ```tsx
- * import { extendedThemePresets, createUseExtendedTheme } from '@kilivi/payloadcms-theme-management'
+ * import { extendedThemePresets, createUseExtendedTheme } from '@kilivi-dev/payloadcms-theme-management'
  *
  * const useExtendedTheme = createUseExtendedTheme(extendedThemePresets)
  *
@@ -208,7 +208,7 @@ export function createUseExtendedTheme(presets: Record<string, ExtendedThemePres
  * @example
  * ```ts
  * // tailwind.config.ts
- * import { getTailwindVarReferences } from '@kilivi/payloadcms-theme-management'
+ * import { getTailwindVarReferences } from '@kilivi-dev/payloadcms-theme-management'
  *
  * export default {
  *   theme: {

@@ -20,7 +20,7 @@ Now you can choose:
 #### Enable Standalone Mode:
 
 ```typescript
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 
 export default buildConfig({
   plugins: [

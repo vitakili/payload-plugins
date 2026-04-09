@@ -3,14 +3,14 @@
 ## Installation
 
 ```bash
-pnpm add @kilivi/payloadcms-theme-management
+pnpm add @kilivi-dev/payloadcms-theme-management
 ```
 
 ## Payload Setup (One Time)
 
 ```typescript
 // payload.config.ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 
 export default buildConfig({
   plugins: [
@@ -38,7 +38,7 @@ export async function getTheme() {
 
 ```typescript
 // app/layout.tsx
-import { generateThemeCSS } from '@kilivi/payloadcms-theme-management'
+import { generateThemeCSS } from '@kilivi-dev/payloadcms-theme-management'
 import { getTheme } from '@/lib/theme'
 
 export default async function Layout({ children }) {
@@ -148,7 +148,7 @@ Automatically handled via `[data-theme="dark"]` attribute.
 
 ```typescript
 // Generate font loading code
-import { getFontLoaderCode, useThemeFonts } from '@kilivi/payloadcms-theme-management'
+import { getFontLoaderCode, useThemeFonts } from '@kilivi-dev/payloadcms-theme-management'
 
 const code = getFontLoaderCode(themeConfig.typography)
 console.log(code) // Copy to layout

@@ -18,7 +18,7 @@ As of version 0.6.0, the Theme Management Plugin supports creating a **standalon
 ### Basic Setup
 
 ```typescript
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -74,7 +74,7 @@ Update your layout to fetch from the standalone global:
 
 ```tsx
 // app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -127,7 +127,7 @@ For multi-tenant setups, the standalone global works seamlessly with Payload's m
 
 ```typescript
 // payload.config.ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 
 export default buildConfig({
   // Multi-tenant setup
@@ -148,7 +148,7 @@ export default buildConfig({
 ### Fetching Theme in Multi-Tenant Context
 
 ```typescript
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 // Fetch for specific tenant
 const theme = await fetchThemeConfiguration({
@@ -162,7 +162,7 @@ const theme = await fetchThemeConfiguration({
 
 ```tsx
 // app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 

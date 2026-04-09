@@ -266,7 +266,7 @@ describe('FontPicker - Component Exports', () => {
     const activeFontField = typographyTab.fields.find((field: any) => field.name === 'activeFont')
     expect(activeFontField).toBeDefined()
     expect(activeFontField.admin.components.Field).toBe(
-      '@kilivi/payloadcms-theme-management/globals/ThemeSettings/FontPicker',
+      '@kilivi-dev/payloadcms-theme-management/globals/ThemeSettings/FontPicker',
     )
   })
 

@@ -17,7 +17,7 @@ Use this configuration when all tenants should share a consistent brand theme:
 
 ```typescript
 // payload.config.ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -43,7 +43,7 @@ Use this when each tenant can customize their own appearance:
 
 ```typescript
 // payload.config.ts
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -182,7 +182,7 @@ hooks: {
 Use `ServerThemeInjector` from the `/server` entry point:
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 

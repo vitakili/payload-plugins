@@ -9,7 +9,7 @@ Use `registerTranslations` to add or override translations at runtime. Translati
 Example:
 
 ```ts
-import { registerTranslations } from '@kilivi/payloadcms-theme-management'
+import { registerTranslations } from '@kilivi-dev/payloadcms-theme-management'
 
 registerTranslations({
   fr: {

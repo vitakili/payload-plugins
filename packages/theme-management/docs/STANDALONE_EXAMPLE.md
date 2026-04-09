@@ -1,6 +1,6 @@
 // Example: Using Theme Management Plugin with Standalone Collection
 
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { buildConfig } from 'payload'
 
 export default buildConfig({
@@ -42,7 +42,7 @@ enableLogging: true,
 // ============================================================================
 
 // app/layout.tsx
-import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -75,7 +75,7 @@ return (
 // Fetching Theme Configuration
 // ============================================================================
 
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 // For standalone collection
 const theme = await fetchThemeConfiguration({
