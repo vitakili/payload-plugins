@@ -302,6 +302,10 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     }
   }
 
+  const selectedOption = options.find((opt) => opt.value === selectedValue)
+  const selectedColor = selectedOption ? resolveCssColor(selectedOption.color) : ''
+  const selectedLabel = selectedOption ? getOptionLabel(selectedOption) : ''
+
   return (
     <div className="field-type theme-token-select">
       {label && (
@@ -325,70 +329,92 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       )}
 
       <div
-        className="token-grid"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-          gap: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          position: 'relative',
         }}
       >
-        {options.map((option) => {
-          const isActive = option.value === selectedValue
-          return (
-            <button
-              type="button"
-              key={option.value}
-              onClick={() => handleSelect(option.value)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '10px 12px',
-                borderRadius: '10px',
-                border: isActive
-                  ? '2px solid var(--theme-success-500)'
-                  : '1px solid var(--theme-elevation-150)',
-                backgroundColor: 'var(--theme-elevation-0)',
-                boxShadow: isActive
-                  ? '0 10px 20px -10px rgba(59, 130, 246, 0.4)'
-                  : '0 1px 2px rgba(15, 23, 42, 0.08)',
-                cursor: 'pointer',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(15, 23, 42, 0.08)',
-                  backgroundColor: resolveCssColor(option.color),
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--theme-elevation-800)' }}
-              >
-                {getOptionLabel(option)}
-              </span>
-            </button>
-          )
-        })}
+        {/* Color preview swatch */}
+        <div
+          aria-hidden
+          style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '8px',
+            border: '2px solid var(--theme-elevation-200)',
+            backgroundColor: selectedColor,
+            flexShrink: 0,
+            transition: 'all 0.2s ease',
+            boxShadow: selectedColor
+              ? '0 2px 8px rgba(0, 0, 0, 0.1)'
+              : 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
+          }}
+        />
+
+        {/* Select dropdown */}
+        <select
+          id={path}
+          value={selectedValue}
+          onChange={(event) => handleSelect(event.target.value)}
+          style={{
+            flex: 1,
+            padding: '10px 12px',
+            borderRadius: '8px',
+            border: '1px solid var(--theme-elevation-200)',
+            backgroundColor: 'var(--theme-elevation-0)',
+            color: 'var(--theme-elevation-900)',
+            fontSize: '14px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            appearance: 'none',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M1 4l5 4 5-4'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 10px center',
+            paddingRight: '32px',
+          }}
+          onFocus={(event) => {
+            event.target.style.borderColor = 'var(--theme-primary-500)'
+            event.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+          }}
+          onBlur={(event) => {
+            event.target.style.borderColor = 'var(--theme-elevation-200)'
+            event.target.style.boxShadow = 'none'
+          }}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {getOptionLabel(option)}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <select
-        id={path}
-        value={selectedValue}
-        onChange={(event) => handleSelect(event.target.value)}
-        style={{ display: 'none' }}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {getOptionLabel(option)}
-          </option>
-        ))}
-      </select>
+      {/* Optional: Show selected label and color info */}
+      {selectedLabel && (
+        <div
+          style={{
+            marginTop: '10px',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            backgroundColor: 'var(--theme-elevation-50)',
+            fontSize: '12px',
+            color: 'var(--theme-elevation-700)',
+          }}
+        >
+          <span style={{ fontWeight: 600 }}>
+            {adminLang === 'cs' ? 'Vybraná barva:' : 'Selected color:'}
+          </span>{' '}
+          {selectedLabel}
+          {selectedColor && selectedColor !== '' && (
+            <span style={{ marginLeft: '8px', fontFamily: 'monospace', opacity: 0.7 }}>
+              ({selectedColor})
+            </span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
