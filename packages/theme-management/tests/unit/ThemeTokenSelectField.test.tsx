@@ -135,7 +135,7 @@ describe('ThemeTokenSelectField', () => {
     render(<ThemeTokenSelectField {...props} />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+      expect(screen.getByRole('combobox')).toBeDefined()
     })
 
     const { fetchThemeConfiguration } = await import('../../src/index.js')
@@ -196,7 +196,7 @@ describe('ThemeTokenSelectField', () => {
     render(<ThemeTokenSelectField {...props} />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+      expect(screen.getByRole('combobox')).toBeDefined()
     })
 
     const { fetchThemeConfiguration } = await import('../../src/index.js')
@@ -255,7 +255,7 @@ describe('ThemeTokenSelectField', () => {
     render(<ThemeTokenSelectField {...props} />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+      expect(screen.getByRole('combobox')).toBeDefined()
     })
 
     const { fetchThemeConfiguration: fetch2 } = await import('../../src/index.js')
@@ -313,7 +313,7 @@ describe('ThemeTokenSelectField', () => {
     render(<ThemeTokenSelectField {...props} />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /^Theme background$/i })).toBeDefined()
+      expect(screen.getByRole('combobox')).toBeDefined()
     })
 
     const { fetchThemeConfiguration: fetch3 } = await import('../../src/index.js')
