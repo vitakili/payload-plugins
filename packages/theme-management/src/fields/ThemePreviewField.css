@@ -2,8 +2,8 @@
 
 .theme-preset-list {
   display: grid;
-  gap: 10px;
-  max-height: 600px;
+  gap: 6px;
+  max-height: 480px;
   overflow-y: auto;
   padding-right: 8px;
   
@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid var(--theme-elevation-200, #e2e8f0);
   background-color: var(--theme-input-bg, #ffffff);
@@ -86,9 +86,57 @@
 }
 
 .color-swatch {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
 }
+
+/* ─── Section header icons (lucide SVG via mask-image) ──────────────────────
+   Payload v3 collapsible structure: .collapsible.{className} > .collapsible__toggle-wrap
+   The toggle-wrap is already display:flex so ::before inserts as first flex item.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.tm-section-typography .collapsible__toggle-wrap::before,
+.tm-section-effects .collapsible__toggle-wrap::before,
+.tm-section-style-preset .collapsible__toggle-wrap::before,
+.tm-section-custom-presets .collapsible__toggle-wrap::before,
+.tm-section-components .collapsible__toggle-wrap::before,
+.tm-section-advanced .collapsible__toggle-wrap::before {
+  content: '';
+  display: inline-flex;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  opacity: 0.55;
+}
+
+.tm-section-typography .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/type.svg');
+}
+
+.tm-section-effects .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/sparkles.svg');
+}
+
+.tm-section-style-preset .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/wand-sparkles.svg');
+}
+
+.tm-section-custom-presets .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/puzzle.svg');
+}
+
+.tm-section-components .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/layers.svg');
+}
+
+.tm-section-advanced .collapsible__toggle-wrap::before {
+  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/settings-2.svg');
+}
+

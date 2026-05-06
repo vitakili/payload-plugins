@@ -74,9 +74,7 @@ const injectThemeTab = (
 
   if (!tabsField || !tabsField.tabs) {
     if (enableLogging) {
-      console.warn(
-        '🎨 Theme Management Plugin: No tabs field found. Creating a new tabs structure.',
-      )
+      console.warn('Theme Management Plugin: No tabs field found. Creating a new tabs structure.')
     }
 
     // If no tabs exist, create a basic tabs structure with just the theme tab
@@ -95,7 +93,7 @@ const injectThemeTab = (
   const updatedTabs = [...sanitizedTabs, themeTab]
 
   if (enableLogging) {
-    console.log('🎨 Theme Management Plugin: injecting Appearance Settings tab')
+    console.log('Theme Management Plugin: injecting Appearance Settings tab')
   }
 
   // Update the tabs field
@@ -377,10 +375,7 @@ const resolveLivePreviewUrl = async (args: {
     return buildDefaultPreviewPath(resolvedPageSlug, tenantSlug, livePreview.tenantQueryParam)
   } catch (error) {
     if (enableLogging) {
-      req.payload.logger?.warn?.(
-        '🎨 Theme Management Plugin: live preview URL fallback used',
-        error,
-      )
+      req.payload.logger?.warn?.('Theme Management Plugin: live preview URL fallback used', error)
     }
 
     return buildDefaultPreviewPath(livePreview.pageSlug, tenantSlug, livePreview.tenantQueryParam)
@@ -468,12 +463,12 @@ const executeThemeRevalidation = async (options: {
 
     if (enableLogging) {
       logger?.info?.(
-        `🎨 Theme Management Plugin: revalidated cache tags=[${tags.join(', ')}] paths=[${paths.join(', ')}]`,
+        `Theme Management Plugin: revalidated cache tags=[${tags.join(', ')}] paths=[${paths.join(', ')}]`,
       )
     }
   } catch (error) {
     if (enableLogging) {
-      logger?.error?.('🎨 Theme Management Plugin: cache invalidation failed:', error)
+      logger?.error?.('Theme Management Plugin: cache invalidation failed:', error)
     }
     throw error
   }
@@ -554,7 +549,7 @@ const createLivePreviewEndpoint = (options: {
       )
 
       if (enableLogging) {
-        console.log('🎨 Theme Management Plugin: live preview redirect', destination)
+        console.log('Theme Management Plugin: live preview redirect', destination)
       }
 
       return {
@@ -675,7 +670,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
 
     if (!enabled) {
       if (enableLogging) {
-        console.log('🎨 Theme Management Plugin: disabled via options, skipping.')
+        console.log('Theme Management Plugin: disabled via options, skipping.')
       }
       return config
     }
@@ -696,7 +691,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     if (useStandaloneCollection) {
       if (enableLogging) {
         console.log(
-          `🎨 Theme Management Plugin: creating standalone global "${standaloneCollectionSlug}"`,
+          `Theme Management Plugin: creating standalone global "${standaloneCollectionSlug}"`,
         )
       }
 
@@ -799,7 +794,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       if (existingIndex !== -1) {
         if (enableLogging) {
           console.warn(
-            `🎨 Theme Management Plugin: global "${standaloneCollectionSlug}" already exists, skipping creation.`,
+            `Theme Management Plugin: global "${standaloneCollectionSlug}" already exists, skipping creation.`,
           )
         }
         return config
@@ -835,7 +830,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       collectionTouched = true
 
       if (enableLogging) {
-        console.log(`🎨 Theme Management Plugin: enhancing collection "${collection.slug}"`)
+        console.log(`Theme Management Plugin: enhancing collection "${collection.slug}"`)
       }
 
       const existingFields = Array.isArray(collection.fields) ? collection.fields : []
@@ -857,7 +852,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     if (!collectionTouched) {
       if (enableLogging) {
         console.warn(
-          `🎨 Theme Management Plugin: collection "${targetCollection}" was not found, leaving config untouched.`,
+          `Theme Management Plugin: collection "${targetCollection}" was not found, leaving config untouched.`,
         )
       }
       return config
@@ -998,11 +993,25 @@ export type {
   ThemeManagementLivePreviewOptions,
   ThemeManagementLivePreviewUrlArgs,
 } from './types.js'
+export type {
+  SiteThemeConfiguration,
+  ThemeColorOverride,
+  ThemeTypographyOverride,
+  ThemeCustomization,
+  ThemeVisualEffects,
+  ThemeComponentStyles,
+} from './payload-types.js'
 export {
   DEFAULT_THEME_CONFIGURATION,
   resolveThemeConfiguration,
 } from './utils/resolveThemeConfiguration.js'
-export type { ResolvedThemeConfiguration } from './utils/resolveThemeConfiguration.js'
+export type {
+  ResolvedThemeConfiguration,
+  ResolvedVisualEffects,
+  ResolvedComponentStyles,
+} from './utils/resolveThemeConfiguration.js'
+export { allStylePresets, stylePresetCategories } from './style-presets.js'
+export type { StylePreset } from './style-presets.js'
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
 export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'

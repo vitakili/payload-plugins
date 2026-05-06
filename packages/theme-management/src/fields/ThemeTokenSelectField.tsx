@@ -305,6 +305,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   const selectedOption = options.find((opt) => opt.value === selectedValue)
   const selectedColor = selectedOption ? resolveCssColor(selectedOption.color) : ''
   const selectedLabel = selectedOption ? getOptionLabel(selectedOption) : ''
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="field-type theme-token-select">
@@ -353,44 +354,135 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
           }}
         />
 
-        {/* Select dropdown */}
-        <select
-          id={path}
-          value={selectedValue}
-          onChange={(event) => handleSelect(event.target.value)}
-          style={{
-            flex: 1,
-            padding: '10px 12px',
-            borderRadius: '8px',
-            border: '1px solid var(--theme-elevation-200)',
-            backgroundColor: 'var(--theme-elevation-0)',
-            color: 'var(--theme-elevation-900)',
-            fontSize: '14px',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-            appearance: 'none',
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M1 4l5 4 5-4'/%3E%3C/svg%3E")`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 10px center',
-            paddingRight: '32px',
-          }}
-          onFocus={(event) => {
-            event.target.style.borderColor = 'var(--theme-primary-500)'
-            event.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
-          }}
-          onBlur={(event) => {
-            event.target.style.borderColor = 'var(--theme-elevation-200)'
-            event.target.style.boxShadow = 'none'
-          }}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {getOptionLabel(option)}
-            </option>
-          ))}
-        </select>
+        {/* Custom Select Combobox */}
+        <div style={{ flex: 1, position: 'relative' }}>
+          <button
+            id={path}
+            type="button"
+            role="combobox"
+            aria-expanded={isOpen}
+            onClick={() => setIsOpen(!isOpen)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              border: '1px solid var(--theme-elevation-200)',
+              backgroundColor: 'var(--theme-elevation-0)',
+              color: 'var(--theme-elevation-900)',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+              textAlign: 'left',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M${isOpen ? '5 8l-5-4 2-1.5L5 4l3-1.5 2 1.5L5 8z' : '1 4l5 4 5-4'}'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 10px center',
+              paddingRight: '32px',
+            }}
+            onFocus={(event) => {
+              event.currentTarget.style.borderColor = 'var(--theme-primary-500)'
+              event.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+            }}
+            onBlur={(event) => {
+              event.currentTarget.style.borderColor = 'var(--theme-elevation-200)'
+              event.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            {selectedLabel}
+          </button>
+
+          {/* Dropdown Menu */}
+          {isOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                marginTop: '4px',
+                backgroundColor: 'var(--theme-elevation-0)',
+                border: '1px solid var(--theme-elevation-200)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                zIndex: 1000,
+                maxHeight: '300px',
+                overflowY: 'auto',
+              }}
+            >
+              {options.map((option) => {
+                const isSelected = option.value === selectedValue
+                const optionColor = resolveCssColor(option.color)
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      handleSelect(option.value)
+                      setIsOpen(false)
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 12px',
+                      border: 'none',
+                      backgroundColor: isSelected ? 'var(--theme-primary-50)' : 'transparent',
+                      color: 'var(--theme-elevation-900)',
+                      fontSize: '14px',
+                      fontWeight: isSelected ? 600 : 500,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s ease',
+                      textAlign: 'left',
+                      borderLeft: isSelected
+                        ? '3px solid var(--theme-primary-500)'
+                        : '3px solid transparent',
+                    }}
+                    onMouseEnter={(event) => {
+                      if (!isSelected) {
+                        event.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
+                      }
+                    }}
+                    onMouseLeave={(event) => {
+                      if (!isSelected) {
+                        event.currentTarget.style.backgroundColor = 'transparent'
+                      }
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(15, 23, 42, 0.1)',
+                        backgroundColor: optionColor,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span>{getOptionLabel(option)}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Click outside to close */}
+      {isOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999,
+          }}
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Optional: Show selected label and color info */}
       {selectedLabel && (

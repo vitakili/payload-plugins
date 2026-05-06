@@ -42,6 +42,14 @@ export interface ThemePreset {
   lightMode?: Record<string, string>
   darkMode?: Record<string, string>
   typography?: ThemeTypographyPreset
+  visualEffects?: {
+    effectStyle?: 'flat' | 'elevated' | 'glass' | 'neumorphic' | 'clay'
+    shadowIntensity?: 'none' | 'subtle' | 'medium' | 'strong' | 'dramatic'
+    backdropBlur?: 'none' | 'slight' | 'medium' | 'strong' | 'heavy'
+    borderStyle?: 'none' | 'solid' | 'dashed' | 'dotted' | 'double'
+    borderWidth?: '0px' | '1px' | '2px' | '3px' | '4px'
+    glassOpacity?: number
+  }
 }
 
 export const defaultThemePresets: ThemePreset[] = [

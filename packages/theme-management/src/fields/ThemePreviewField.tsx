@@ -3,7 +3,7 @@
 import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   ResolvedTypographyPreview,
   TypographySelection,
@@ -44,6 +44,7 @@ interface ThemePresetDefinition {
   darkMode: ColorModeColors
   typography?: ThemeTypographyPreset
   borderRadius: 'none' | 'small' | 'medium' | 'large' | 'xl'
+  visualEffects?: ThemePreset['visualEffects']
 }
 
 // FALLBACK_THEME and runtime theme presets are computed inside the component
@@ -273,6 +274,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           darkMode: { ...darkModeDefaults, ...(preset.darkMode ?? {}) },
           typography: preset.typography,
           borderRadius: preset.borderRadius,
+          visualEffects: preset.visualEffects,
         }
         return acc
       },
@@ -284,6 +286,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { dispatchFields } = useForm()
   const formFields = useFormFields(([formState]: any) => formState)
   const hasAppliedInitialPresetRef = useRef(false)
+  const [previewOpen, setPreviewOpen] = useState(true)
 
   const applyPreset = useCallback(
     (presetName: string) => {
@@ -312,6 +315,27 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           })
         }
       })
+
+      if (preset.visualEffects) {
+        const vfKeys = [
+          'effectStyle',
+          'shadowIntensity',
+          'backdropBlur',
+          'borderStyle',
+          'borderWidth',
+          'glassOpacity',
+        ] as const
+        vfKeys.forEach((key) => {
+          const value = preset.visualEffects?.[key]
+          if (value !== undefined) {
+            dispatchFields({
+              type: 'UPDATE',
+              path: `themeConfiguration.visualEffects.${key}`,
+              value,
+            })
+          }
+        })
+      }
     },
     [dispatchFields],
   )
@@ -469,33 +493,68 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
 
   return (
     <div style={{ marginBottom: '24px' }}>
-      <label
+      <div
         style={{
-          display: 'block',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           marginBottom: '10px',
-          fontSize: '13px',
-          fontWeight: 600,
-          color: 'var(--theme-elevation-800)',
         }}
       >
-        {fieldLabel}
-      </label>
+        <label
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            color: 'var(--theme-elevation-800)',
+          }}
+        >
+          {fieldLabel}
+        </label>
+        {showPreviewPanel && (
+          <button
+            type="button"
+            onClick={() => setPreviewOpen((v) => !v)}
+            style={{
+              fontSize: '11px',
+              fontWeight: 500,
+              padding: '3px 10px',
+              borderRadius: '6px',
+              border: '1px solid var(--theme-elevation-200, #e2e8f0)',
+              background: 'var(--theme-elevation-50, #f8fafc)',
+              cursor: 'pointer',
+              color: 'var(--theme-elevation-600, #475569)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}
+          >
+            <span style={{ fontSize: '9px', lineHeight: 1 }}>{previewOpen ? '▼' : '▶'}</span>
+            {previewOpen
+              ? getAdminLanguage() === 'cs'
+                ? 'Skrýt náhled'
+                : 'Hide preview'
+              : getAdminLanguage() === 'cs'
+                ? 'Náhled'
+                : 'Preview'}
+          </button>
+        )}
+      </div>
 
       <div
         style={{
           display: 'flex',
           flexWrap: 'wrap',
-          gap: '24px',
+          gap: '16px',
           alignItems: 'flex-start',
         }}
       >
         <div
           style={{
-            flex: '0 0 320px',
-            minWidth: '260px',
-            maxWidth: '420px',
+            flex: '1 1 240px',
+            minWidth: '220px',
+            maxWidth: '380px',
             display: 'grid',
-            gap: '12px',
+            gap: '10px',
           }}
         >
           <div className="theme-preset-list">
@@ -546,8 +605,6 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
               <div style={{ fontWeight: 600, color: 'var(--theme-elevation-800)' }}>
                 {activePreset.label}
               </div>
-              <div>Primary color: {activePreset.lightMode.primary}</div>
-              <div>Accent color: {activePreset.lightMode.accent}</div>
               <div
                 style={{
                   display: 'flex',
@@ -609,11 +666,12 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           )}
         </div>
 
-        {showPreviewPanel && (
+        {showPreviewPanel && previewOpen && (
           <div
             style={{
-              flex: '1 1 420px',
-              minWidth: '320px',
+              flex: '0 1 400px',
+              minWidth: '260px',
+              maxWidth: '420px',
               position: 'sticky',
               top: '96px',
               alignSelf: 'flex-start',

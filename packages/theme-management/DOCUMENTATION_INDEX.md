@@ -68,9 +68,32 @@ Complete Tailwind CSS integration guide with full configuration examples.
 
 Complete version history with all changes, fixes, and improvements.
 
-- v0.6.0 - Standalone Global Support (Current)
+- v1.2.0 - Extended Theme Presets & Appearance Controls (Current)
+- v1.1.0 - ThemeTokenSelectField fixes, robust fetching
+- v0.6.0 - Standalone Global Support
 - v0.2.1 - Proper Tabs Integration
 - Earlier versions
+
+## New in v1.2.0
+
+### [docs/APPEARANCE_CONTROLS.md](./docs/APPEARANCE_CONTROLS.md)
+
+Full reference for the 3 new configuration sections added to the Appearance Settings tab.
+
+- **Visual Effects** — effect style, shadow intensity, backdrop blur, border style/width, glass opacity
+- **Hero & Background** — hero style, height, gradient direction, pattern overlays, section dividers, parallax
+- **Component Styles** — button variant, card style, hover effects, image style, icon set, navbar/footer style
+- TypeScript type interfaces (`ThemeVisualEffects`, `ThemeHeroBackground`, `ThemeComponentStyles`)
+- Next.js resolver example with HTML `data-*` attributes
+- Complete CSS variable mapping guide with Tailwind examples
+
+### [docs/THEME_PRESETS_EXTENDED.md](./docs/THEME_PRESETS_EXTENDED.md)
+
+Documentation for the 8 new visual-style theme presets.
+
+- Per-preset colour token overview and design intent
+- Pairing suggestions (effectStyle, cardHoverEffect, backgroundPattern, buttonVariant)
+- OKLCH colour format notes and legacy HEX fallback utilities
 
 ## Quick Reference
 

@@ -51,6 +51,20 @@ interface GenericThemeConfiguration {
     info?: string | null
   } | null
   typography?: ThemeTypographyOverride | null
+  visualEffects?: {
+    effectStyle?: string | null
+    shadowIntensity?: string | null
+    backdropBlur?: string | null
+    borderStyle?: string | null
+    borderWidth?: string | null
+    glassOpacity?: number | null
+  } | null
+  componentStyles?: {
+    buttonVariant?: string | null
+    cardStyle?: string | null
+    cardHoverEffect?: string | null
+    navbarStyle?: string | null
+  } | null
 }
 
 const BORDER_RADIUS_VALUES = ['none', 'small', 'medium', 'large', 'xl'] as const
@@ -77,6 +91,22 @@ type ThemeColorConfiguration = NonNullable<GenericThemeConfiguration['lightMode'
 const DEFAULT_THEME_NAME: ThemeDefaults = 'cool'
 const DEFAULT_THEME_PRESET = allThemePresets.find((preset) => preset.name === DEFAULT_THEME_NAME)
 
+export interface ResolvedVisualEffects {
+  effectStyle?: string | null
+  shadowIntensity?: string | null
+  backdropBlur?: string | null
+  borderStyle?: string | null
+  borderWidth?: string | null
+  glassOpacity?: number | null
+}
+
+export interface ResolvedComponentStyles {
+  buttonVariant?: string | null
+  cardStyle?: string | null
+  cardHoverEffect?: string | null
+  navbarStyle?: string | null
+}
+
 export interface ResolvedThemeConfiguration {
   theme: ThemeDefaults
   colorMode: Mode
@@ -89,6 +119,8 @@ export interface ResolvedThemeConfiguration {
   lightMode?: ThemeColorConfiguration
   darkMode?: ThemeColorConfiguration
   typography: ThemeTypographyPreset | null
+  visualEffects?: ResolvedVisualEffects | null
+  componentStyles?: ResolvedComponentStyles | null
 }
 
 export const DEFAULT_THEME_CONFIGURATION: ResolvedThemeConfiguration = {
@@ -166,6 +198,8 @@ export function resolveThemeConfiguration(
     lightMode,
     darkMode,
     typography,
+    visualEffects,
+    componentStyles,
   } = themeConfiguration
 
   const resolvedTheme =
@@ -194,6 +228,10 @@ export function resolveThemeConfiguration(
   const resolvedTypography =
     mergeTypography(preset?.typography, typography) ?? preset?.typography ?? null
 
+  // Pass visualEffects and componentStyles through as-is (no normalization needed)
+  const resolvedVisualEffects = visualEffects ?? null
+  const resolvedComponentStyles = componentStyles ?? null
+
   return {
     theme: resolvedTheme,
     colorMode: resolvedMode,
@@ -206,6 +244,8 @@ export function resolveThemeConfiguration(
     lightMode: resolvedLightMode,
     darkMode: resolvedDarkMode,
     typography: resolvedTypography,
+    visualEffects: resolvedVisualEffects,
+    componentStyles: resolvedComponentStyles,
   }
 }
 

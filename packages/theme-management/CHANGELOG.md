@@ -1,5 +1,80 @@
 # Changelog
 
+## [1.2.0] - 2026-05-04
+
+### ✨ New: Extended Theme Presets & Appearance Controls
+
+#### 8 New Visual-Style Theme Presets
+
+Added to `tweakcn-special-themes.ts` — available automatically via `allThemePresets`:
+
+| Key             | Label               | Style                                      |
+| --------------- | ------------------- | ------------------------------------------ |
+| `glassmorphism` | Glassmorphism       | Frosted glass with alpha-transparent cards |
+| `claymorphism`  | Claymorphism        | Chunky clay shadows, vibrant colours       |
+| `neumorphism`   | Neumorphism Soft UI | Monochromatic inset/outset shadows         |
+| `aurora`        | Aurora Borealis     | Northern-lights teal-violet palette        |
+| `luxury`        | Luxury Gold         | Editorial gold with near-black dark mode   |
+| `healthcare`    | Healthcare Clean    | Clinical blue, high-contrast, calm         |
+| `nordic`        | Nordic Minimal      | Cold Scandinavian near-greyscale           |
+| `warm-earth`    | Warm Earth Tones    | Terracotta, sage, golden straw             |
+
+All presets use OKLCH colour format and include shadow control tokens (`shadow-color`, `shadow-opacity`, `shadow-blur`, `shadow-spread`, `shadow-offset-x/y`) and optional `font-sans`/`font-serif` hints.
+
+#### 3 New Appearance Control Sections
+
+Three new collapsible sections added to the **Appearance Settings** tab (`themeConfigurationField.ts`):
+
+**1. ✨ Visual Effects** (`themeConfiguration.visualEffects`)
+
+- `effectStyle` — flat / elevated / glass / neumorphic / clay
+- `shadowIntensity` — none / subtle / medium / strong / dramatic
+- `backdropBlur` — none / slight / medium / strong / heavy
+- `borderStyle` — none / solid / dashed / dotted / double
+- `borderWidth` — 0px / 1px / 2px / 3px / 4px
+- `glassOpacity` — 0–100 (conditional on glass effect)
+
+**2. 🖼️ Hero & Background** (`themeConfiguration.heroBackground`)
+
+- `heroStyle` — solid / gradient / radial / mesh / image-overlay / video
+- `heroHeight` — small / medium / large / full
+- `gradientDirection` — 6 directions (conditional)
+- `overlayOpacity` — 0–100 (conditional)
+- `backgroundPattern` — 9 patterns (none / dots / grid / cross / lines-h / lines-d / noise / waves / hexagons)
+- `patternOpacity` — 0–100 (conditional)
+- `sectionDivider` — none / line / wave / diagonal / chevron / curved / zigzag
+- `enableParallax` — boolean
+
+**3. 🧩 Component Styles** (`themeConfiguration.componentStyles`)
+
+- `buttonVariant` — filled / outlined / ghost / gradient / pill / brutal
+- `buttonSize` — small / medium / large / xl
+- `cardStyle` — elevated / flat / bordered / glass / neumorphic / gradient-border
+- `cardHoverEffect` — none / lift / scale / shadow / glow / tilt
+- `imageStyle` — default / rounded / circle / vignette / grayscale / duotone / polaroid
+- `iconSet` — lucide / heroicons / phosphor / tabler / font-awesome
+- `navbarStyle` — solid / transparent / blur / floating / minimal
+- `footerStyle` — standard / minimal / dark / gradient-top / full-color
+- `enableScrollReveal` — boolean
+- `enableHoverAnimations` — boolean
+
+#### New TypeScript Types
+
+Three new exported interfaces in `payload-types.ts` and re-exported from `index.ts`:
+
+- `ThemeVisualEffects`
+- `ThemeHeroBackground`
+- `ThemeComponentStyles`
+
+`SiteThemeConfiguration` extended with optional `visualEffects`, `heroBackground`, `componentStyles` fields.
+
+#### New Documentation
+
+- [`docs/APPEARANCE_CONTROLS.md`](./docs/APPEARANCE_CONTROLS.md) — full field reference, CSS mapping guide, Next.js resolver example
+- [`docs/THEME_PRESETS_EXTENDED.md`](./docs/THEME_PRESETS_EXTENDED.md) — per-preset colour docs and pairing suggestions
+
+---
+
 ## [1.1.0] - 2025-12-20
 
 ### 🔧 Fixes & Improvements

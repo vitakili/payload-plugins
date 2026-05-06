@@ -13,7 +13,7 @@ describe('Theme Management Plugin - i18n integration', () => {
               type: 'tabs',
               tabs: [
                 {
-                  label: { cs: '🎨 Nastavení vzhledu' },
+                  label: { cs: 'Nastavení vzhledu' },
                   fields: [],
                 },
               ],

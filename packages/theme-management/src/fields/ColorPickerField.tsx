@@ -194,7 +194,22 @@ export default function ColorPickerField(props: TextFieldClientProps) {
               color: 'var(--theme-elevation-800)',
             }}
           >
-            🎨 Professional Color Picker
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '14px',
+                  height: '14px',
+                  maskImage:
+                    "url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/palette.svg')",
+                  maskRepeat: 'no-repeat',
+                  maskSize: 'contain',
+                  backgroundColor: 'currentColor',
+                  flexShrink: 0,
+                }}
+              />
+              Professional Color Picker
+            </span>
           </div>
 
           {Object.entries(colorPresets).map(([groupName, colors]) => (

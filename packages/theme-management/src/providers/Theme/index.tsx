@@ -61,6 +61,25 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         // Force re-computation of CSS custom properties
         document.documentElement.style.setProperty('--color-mode', resolvedMode)
 
+        // Synchronise data attributes for effect/component styles from CSS vars
+        // (set by ServerThemeInjector; this ensures client hydration matches SSR)
+        const computedStyle = getComputedStyle(document.documentElement)
+        const effectStyle = computedStyle.getPropertyValue('--effect-style').trim()
+        const cardStyle = computedStyle.getPropertyValue('--card-style').trim()
+        const buttonVariant = computedStyle.getPropertyValue('--button-variant').trim()
+        const navbarStyle = computedStyle.getPropertyValue('--navbar-style').trim()
+        const cardHoverEffect = computedStyle.getPropertyValue('--card-hover-effect').trim()
+        const borderWidth = computedStyle.getPropertyValue('--border-width').trim()
+
+        if (effectStyle) document.documentElement.setAttribute('data-effect-style', effectStyle)
+        if (cardStyle) document.documentElement.setAttribute('data-card-style', cardStyle)
+        if (buttonVariant)
+          document.documentElement.setAttribute('data-button-variant', buttonVariant)
+        if (navbarStyle) document.documentElement.setAttribute('data-navbar-style', navbarStyle)
+        if (cardHoverEffect)
+          document.documentElement.setAttribute('data-card-hover', cardHoverEffect)
+        if (borderWidth) document.documentElement.setAttribute('data-border-width', borderWidth)
+
         // Force repaint to ensure CSS variables update
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         document.documentElement.offsetHeight

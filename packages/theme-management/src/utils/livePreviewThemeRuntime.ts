@@ -57,7 +57,7 @@ export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
 
   const borderRadiusBlock = borderRadiusCSS ? `:root {\n${borderRadiusCSS}\n}` : ''
 
-  const themeConfigurationCSS = generateThemeCSS(resolved)
+  const themeConfigurationCSS = generateThemeCSS(resolved as any)
   const colorModesCSS = generateThemeColorsCss({
     themeName: resolved.theme,
     lightMode: resolved.lightMode,

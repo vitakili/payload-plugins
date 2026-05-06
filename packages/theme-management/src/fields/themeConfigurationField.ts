@@ -57,8 +57,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       required: true,
       defaultValue: defaultTheme,
       label: {
-        en: '🎨 Theme Selection',
-        cs: '🎨 Výběr tématu',
+        en: 'Theme Selection',
+        cs: 'Výběr tématu',
       },
       validate: (value: unknown) => {
         if (typeof value === 'string' && value.trim().length > 0) {
@@ -82,6 +82,39 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     },
   ]
 
+  // Style Preset - visual style selection independent of colors
+  fields.push({
+    type: 'collapsible',
+    label: {
+      en: 'Style Preset',
+      cs: 'Styl předlohy',
+    },
+    admin: {
+      initCollapsed: true,
+      className: 'tm-section-style-preset',
+      description: {
+        en: 'Choose a visual style (Brutalism, Swiss, Glassmorphism …) without changing the colour palette.',
+        cs: 'Zvolte vizuální styl (Brutalismus, Švýcarský, Glassmorphism …) bez změny barevné palety.',
+      },
+    },
+    fields: [
+      {
+        name: 'stylePreset',
+        type: 'text',
+        label: {
+          en: 'Active Style Preset',
+          cs: 'Aktivní styl předlohy',
+        },
+        defaultValue: '',
+        admin: {
+          components: {
+            Field: '@kilivi-dev/payloadcms-theme-management/fields/StylePresetField',
+          },
+        },
+      },
+    ],
+  })
+
   // Border Radius Configuration - Always visible
   fields.push({
     type: 'row',
@@ -90,8 +123,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         name: 'borderRadius',
         type: 'select',
         label: {
-          en: '📐 Border Radius',
-          cs: '📐 Zaoblení rohů',
+          en: 'Border Radius',
+          cs: 'Zaoblení rohů',
         },
         defaultValue: 'medium',
         options: [
@@ -114,8 +147,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         name: 'spacing',
         type: 'select',
         label: {
-          en: '📏 Spacing Scale',
-          cs: '📏 Škála rozestupů',
+          en: 'Spacing Scale',
+          cs: 'Škála rozestupů',
         },
         defaultValue: 'medium',
         options: [
@@ -140,8 +173,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     fields.push({
       type: 'collapsible',
       label: {
-        en: '🌗 Color Mode Settings',
-        cs: '🌗 Nastavení barevného režimu',
+        en: 'Color Mode Settings',
+        cs: 'Nastavení barevného režimu',
       },
       admin: {
         initCollapsed: false,
@@ -216,11 +249,12 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   fields.push({
     type: 'collapsible',
     label: {
-      en: '🅰️ Typography',
-      cs: '🅰️ Typografie',
+      en: 'Typography',
+      cs: 'Typografie',
     },
     admin: {
       initCollapsed: true,
+      className: 'tm-section-typography',
       description: {
         en: 'Choose font families and base typography settings. Leave fields on "Use preset" to inherit the theme defaults.',
         cs: 'Zvolte rodiny písem a základní typografické nastavení. Hodnota "Použít výchozí" zachová nastavení motivu.',
@@ -356,11 +390,12 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   const customPresetsField: Field = {
     type: 'collapsible',
     label: {
-      en: '🧩 Custom Theme Presets',
-      cs: '🧩 Vlastní motivy',
+      en: 'Custom Theme Presets',
+      cs: 'Vlastní motivy',
     },
     admin: {
       initCollapsed: true,
+      className: 'tm-section-custom-presets',
       description: {
         en: 'Import additional theme presets via JSON to extend or override the defaults. These presets become available instantly in the Theme Selection above.',
         cs: 'Importujte další motivy pomocí JSONu a rozšiřte nebo přepište výchozí nabídku. Motivy budou ihned k dispozici ve výběru výše.',
@@ -388,6 +423,336 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   }
 
   fields.push(customPresetsField)
+
+  // Visual Effects — glassmorphism, shadows, border style
+  fields.push({
+    type: 'collapsible',
+    label: {
+      en: 'Visual Effects',
+      cs: 'Vizuální efekty',
+    },
+    admin: {
+      initCollapsed: true,
+      className: 'tm-section-effects',
+      description: {
+        en: 'Configure UI effect style, shadow intensity and border appearance.',
+        cs: 'Nastavte styl efektů UI, intenzitu stínů a vzhled okrajů.',
+      },
+    },
+    fields: [
+      {
+        name: 'visualEffects',
+        type: 'group',
+        fields: [
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'effectStyle',
+                type: 'select',
+                label: {
+                  en: 'Effect Style',
+                  cs: 'Styl efektů',
+                },
+                defaultValue: 'flat',
+                options: [
+                  { label: { en: 'Flat', cs: 'Plochý' }, value: 'flat' },
+                  {
+                    label: { en: 'Elevated (Box shadows)', cs: 'Vyvýšený (stíny)' },
+                    value: 'elevated',
+                  },
+                  {
+                    label: {
+                      en: 'Glassmorphism (Frosted glass)',
+                      cs: 'Glassmorphism (mléčné sklo)',
+                    },
+                    value: 'glass',
+                  },
+                  {
+                    label: { en: 'Neumorphism (Soft UI)', cs: 'Neumorphism (měkké UI)' },
+                    value: 'neumorphic',
+                  },
+                  {
+                    label: { en: 'Claymorphism (Clay-like)', cs: 'Claymorphism (hlína)' },
+                    value: 'clay',
+                  },
+                ],
+                admin: {
+                  description: {
+                    en: 'Visual style applied to cards, panels and interactive elements.',
+                    cs: 'Vizuální styl karet, panelů a interaktivních prvků.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'effect_style',
+              },
+              {
+                name: 'shadowIntensity',
+                type: 'select',
+                label: {
+                  en: 'Shadow Intensity',
+                  cs: 'Intenzita stínů',
+                },
+                defaultValue: 'medium',
+                options: [
+                  { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
+                  { label: { en: 'Subtle', cs: 'Jemné' }, value: 'subtle' },
+                  { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+                  { label: { en: 'Strong', cs: 'Silné' }, value: 'strong' },
+                  { label: { en: 'Dramatic', cs: 'Dramatické' }, value: 'dramatic' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Global shadow depth for elevated elements.',
+                    cs: 'Globální hloubka stínů pro vyvýšené prvky.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'shadow_intensity',
+              },
+            ],
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'backdropBlur',
+                type: 'select',
+                label: {
+                  en: 'Backdrop Blur',
+                  cs: 'Rozmazání pozadí',
+                },
+                defaultValue: 'none',
+                options: [
+                  { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
+                  { label: { en: 'Slight (4px)', cs: 'Jemné (4px)' }, value: 'slight' },
+                  { label: { en: 'Medium (8px)', cs: 'Střední (8px)' }, value: 'medium' },
+                  { label: { en: 'Strong (16px)', cs: 'Silné (16px)' }, value: 'strong' },
+                  { label: { en: 'Heavy (24px)', cs: 'Intenzivní (24px)' }, value: 'heavy' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Blur effect behind translucent elements (requires glass effect style).',
+                    cs: 'Rozmazání za průhledné prvky (vyžaduje styl skla).',
+                  },
+                  width: '50%',
+                },
+                dbName: 'backdrop_blur',
+              },
+              {
+                name: 'borderStyle',
+                type: 'select',
+                label: {
+                  en: 'Border Style',
+                  cs: 'Styl okrajů',
+                },
+                defaultValue: 'solid',
+                options: [
+                  { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
+                  { label: { en: 'Solid', cs: 'Plné' }, value: 'solid' },
+                  { label: { en: 'Dashed', cs: 'Čárkované' }, value: 'dashed' },
+                  { label: { en: 'Dotted', cs: 'Tečkované' }, value: 'dotted' },
+                  { label: { en: 'Double', cs: 'Dvojité' }, value: 'double' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default border style for cards, inputs and dividers.',
+                    cs: 'Výchozí styl okrajů pro karty, vstupy a oddělovače.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'border_style',
+              },
+            ],
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'borderWidth',
+                type: 'select',
+                label: {
+                  en: 'Border Width',
+                  cs: 'Tloušťka okraje',
+                },
+                defaultValue: '1px',
+                options: [
+                  { label: '0px', value: '0px' },
+                  { label: '1px', value: '1px' },
+                  { label: '2px', value: '2px' },
+                  { label: '3px', value: '3px' },
+                  { label: '4px', value: '4px' },
+                ],
+                admin: { width: '50%' },
+                dbName: 'border_width',
+              },
+              {
+                name: 'glassOpacity',
+                type: 'number',
+                label: {
+                  en: 'Glass Opacity (%)',
+                  cs: 'Průhlednost skla (%)',
+                },
+                defaultValue: 60,
+                min: 0,
+                max: 100,
+                admin: {
+                  description: {
+                    en: 'Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).',
+                    cs: 'Průhlednost karet/panelů při skleněném efektu (0 = plně průhledné, 100 = neprůhledné).',
+                  },
+                  width: '50%',
+                  condition: (_, siblingData) => siblingData?.effectStyle === 'glass',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  })
+
+  // Component Styles — buttons, cards, images, icons
+  fields.push({
+    type: 'collapsible',
+    label: {
+      en: 'Component Styles',
+      cs: 'Styly komponent',
+    },
+    admin: {
+      initCollapsed: true,
+      className: 'tm-section-components',
+      description: {
+        en: 'Customize button variant, card style and navbar appearance.',
+        cs: 'Přizpůsobte styl tlačítek, karet a navigační lišty.',
+      },
+    },
+    fields: [
+      {
+        name: 'componentStyles',
+        type: 'group',
+        fields: [
+          {
+            name: 'buttonVariant',
+            type: 'select',
+            label: {
+              en: 'Primary Button Style',
+              cs: 'Styl primárního tlačítka',
+            },
+            defaultValue: 'filled',
+            options: [
+              { label: { en: 'Filled (solid)', cs: 'Plné (solid)' }, value: 'filled' },
+              { label: { en: 'Outlined', cs: 'Ohraničené' }, value: 'outlined' },
+              { label: { en: 'Ghost (transparent)', cs: 'Průhledné' }, value: 'ghost' },
+              { label: { en: 'Gradient', cs: 'Přechodové' }, value: 'gradient' },
+              { label: { en: 'Pill (full rounded)', cs: 'Pill (plné zaoblení)' }, value: 'pill' },
+              {
+                label: { en: 'Brutalist (thick border)', cs: 'Brutalistické (silný okraj)' },
+                value: 'brutal',
+              },
+            ],
+            admin: {
+              description: {
+                en: 'Default visual style of primary action buttons.',
+                cs: 'Výchozí vizuální styl primárních tlačítek.',
+              },
+            },
+            dbName: 'button_variant',
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'cardStyle',
+                type: 'select',
+                label: {
+                  en: 'Card Style',
+                  cs: 'Styl karet',
+                },
+                defaultValue: 'elevated',
+                options: [
+                  { label: { en: 'Elevated (shadow)', cs: 'Vyvýšené (stín)' }, value: 'elevated' },
+                  { label: { en: 'Flat (no shadow)', cs: 'Ploché (bez stínu)' }, value: 'flat' },
+                  { label: { en: 'Bordered', cs: 'S okrajem' }, value: 'bordered' },
+                  { label: { en: 'Glass', cs: 'Skleněné' }, value: 'glass' },
+                  { label: { en: 'Neumorphic', cs: 'Neumorfní' }, value: 'neumorphic' },
+                  {
+                    label: { en: 'Gradient border', cs: 'Přechodový okraj' },
+                    value: 'gradient-border',
+                  },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default card/panel visual style across the website.',
+                    cs: 'Výchozí vizuální styl karet a panelů na webu.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'card_style',
+              },
+              {
+                name: 'cardHoverEffect',
+                type: 'select',
+                label: {
+                  en: 'Card Hover Effect',
+                  cs: 'Efekt při najetí na kartu',
+                },
+                defaultValue: 'lift',
+                options: [
+                  { label: { en: 'None', cs: 'Žádný' }, value: 'none' },
+                  {
+                    label: { en: 'Lift (translate up)', cs: 'Zvednutí (posun nahoru)' },
+                    value: 'lift',
+                  },
+                  { label: { en: 'Scale up', cs: 'Zvětšení' }, value: 'scale' },
+                  { label: { en: 'Shadow grow', cs: 'Větší stín' }, value: 'shadow' },
+                  { label: { en: 'Border glow', cs: 'Zářící okraj' }, value: 'glow' },
+                  { label: { en: 'Tilt 3D', cs: '3D náklon' }, value: 'tilt' },
+                ],
+                admin: {
+                  width: '50%',
+                },
+                dbName: 'card_hover_effect',
+              },
+            ],
+          },
+
+          {
+            name: 'navbarStyle',
+            type: 'select',
+            label: {
+              en: 'Navbar Style',
+              cs: 'Styl navigace',
+            },
+            defaultValue: 'solid',
+            options: [
+              { label: { en: 'Solid', cs: 'Plná' }, value: 'solid' },
+              {
+                label: { en: 'Transparent (on hero)', cs: 'Průhledná (nad hero)' },
+                value: 'transparent',
+              },
+              { label: { en: 'Blurred glass', cs: 'Rozmazané sklo' }, value: 'blur' },
+              { label: { en: 'Floating', cs: 'Plovoucí' }, value: 'floating' },
+              {
+                label: {
+                  en: 'Minimal (bottom border only)',
+                  cs: 'Minimalistická (jen spodní okraj)',
+                },
+                value: 'minimal',
+              },
+            ],
+            admin: {
+              description: {
+                en: 'Navigation bar visual style.',
+                cs: 'Vizuální styl navigační lišty.',
+              },
+            },
+            dbName: 'navbar_style',
+          },
+        ],
+      },
+    ],
+  })
 
   if (customThemeConfigurationFields?.length) {
     fields.push(...customThemeConfigurationFields)
@@ -459,11 +824,12 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     fields.push({
       type: 'collapsible',
       label: {
-        en: '⚙️ Advanced Settings',
-        cs: '⚙️ Pokročilé nastavení',
+        en: 'Advanced Settings',
+        cs: 'Pokročilé nastavení',
       },
       admin: {
         initCollapsed: true,
+        className: 'tm-section-advanced',
       },
       fields: advancedFields,
     })
@@ -472,8 +838,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   // Return as tab configuration to be injected into tabs structure
   return {
     label: {
-      en: '🎨 Appearance Settings',
-      cs: '🎨 Nastavení vzhledu',
+      en: 'Appearance Settings',
+      cs: 'Nastavení vzhledu',
     },
     fields: [
       {

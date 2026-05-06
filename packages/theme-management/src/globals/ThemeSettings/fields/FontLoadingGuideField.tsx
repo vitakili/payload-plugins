@@ -45,7 +45,22 @@ const FontLoadingGuideField: React.FC<UIFieldClientProps> = () => {
         }}
       >
         <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
-          🌐 Dynamic Fonts (Google Fonts CSS)
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span
+              style={{
+                display: 'inline-block',
+                width: '14px',
+                height: '14px',
+                maskImage:
+                  "url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/globe.svg')",
+                maskRepeat: 'no-repeat',
+                maskSize: 'contain',
+                backgroundColor: 'currentColor',
+                flexShrink: 0,
+              }}
+            />
+            Dynamic Fonts (Google Fonts CSS)
+          </span>
         </h3>
         <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6' }}>
           Other fonts are loaded dynamically via Google Fonts CSS link. This provides access to

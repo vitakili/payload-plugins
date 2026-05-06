@@ -29,25 +29,44 @@ function resolveLocalizedValue(value: unknown, fallback: string) {
 }
 
 /**
- * Convert various color formats to HEX for the color picker
+ * Convert any CSS color string to hex for the picker.
+ * Uses 'color' package for hex/rgb/hsl; falls back to canvas
+ * for modern formats (oklch, oklab, lch, etc.) which all
+ * modern browsers support in fillStyle.
  */
-function toHex(color: string): string {
-  if (!color) return '#000000'
-
-  return Color(color).hex().toString()
+function cssColorToHex(cssColor: string): string {
+  if (!cssColor) return '#000000'
+  try {
+    return Color(cssColor).hex().toString()
+  } catch {}
+  // Canvas fallback — Chrome 111+, Firefox 113+, Safari 16.4+ all support oklch in fillStyle
+  if (typeof document === 'undefined') return '#888888'
+  try {
+    const cv = document.createElement('canvas')
+    cv.width = 1
+    cv.height = 1
+    const ctx = cv.getContext('2d')
+    if (!ctx) return '#888888'
+    ctx.fillStyle = cssColor
+    ctx.fillRect(0, 0, 1, 1)
+    const [r, g, b] = Array.from(ctx.getImageData(0, 0, 1, 1).data)
+    return '#' + [r, g, b].map((n) => (n as number).toString(16).padStart(2, '0')).join('')
+  } catch {
+    return '#888888'
+  }
 }
 
 const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
   const [localValue, setLocalValue] = useState(value || '')
   const [showPicker, setShowPicker] = useState(false)
-  const [hexValue, setHexValue] = useState(toHex(value || ''))
+  const [hexValue, setHexValue] = useState(cssColorToHex(value || ''))
   const [isDragging, setIsDragging] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setLocalValue(value || '')
-    setHexValue(toHex(value || ''))
+    setHexValue(cssColorToHex(value || ''))
   }, [value])
 
   // Close picker when clicking outside
@@ -78,7 +97,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
 
   const handleTextChange = useCallback((nextValue: string) => {
     setLocalValue(nextValue)
-    setHexValue(toHex(nextValue))
+    setHexValue(cssColorToHex(nextValue))
   }, [])
 
   const handlePickerMouseDown = useCallback(() => {
@@ -105,7 +124,7 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
           <button
             type="button"
             className="color-swatch-btn"
-            style={{ backgroundColor: hexValue }}
+            style={{ backgroundColor: localValue || hexValue }}
             onClick={() => setShowPicker(!showPicker)}
             aria-label="Open color picker"
             title={hexValue}

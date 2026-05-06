@@ -26,6 +26,15 @@ export const THEME_DEFAULTS = [
   'slate',
   'stone',
   'gray',
+  // Extended themes with oklch colors
+  'glassmorphism',
+  'claymorphism',
+  'neumorphism',
+  'aurora',
+  'luxury',
+  'healthcare',
+  'nordic',
+  'warm-earth',
 ] as const
 
 export type ThemeDefaults = (typeof THEME_DEFAULTS)[number]

@@ -353,6 +353,110 @@ export const themeConfigs: Record<ThemeDefaults, ThemeConfig> = {
       },
     },
   },
+  glassmorphism: {
+    name: 'glassmorphism',
+    label: 'Glassmorphism',
+    borderRadius: 'large',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.60 0.18 250)',
+        background: 'oklch(0.97 0.015 230)',
+        accent: 'oklch(0.72 0.15 190)',
+      },
+    },
+  },
+  claymorphism: {
+    name: 'claymorphism',
+    label: 'Claymorphism',
+    borderRadius: 'xl',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.65 0.20 255)',
+        background: 'oklch(0.96 0.02 200)',
+        accent: 'oklch(0.80 0.12 40)',
+      },
+    },
+  },
+  neumorphism: {
+    name: 'neumorphism',
+    label: 'Neumorphism',
+    borderRadius: 'large',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.60 0.16 250)',
+        background: 'oklch(0.93 0.01 240)',
+        accent: 'oklch(0.68 0.14 215)',
+      },
+    },
+  },
+  aurora: {
+    name: 'aurora',
+    label: 'Aurora Borealis',
+    borderRadius: 'large',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.62 0.18 175)',
+        background: 'oklch(0.97 0.02 175)',
+        accent: 'oklch(0.72 0.16 300)',
+      },
+    },
+  },
+  luxury: {
+    name: 'luxury',
+    label: 'Luxury Gold',
+    borderRadius: 'small',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.72 0.14 75)',
+        background: 'oklch(0.98 0.01 80)',
+        accent: 'oklch(0.62 0.18 55)',
+      },
+    },
+  },
+  healthcare: {
+    name: 'healthcare',
+    label: 'Healthcare Clean',
+    borderRadius: 'medium',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.55 0.16 218)',
+        background: 'oklch(0.99 0.005 210)',
+        accent: 'oklch(0.68 0.14 170)',
+      },
+    },
+  },
+  nordic: {
+    name: 'nordic',
+    label: 'Nordic Minimal',
+    borderRadius: 'small',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.42 0.10 225)',
+        background: 'oklch(0.97 0.01 220)',
+        accent: 'oklch(0.65 0.10 195)',
+      },
+    },
+  },
+  'warm-earth': {
+    name: 'warm-earth',
+    label: 'Warm Earth',
+    borderRadius: 'medium',
+    dynamicCSS: true,
+    preview: {
+      colors: {
+        primary: 'oklch(0.52 0.12 50)',
+        background: 'oklch(0.97 0.025 75)',
+        accent: 'oklch(0.68 0.14 145)',
+      },
+    },
+  },
 }
 
 export const borderRadiusPresets = {

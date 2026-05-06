@@ -25,7 +25,6 @@ interface ServerThemeInjectorProps {
 type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> & {
   typography?: ThemeTypographyPreset | null
 }
-
 /**
  * Server-side theme CSS injector to prevent FOUC
  * This component injects critical theme CSS directly into the HTML head during SSR
@@ -48,6 +47,8 @@ export async function ServerThemeInjector({
     allowColorModeToggle,
     colorMode,
     typography,
+    visualEffects,
+    componentStyles,
   } = resolvedConfiguration
 
   // Use resolved configuration directly
@@ -63,6 +64,8 @@ export async function ServerThemeInjector({
     lightMode,
     darkMode,
     typography: typography ?? undefined,
+    visualEffects: visualEffects ?? null,
+    componentStyles: componentStyles ?? null,
   }
 
   let criticalCSS = await getThemeCriticalCSS(theme as ThemeDefaults)
@@ -93,7 +96,7 @@ ${borderRadiusCSS}
 }`
     : ''
 
-  const themeConfigurationCSS = generateThemeCSS(normalizedThemeConfiguration)
+  const themeConfigurationCSS = generateThemeCSS(normalizedThemeConfiguration as any)
   const colorModesCSS = generateThemeColorsCss({ themeName: theme, lightMode, darkMode })
   const customCSSBlock = typeof customCSS === 'string' ? customCSS.trim() : ''
 

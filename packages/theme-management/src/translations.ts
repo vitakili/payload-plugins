@@ -46,11 +46,11 @@ export interface PluginTranslations {
 // Mutable translations object to allow runtime registration/extension
 const translations: Record<Language, PluginTranslations> = {
   en: {
-    tabLabel: '🎨 Appearance Settings',
+    tabLabel: 'Appearance Settings',
     standaloneCollectionLabel: 'Appearance Settings',
     livePreview: {
-      smallTitle: '🎨 Live Preview',
-      largeTitle: '🎨 Live Theme Preview',
+      smallTitle: 'Live Preview',
+      largeTitle: 'Live Theme Preview',
     },
     ui: {
       primaryAction: 'Primary Action',
@@ -89,11 +89,11 @@ const translations: Record<Language, PluginTranslations> = {
     },
   },
   cs: {
-    tabLabel: '🎨 Nastavení vzhledu',
+    tabLabel: 'Nastavení vzhledu',
     standaloneCollectionLabel: 'Nastavení vzhledu',
     livePreview: {
-      smallTitle: '🎨 Náhled',
-      largeTitle: '🎨 Náhled motivu',
+      smallTitle: 'Náhled',
+      largeTitle: 'Náhled motivu',
     },
     ui: {
       primaryAction: 'Primární akce',

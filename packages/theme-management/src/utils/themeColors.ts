@@ -108,7 +108,7 @@ export function generateColorModeCss(
   const cssVariables = COLOR_VARIABLE_MAP.reduce<string[]>((acc, { key, variable }) => {
     const value = normalizeColor(colors[key])
     if (!value) return acc
-    acc.push(`${variable}: hsl(${hexToHsl(value)});`)
+    acc.push(`${variable}: ${normalizeToCssColor(value)};`)
     return acc
   }, [])
 
@@ -156,4 +156,23 @@ function normalizeColor(value: string | null | undefined): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
   return trimmed.length === 0 ? null : trimmed
+}
+
+/**
+ * Convert any color value to a valid CSS color string.
+ * - oklch(...), hsl(...), rgb(...), etc. → pass through as-is
+ * - var(...) CSS variable references → pass through as-is
+ * - Hex (#rgb, #rrggbb) → convert to hsl(H S% L%)
+ */
+function normalizeToCssColor(value: string): string {
+  // Already a complete CSS color function — pass through unchanged
+  if (/^(hsl|hsla|rgb|rgba|oklch|oklab|lch|lab|color|hwb)\s*\(/i.test(value)) {
+    return value
+  }
+  // CSS variable reference — pass through
+  if (/^var\s*\(/i.test(value)) {
+    return value
+  }
+  // Hex color (#rgb or #rrggbb) — convert to hsl()
+  return `hsl(${hexToHsl(value)})`
 }

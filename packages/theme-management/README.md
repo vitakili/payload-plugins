@@ -4,6 +4,20 @@ Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, stand
 
 > **Note:** This package was previously published under `@kilivi/payloadcms-theme-management`. It is now maintained under the `@kilivi-dev` scope starting from v1.0.0.
 
+## Version 1.2.0 — Extended Presets & Appearance Controls
+
+### New in this release
+
+- **8 new visual-style theme presets** — glassmorphism, claymorphism, neumorphism, aurora, luxury, healthcare, nordic, warm-earth (all in OKLCH)
+- **Visual Effects section** — effect style (flat/glass/clay/neumorphic/elevated), shadow intensity, backdrop blur, border style/width, glass opacity
+- **Hero & Background section** — hero style (gradient/mesh/video/image-overlay/solid), height, pattern overlays (9 patterns), section dividers, parallax toggle
+- **Component Styles section** — button variant (6 options), card style, card hover effects, image style, icon set, navbar style, footer style, scroll/hover animation toggles
+- **New TypeScript types** — `ThemeVisualEffects`, `ThemeHeroBackground`, `ThemeComponentStyles` exported from main package
+
+See [CHANGELOG.md](./CHANGELOG.md) for the full list of changes and [docs/APPEARANCE_CONTROLS.md](./docs/APPEARANCE_CONTROLS.md) for the complete field reference.
+
+---
+
 ## Version 1.0.0
 
 ### Highlights
@@ -14,7 +28,7 @@ Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, stand
 - Standalone global mode with automatic theme cache invalidation
 - ThemeTokenSelectField: CSS variable preview swatch resolves computed colors correctly
 - Robust fetching: fallback to standalone global if collection returns no config
-- Professional color picker and extended preset/token support (60+ themes)
+- Professional color picker and extended preset/token support (70+ themes)
 - Full TypeScript support and server/client-safe exports
 
 ## Installation
@@ -352,6 +366,50 @@ const tenantThemeConfiguration = await fetchThemeConfiguration({
 | `tags`        | `string[]` | `[global_{slug}]`                       |
 | `paths`       | `string[]` | `[]`                                    |
 
+## Appearance Controls (v1.2.0)
+
+The Appearance Settings tab contains three additional collapsible sections that give editors detailed control over the site's visual style.
+
+| Section              | Admin group                          | Fields                                                                                                                                          |
+| -------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| ✨ Visual Effects    | `themeConfiguration.visualEffects`   | effectStyle, shadowIntensity, backdropBlur, borderStyle, borderWidth, glassOpacity                                                              |
+| 🖼️ Hero & Background | `themeConfiguration.heroBackground`  | heroStyle, heroHeight, gradientDirection, overlayOpacity, backgroundPattern, patternOpacity, sectionDivider, enableParallax                     |
+| 🧩 Component Styles  | `themeConfiguration.componentStyles` | buttonVariant, buttonSize, cardStyle, cardHoverEffect, imageStyle, iconSet, navbarStyle, footerStyle, enableScrollReveal, enableHoverAnimations |
+
+Full reference: [docs/APPEARANCE_CONTROLS.md](./docs/APPEARANCE_CONTROLS.md)
+
+### Reading appearance values in Next.js
+
+```tsx
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
+
+const theme = await fetchThemeConfiguration({ collectionSlug: 'site-settings' })
+
+const effect = theme?.visualEffects?.effectStyle ?? 'flat'
+const pattern = theme?.heroBackground?.backgroundPattern ?? 'none'
+const button = theme?.componentStyles?.buttonVariant ?? 'filled'
+
+return (
+  <html data-effect={effect} data-pattern={pattern} data-button={button}>
+    ...
+  </html>
+)
+```
+
+## Theme Presets (70+)
+
+Built-in presets are available from `allThemePresets`. New in v1.2.0:
+
+```ts
+import { allThemePresets } from '@kilivi-dev/payloadcms-theme-management'
+
+// New visual-style presets (v1.2.0):
+// 'glassmorphism' | 'claymorphism' | 'neumorphism' | 'aurora'
+// 'luxury' | 'healthcare' | 'nordic' | 'warm-earth'
+```
+
+Full preset reference: [docs/THEME_PRESETS_EXTENDED.md](./docs/THEME_PRESETS_EXTENDED.md)
+
 ## Public API
 
 ### Main package
@@ -367,6 +425,13 @@ import {
   resolveThemeConfiguration,
   themeManagementPlugin,
   ThemeProvider,
+} from '@kilivi-dev/payloadcms-theme-management'
+// TypeScript types (v1.2.0)
+import type {
+  SiteThemeConfiguration,
+  ThemeComponentStyles,
+  ThemeHeroBackground,
+  ThemeVisualEffects,
 } from '@kilivi-dev/payloadcms-theme-management'
 ```
 
