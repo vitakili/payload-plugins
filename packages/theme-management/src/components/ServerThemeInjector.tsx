@@ -1,6 +1,6 @@
 import type { ThemeTypographyPreset } from '../presets.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
-import type { BorderRadiusPreset, ThemeDefaults } from '../providers/Theme/types.js'
+import type { ThemeDefaults } from '../providers/Theme/types.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import type { ResolvedThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 import { createFallbackCriticalCSS, getThemeCriticalCSS } from '../utils/themeAssets.js'
@@ -70,16 +70,7 @@ export async function ServerThemeInjector({
   let criticalCSS = await getThemeCriticalCSS(theme as ThemeDefaults)
   criticalCSS ??= createFallbackCriticalCSS(theme as ThemeDefaults)
 
-  const borderRadiusMap: Record<string, BorderRadiusPreset> = {
-    none: 'none',
-    small: 'small',
-    medium: 'medium',
-    large: 'large',
-    xl: 'xl',
-    full: 'xl',
-  }
-  const mappedBorderRadius = borderRadiusMap[borderRadius ?? 'medium'] ?? 'medium'
-  const borderRadiusConfig = getBorderRadiusConfig(mappedBorderRadius)
+  const borderRadiusConfig = getBorderRadiusConfig(borderRadius ?? 'medium')
   const cssRecord =
     typeof borderRadiusConfig?.css === 'string'
       ? { '--radius-default': borderRadiusConfig.css }

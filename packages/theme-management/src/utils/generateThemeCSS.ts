@@ -1,5 +1,6 @@
 import type { ThemePreset } from '../presets.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
+import { hexToHsl } from './themeColors.js'
 
 /**
  * Generates complete CSS for a theme preset
@@ -44,54 +45,6 @@ export function generateThemeCSS(preset: ThemePreset): string {
   sections.push(buildCssBlock(`[data-theme='${name}'][data-theme-mode='dark']`, darkLines))
 
   return sections.join('\n').trim()
-}
-
-/**
- * Convert HEX color to HSL format
- * Example: #3b82f6 -> hsl(221, 83%, 53%)
- */
-function hexToHsl(hex: string): string {
-  let normalized = hex.trim()
-  if (!normalized.startsWith('#')) {
-    normalized = `#${normalized}`
-  }
-
-  if (normalized.length === 4) {
-    normalized = `#${normalized[1]}${normalized[1]}${normalized[2]}${normalized[2]}${normalized[3]}${normalized[3]}`
-  }
-
-  const r = parseInt(normalized.substring(1, 3), 16) / 255
-  const g = parseInt(normalized.substring(3, 5), 16) / 255
-  const b = parseInt(normalized.substring(5, 7), 16) / 255
-
-  const max = Math.max(r, g, b)
-  const min = Math.min(r, g, b)
-  let h = 0
-  let s = 0
-  const l = (max + min) / 2
-
-  if (max !== min) {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-
-    switch (max) {
-      case r:
-        h = ((g - b) / d + (g < b ? 6 : 0)) / 6
-        break
-      case g:
-        h = ((b - r) / d + 2) / 6
-        break
-      case b:
-        h = ((r - g) / d + 4) / 6
-        break
-    }
-  }
-
-  const hDeg = Math.round(h * 360)
-  const sPercent = Math.round(s * 100)
-  const lPercent = Math.round(l * 100)
-
-  return `hsl(${hDeg}, ${sPercent}%, ${lPercent}%)`
 }
 
 function toCssColor(color?: string | null): string | null {

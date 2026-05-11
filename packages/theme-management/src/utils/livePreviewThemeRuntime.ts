@@ -34,17 +34,7 @@ const resolveColorMode = (mode: string): 'light' | 'dark' => {
 export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
   const resolved = resolveThemeConfiguration(themeConfiguration)
 
-  const borderRadiusMap: Record<string, 'none' | 'small' | 'medium' | 'large' | 'xl'> = {
-    none: 'none',
-    small: 'small',
-    medium: 'medium',
-    large: 'large',
-    xl: 'xl',
-    full: 'xl',
-  }
-
-  const mappedBorderRadius = borderRadiusMap[resolved.borderRadius ?? 'medium'] ?? 'medium'
-  const borderRadiusConfig = getBorderRadiusConfig(mappedBorderRadius)
+  const borderRadiusConfig = getBorderRadiusConfig(resolved.borderRadius ?? 'medium')
   const cssRecord =
     typeof borderRadiusConfig?.css === 'string'
       ? { '--radius-default': borderRadiusConfig.css }

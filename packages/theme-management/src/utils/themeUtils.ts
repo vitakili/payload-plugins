@@ -187,7 +187,7 @@ function applyAnimationRule(rules: string[], config: ThemeConfiguration): void {
       easing: 'ease-out',
       scale: '1',
     },
-    full: {
+    high: {
       duration: '0.3s',
       easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
       scale: '1.2',

@@ -1,7 +1,7 @@
 /**
  * Extended Shadcn-style theme presets with full color token support
  * Inspired by https://ui.shadcn.com/themes and https://tweakcn.com/editor/theme
- * 
+ *
  * This extends the existing theme system with:
  * - Full shadcn/ui color tokens
  * - OKLCH color format support
@@ -16,47 +16,47 @@ export interface ShadcnColorTokens {
   // Base colors
   background: string
   foreground: string
-  
+
   // Card colors
   card: string
   'card-foreground': string
-  
+
   // Popover colors
   popover: string
   'popover-foreground': string
-  
+
   // Primary colors
   primary: string
   'primary-foreground': string
-  
+
   // Secondary colors
   secondary: string
   'secondary-foreground': string
-  
+
   // Muted colors
   muted: string
   'muted-foreground': string
-  
+
   // Accent colors
   accent: string
   'accent-foreground': string
-  
+
   // Destructive colors
   destructive: string
   'destructive-foreground': string
-  
+
   // Border & Input
   border: string
   input: string
   ring: string
-  
+
   // Chart colors (for data visualization)
   'chart-1': string
   'chart-2': string
   'chart-3': string
   'chart-4': string
   'chart-5': string
-  
+
   // Shadow controls (TweakCN)
   'shadow-color'?: string
   'shadow-opacity'?: string
@@ -64,16 +64,16 @@ export interface ShadcnColorTokens {
   'shadow-spread'?: string
   'shadow-offset-x'?: string
   'shadow-offset-y'?: string
-  
+
   // Font families (TweakCN)
   'font-sans'?: string
   'font-serif'?: string
   'font-mono'?: string
-  
+
   // Advanced typography (TweakCN)
   'letter-spacing'?: string
   spacing?: string
-  
+
   // Border radius
   radius?: string
 }
@@ -152,7 +152,7 @@ export const extendedThemePresets: Record<string, ExtendedThemePreset> = {
       },
     },
   },
-  
+
   'neon-extended': {
     label: 'Neon Cyberpunk (Extended)',
     value: 'neon-extended',
@@ -213,7 +213,7 @@ export const extendedThemePresets: Record<string, ExtendedThemePreset> = {
       },
     },
   },
-  
+
   'solar-extended': {
     label: 'Solar Warmth (Extended)',
     value: 'solar-extended',
@@ -289,34 +289,14 @@ export const allExtendedThemePresets = {
  */
 export function extendedThemeToCSSVariables(
   theme: ExtendedThemePreset,
-  mode: 'light' | 'dark' = 'light'
+  mode: 'light' | 'dark' = 'light',
 ): string {
   const tokens = theme.styles[mode]
   const cssVars: string[] = []
-  
+
   Object.entries(tokens).forEach(([key, value]) => {
     cssVars.push(`  --${key}: ${value};`)
   })
-  
+
   return cssVars.join('\n')
-}
-
-/**
- * Generate complete CSS for an extended theme
- */
-export function generateExtendedThemeCSS(theme: ExtendedThemePreset): string {
-  const lightCSS = extendedThemeToCSSVariables(theme, 'light')
-  const darkCSS = extendedThemeToCSSVariables(theme, 'dark')
-  
-  return `:root {
-${lightCSS}
-}
-
-.dark {
-${darkCSS}
-}
-
-[data-theme-mode="dark"] {
-${darkCSS}
-}`
 }

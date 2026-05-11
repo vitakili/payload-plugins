@@ -1,7 +1,7 @@
 'use client'
 
 import { useLivePreview } from '@payloadcms/live-preview-react'
-import { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import {
   buildLivePreviewThemeRuntime,
   extractThemeConfigurationFromLiveData,

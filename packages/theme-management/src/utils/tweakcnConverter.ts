@@ -1,7 +1,5 @@
 /**
- * Converts TweakCN theme presets to sta  // Extract lightness from oklch(L C H) or oklch(L C H / A)
-  const match = color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*[\d.]+%?)?\)/)
-  if (!match) return 'hsl(217, 91%, 60%)' // fallback bluerd ThemePreset format
+ * Converts TweakCN theme presets to standard ThemePreset format
  */
 
 import type { ExtendedThemePreset } from '../extended-presets.js'
