@@ -32,9 +32,8 @@ type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> 
 export async function ServerThemeInjector({
   themeConfiguration,
 }: Readonly<ServerThemeInjectorProps>) {
-  // Accept unknown type to avoid type conflicts between app's payload-types and plugin's payload-types
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration as any)
+  // resolveThemeConfiguration accepts `unknown` — no cast needed
+  const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration)
   const {
     theme,
     borderRadius,
@@ -96,7 +95,7 @@ ${borderRadiusCSS}
 }`
     : ''
 
-  const themeConfigurationCSS = generateThemeCSS(normalizedThemeConfiguration as any)
+  const themeConfigurationCSS = generateThemeCSS(normalizedThemeConfiguration)
   const colorModesCSS = generateThemeColorsCss({ themeName: theme, lightMode, darkMode })
   const customCSSBlock = typeof customCSS === 'string' ? customCSS.trim() : ''
 

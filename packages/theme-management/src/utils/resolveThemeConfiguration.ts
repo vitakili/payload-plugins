@@ -180,9 +180,17 @@ function isMode(value: unknown): value is ThemeModeOption {
 }
 
 export function resolveThemeConfiguration(
-  themeConfiguration?: GenericThemeConfiguration | null,
+  themeConfiguration?: unknown,
 ): ResolvedThemeConfiguration {
-  if (!themeConfiguration) {
+  // Accept `unknown` so callers don't need to cast from app-specific payload-types
+  const cfg =
+    themeConfiguration !== null &&
+    typeof themeConfiguration === 'object' &&
+    !Array.isArray(themeConfiguration)
+      ? (themeConfiguration as GenericThemeConfiguration)
+      : null
+
+  if (!cfg) {
     return DEFAULT_THEME_CONFIGURATION
   }
 
@@ -200,7 +208,7 @@ export function resolveThemeConfiguration(
     typography,
     visualEffects,
     componentStyles,
-  } = themeConfiguration
+  } = cfg
 
   const resolvedTheme =
     typeof theme === 'string' && themeIsValid(theme)

@@ -7,6 +7,7 @@ import { allThemePresets } from './presets.js'
 import { getTranslations, translations } from './translations.js'
 import type {
   FetchThemeConfigurationOptions,
+  PluginLogger,
   ThemeManagementLivePreviewOptions,
   ThemeManagementLivePreviewUrlArgs,
   ThemeManagementPluginOptions,
@@ -451,7 +452,7 @@ const executeThemeRevalidation = async (options: {
   tags: string[]
   paths: string[]
   enableLogging: boolean
-  logger?: { info?: (...args: any[]) => void; error?: (...args: any[]) => void }
+  logger?: PluginLogger
 }): Promise<{ tags: string[]; paths: string[] }> => {
   const { tags, paths, enableLogging, logger } = options
 
@@ -578,9 +579,7 @@ const createCacheRevalidationEndpoint = (options: {
     handler: async (req: unknown) => {
       const reqRecord = asRecord(req)
       const payload = asRecord(reqRecord?.payload)
-      const logger = payload?.logger as
-        | { info?: (...args: any[]) => void; error?: (...args: any[]) => void }
-        | undefined
+      const logger = payload?.logger as PluginLogger | undefined
 
       if (cacheRevalidation.secret) {
         const providedSecret = await readSecretFromRequest(req)
@@ -992,6 +991,7 @@ export type {
   FetchThemeConfigurationOptions,
   ThemeManagementLivePreviewOptions,
   ThemeManagementLivePreviewUrlArgs,
+  PluginLogger,
 } from './types.js'
 export type {
   SiteThemeConfiguration,

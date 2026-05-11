@@ -127,3 +127,9 @@ export interface FetchThemeConfigurationOptions {
   /** Set to true if using standalone global instead of collection (default: false) */
   useGlobal?: boolean
 }
+
+/** Minimal logger interface accepted by internal plugin utilities */
+export interface PluginLogger {
+  info?: (...args: unknown[]) => void
+  error?: (...args: unknown[]) => void
+}

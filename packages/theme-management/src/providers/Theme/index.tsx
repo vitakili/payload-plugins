@@ -27,11 +27,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   initialMode,
   allowColorModeToggle = true,
 }) => {
-  // State pro light/dark mode switching
+  // Light/dark mode state
   const [mode, setMode] = useState<Mode | null>(initialMode || defaultMode)
   const [theme] = useState<ThemeDefaults | null>(initialTheme || null)
 
-  // Funkce pro získání skutečného módu (resolve "auto" mode)
+  // Resolve the effective mode: "auto" maps to the system preference
   const getResolvedMode = useCallback((currentMode: Mode | null): 'light' | 'dark' => {
     if (currentMode === 'auto' && typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -40,18 +40,18 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return currentMode === 'dark' ? 'dark' : 'light'
   }, [])
 
-  // Aplikace módu na DOM a CSS variables
+  // Apply color mode to DOM attributes and CSS variables
   const applyMode = useCallback(
     (currentMode: Mode | null) => {
       if (typeof window !== 'undefined') {
         const resolvedMode = getResolvedMode(currentMode)
 
-        // Získej aktuální theme z DOM nebo použij fallback
+        // Read current theme from DOM or fall back to default
         const currentTheme =
           document.documentElement.getAttribute('data-theme') ||
           (typeof theme === 'string' ? theme : 'cool')
 
-        // Aplikuj data atributy a třídy (kompatibilní s CSS selektory)
+        // Set data attributes and classes (compatible with CSS selectors)
         document.documentElement.setAttribute('data-color-mode', resolvedMode)
         document.documentElement.setAttribute('data-theme-mode', resolvedMode)
         document.documentElement.setAttribute('data-theme', currentTheme)
@@ -95,7 +95,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     [getResolvedMode, theme],
   )
 
-  // Uložení light/dark mode do localStorage a aplikace
+  // Persist the selected mode to localStorage and apply it to the DOM
   const updateMode = useCallback(
     (newMode: Mode | null) => {
       setMode(newMode)
@@ -107,7 +107,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     [applyMode],
   )
 
-  // Načtení mode z localStorage při startu
+  // Restore mode from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedMode = localStorage.getItem(modeLocalStorageKey) as Mode | null
@@ -115,19 +115,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         setMode(storedMode)
         applyMode(storedMode)
       } else {
-        // Fallback na default mode
+        // Fall back to the default mode
         applyMode(defaultMode)
       }
     }
   }, [applyMode])
 
-  // Listener pro změny system preference (pouze při auto mode)
+  // Listen for system color-scheme changes (only relevant when mode === 'auto')
   useEffect(() => {
     if (mode === 'auto' && typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
       const handleChange = () => {
-        applyMode('auto') // Re-resolve auto mode
+        applyMode('auto') // Re-evaluate auto mode against current system preference
       }
 
       mediaQuery.addEventListener('change', handleChange)
@@ -139,7 +139,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   }, [mode, applyMode])
 
   const refreshTheme = useCallback(() => {
-    // Refresh theme - aplikuj aktuální mode
+    // Re-apply the current mode (e.g. after external DOM changes)
     applyMode(mode)
   }, [mode, applyMode])
 
@@ -147,7 +147,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     () => ({
       theme,
       mode,
-      setTheme: () => {}, // Nepoužíváme - theme se nastavuje přes SSR
+      setTheme: () => {}, // Theme is set via SSR; client-side mutation is intentionally a no-op
       setMode: updateMode,
       isColorModeToggleAllowed: allowColorModeToggle,
       refreshTheme,

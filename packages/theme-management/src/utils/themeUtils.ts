@@ -1,13 +1,10 @@
-import type { SiteSetting } from '../payload-types.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
+import type { ResolvedThemeConfiguration } from './resolveThemeConfiguration.js'
 
-type ThemeTypographyConfiguration = {
-  typography?: ThemeTypographyPreset | null
+type ThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> & {
+  typography?: ResolvedThemeConfiguration['typography']
 }
-
-type ThemeConfiguration = Omit<NonNullable<SiteSetting['themeConfiguration']>, 'typography'> &
-  ThemeTypographyConfiguration
 
 interface ThemeCustomization {
   primaryColor?: string | null

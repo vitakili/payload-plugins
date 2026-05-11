@@ -32,8 +32,7 @@ const resolveColorMode = (mode: string): 'light' | 'dark' => {
 }
 
 export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolved = resolveThemeConfiguration(themeConfiguration as any)
+  const resolved = resolveThemeConfiguration(themeConfiguration)
 
   const borderRadiusMap: Record<string, 'none' | 'small' | 'medium' | 'large' | 'xl'> = {
     none: 'none',
@@ -57,7 +56,7 @@ export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
 
   const borderRadiusBlock = borderRadiusCSS ? `:root {\n${borderRadiusCSS}\n}` : ''
 
-  const themeConfigurationCSS = generateThemeCSS(resolved as any)
+  const themeConfigurationCSS = generateThemeCSS(resolved)
   const colorModesCSS = generateThemeColorsCss({
     themeName: resolved.theme,
     lightMode: resolved.lightMode,
