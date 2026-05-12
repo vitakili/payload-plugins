@@ -196,7 +196,6 @@ function applyAnimationRule(rules: string[], config: ThemeConfiguration): void {
 
   const level = config.animationLevel as keyof typeof animationSettings
   const settings = animationSettings[level] ?? animationSettings.medium
-  if (!settings) return
   rules.push(`  --animation-duration: ${settings.duration};`)
   rules.push(`  --animation-easing: ${settings.easing};`)
   rules.push(`  --animation-scale: ${settings.scale};`)

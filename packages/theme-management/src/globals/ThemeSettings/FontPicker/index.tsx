@@ -14,7 +14,6 @@ import { getTranslations, type Language } from './translations.js'
 
 // Import CSS for styling
 if (typeof window !== 'undefined') {
-  // @ts-expect-error - Dynamic CSS import
   import('./styles.css').catch(() => {})
 }
 

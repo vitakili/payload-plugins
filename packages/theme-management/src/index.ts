@@ -140,7 +140,8 @@ type MinimalPayloadRequest = ThemeManagementLivePreviewUrlArgs['req']
 const normalizeLivePreviewOptions = (
   livePreview: ThemeManagementPluginOptions['livePreview'],
 ): NormalizedLivePreviewOptions => {
-  if (livePreview === false) {
+  if (!livePreview) {
+    // undefined or false → live preview not configured; show ThemePreviewField instead
     return {
       enabled: false,
       injectRoute: false,
@@ -154,7 +155,7 @@ const normalizeLivePreviewOptions = (
     }
   }
 
-  const raw = typeof livePreview === 'object' && livePreview ? livePreview : {}
+  const raw = typeof livePreview === 'object' ? livePreview : {}
 
   return {
     enabled: raw.enabled ?? true,

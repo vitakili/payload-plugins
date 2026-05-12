@@ -137,7 +137,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       depth?: number
       locale?: string
       draft?: boolean
-      queryParams?: Record<string, unknown>
+      queryParams?: Record<string, string | number | boolean>
     }
 
     const custom = field.admin?.custom as unknown as CustomAdmin

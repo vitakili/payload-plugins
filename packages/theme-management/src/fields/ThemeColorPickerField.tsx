@@ -8,7 +8,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Import CSS for styling
 if (typeof window !== 'undefined') {
-  // @ts-expect-error - Dynamic CSS import
   import('./ThemeColorPickerField.css').catch(() => {})
 }
 
