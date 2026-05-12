@@ -892,6 +892,7 @@ export const fetchThemeConfiguration = async (
     draft,
     queryParams = {},
     useGlobal = false, // Set to true if using standalone global instead of collection
+    signal,
   } = normalizedOptions
 
   try {
@@ -914,7 +915,7 @@ export const fetchThemeConfiguration = async (
       const queryString = params.toString()
       const url = `/api/globals/${collectionSlug}${queryString ? `?${queryString}` : ''}`
 
-      const response = await fetch(url)
+      const response = await fetch(url, { signal })
       if (!response.ok) {
         throw new Error(`Failed to fetch theme global (status ${response.status})`)
       }
@@ -941,7 +942,7 @@ export const fetchThemeConfiguration = async (
 
       const url = `/api/${collectionSlug}?${params.toString()}`
 
-      const response = await fetch(url)
+      const response = await fetch(url, { signal })
       if (!response.ok) {
         throw new Error(`Failed to fetch theme configuration (status ${response.status})`)
       }

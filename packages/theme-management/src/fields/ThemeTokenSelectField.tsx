@@ -125,7 +125,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       return
     }
 
-    let isMounted = true
+    const controller = new AbortController()
 
     // Allow fields to override fetch options via admin.custom
     type CustomAdmin = {
@@ -181,10 +181,11 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
       ...(rawFetchOpts ?? {}),
       tenantSlug: rawFetchOpts?.tenantSlug ?? inferredTenant,
       locale: rawFetchOpts?.locale ?? adminLang,
+      signal: controller.signal,
     }
 
     fetchThemeConfiguration(fetchOpts).then(async (configuration) => {
-      if (!isMounted) return
+      if (controller.signal.aborted) return
       if (configuration) {
         setOptions(buildOptionsFromConfiguration(configuration, themePresets))
         return
@@ -207,9 +208,10 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
             collectionSlug: fallbackCollection,
             tenantSlug: inferredTenant,
             locale: custom?.locale ?? adminLang,
+            signal: controller.signal,
           }
           const fallbackConfig = await fetchThemeConfiguration(fallbackOpts)
-          if (!isMounted) return
+          if (controller.signal.aborted) return
           if (fallbackConfig) {
             // Found theme config in global, use it
             setOptions(buildOptionsFromConfiguration(fallbackConfig, themePresets))
@@ -225,7 +227,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     })
 
     return () => {
-      isMounted = false
+      controller.abort()
     }
   }, [themePresets, field.admin?.custom, formThemeConfiguration, formTenant])
 

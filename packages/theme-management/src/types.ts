@@ -126,6 +126,8 @@ export interface FetchThemeConfigurationOptions {
   queryParams?: Record<string, string | number | boolean>
   /** Set to true if using standalone global instead of collection (default: false) */
   useGlobal?: boolean
+  /** Optional AbortSignal to cancel the in-flight request */
+  signal?: AbortSignal
 }
 
 /** Minimal logger interface accepted by internal plugin utilities */
