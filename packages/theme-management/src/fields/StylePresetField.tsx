@@ -18,6 +18,15 @@ const VF_KEYS = [
 
 const CS_KEYS = ['buttonVariant', 'cardStyle', 'cardHoverEffect', 'navbarStyle'] as const
 
+const TYPO_KEYS = [
+  'bodyFont',
+  'headingFont',
+  'baseFontSize',
+  'lineHeight',
+  'letterSpacing',
+  'headingWeight',
+] as const
+
 // Visual preview config for each effect style
 const EFFECT_PREVIEW: Record<
   string,
@@ -137,6 +146,13 @@ export default function StylePresetField(props: TextFieldClientProps) {
           value: preset.animationLevel,
         })
 
+      if (preset.spacing !== undefined)
+        dispatchFields({
+          type: 'UPDATE',
+          path: `${basePath}.spacing`,
+          value: preset.spacing,
+        })
+
       if (preset.visualEffects) {
         VF_KEYS.forEach((key) => {
           const value = preset.visualEffects?.[key]
@@ -150,6 +166,14 @@ export default function StylePresetField(props: TextFieldClientProps) {
           const value = preset.componentStyles?.[key]
           if (value !== undefined)
             dispatchFields({ type: 'UPDATE', path: `${basePath}.componentStyles.${key}`, value })
+        })
+      }
+
+      if (preset.typography) {
+        TYPO_KEYS.forEach((key) => {
+          const value = preset.typography?.[key]
+          if (value !== undefined)
+            dispatchFields({ type: 'UPDATE', path: `${basePath}.typography.${key}`, value })
         })
       }
     },
@@ -397,6 +421,71 @@ export default function StylePresetField(props: TextFieldClientProps) {
                       >
                         {labelText}
                       </div>
+                      {/* Font sample row */}
+                      {preset.typography && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '6px',
+                            alignItems: 'baseline',
+                            marginBottom: '3px',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontFamily: preset.typography.headingFont ?? 'inherit',
+                              fontWeight: preset.typography.headingWeight ?? '700',
+                              fontSize: '11px',
+                              color: isSelected ? accent : 'var(--theme-elevation-700, #334155)',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              maxWidth: '70px',
+                              flexShrink: 0,
+                            }}
+                            title={preset.typography.headingFont}
+                          >
+                            {(preset.typography.headingFont ?? '')
+                              .split(',')[0]
+                              ?.split(' ')
+                              .slice(0, 2)
+                              .join(' ') || 'Heading'}
+                          </span>
+                          {preset.typography.bodyFont !== preset.typography.headingFont && (
+                            <span
+                              style={{
+                                fontFamily: preset.typography.bodyFont ?? 'inherit',
+                                fontSize: '10px',
+                                color: 'var(--theme-elevation-500, #64748b)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '70px',
+                              }}
+                              title={preset.typography.bodyFont}
+                            >
+                              {(preset.typography.bodyFont ?? '')
+                                .split(',')[0]
+                                ?.split(' ')
+                                .slice(0, 2)
+                                .join(' ') || 'Body'}
+                            </span>
+                          )}
+                          {preset.spacing && (
+                            <span
+                              style={{
+                                marginLeft: 'auto',
+                                fontSize: '9px',
+                                color: 'var(--theme-elevation-400, #94a3b8)',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {preset.spacing}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       {descText && (
                         <div
                           style={{
