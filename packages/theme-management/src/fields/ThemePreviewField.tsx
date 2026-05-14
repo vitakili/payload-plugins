@@ -573,9 +573,9 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
       >
         <div
           style={{
-            flex: '1 1 240px',
+            flex: '0 0 auto',
             minWidth: '220px',
-            maxWidth: showPreviewPanel ? '380px' : '100%',
+            maxWidth: '320px',
             display: 'grid',
             gap: '10px',
           }}
@@ -692,9 +692,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
         {showPreviewPanel && previewOpen && (
           <div
             style={{
-              flex: '0 1 400px',
+              flex: '1 1 400px',
               minWidth: '260px',
-              maxWidth: '420px',
               position: 'sticky',
               top: '96px',
               alignSelf: 'flex-start',
