@@ -20,10 +20,15 @@ import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 // useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
 // the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules.
 // Fall back to a no-op so the component never crashes when the export is absent.
+//
+// Context fields (from packages/ui/src/providers/LivePreview/context.ts):
+//   isLivePreviewEnabled – whether livePreview is configured for this document in Payload config
+//   isLivePreviewing     – whether the user has actively clicked Preview (iframe/popup is open)
 type _LivePreviewCtxResult = { isLivePreviewEnabled?: boolean; isLivePreviewing?: boolean }
 const _useLivePreviewContext: () => _LivePreviewCtxResult =
   (_PayloadUI as unknown as { useLivePreviewContext?: () => _LivePreviewCtxResult })
-    .useLivePreviewContext ?? function useLivePreviewContextFallback() {
+    .useLivePreviewContext ??
+  function useLivePreviewContextFallback() {
     return {}
   }
 
@@ -264,14 +269,16 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
 
 export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
+  // useThemePreviewField: explicit opt-out via admin.custom.useThemePreviewField = false
+  // Plugin always passes true; advanced users can override to permanently hide the panel.
   const configuredShowPreview =
     (field?.admin?.custom as unknown as { useThemePreviewField?: boolean })?.useThemePreviewField ??
     true
-  // isLivePreviewEnabled from context: if livePreview is actively running (editor open in iframe),
-  // hide the static panel to avoid duplication. The plugin already sets useThemePreviewField=false
-  // when livePreview.enabled=true, so this is a secondary runtime guard only.
-  const { isLivePreviewEnabled } = _useLivePreviewContext()
-  const showPreviewPanel = configuredShowPreview && !isLivePreviewEnabled
+  // isLivePreviewing: true only when the user actively clicked Preview and the iframe/popup is open.
+  // While editing (before clicking Preview), the panel is always shown regardless of livePreview config.
+  // Default context value is false, so the panel shows by default even without LivePreview provider.
+  const { isLivePreviewing } = _useLivePreviewContext()
+  const showPreviewPanel = configuredShowPreview && !isLivePreviewing
   // If the plugin provided theme presets via admin config, prefer those;
   // support both `field.admin.themePresets` (legacy) and `field.admin.custom.themePresets`
   // otherwise fallback to `allThemePresets`.
@@ -568,7 +575,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           style={{
             flex: '1 1 240px',
             minWidth: '220px',
-            maxWidth: '380px',
+            maxWidth: showPreviewPanel ? '380px' : '100%',
             display: 'grid',
             gap: '10px',
           }}

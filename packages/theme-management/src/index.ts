@@ -684,7 +684,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       customThemeConfigurationSections,
       includeBrandIdentity: includeBrandIdentity ?? false,
       enableAdvancedFeatures,
-      useThemePreviewField: !normalizedLivePreview.enabled,
+      // Always show the static ModePreview panel; it hides at runtime when the user
+      // actively enters livePreview mode (isLivePreviewing = true in context).
+      useThemePreviewField: true,
     })
 
     // If using standalone collection, create a new global
