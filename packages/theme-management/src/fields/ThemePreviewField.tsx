@@ -18,11 +18,14 @@ import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
 // useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
-// the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules
+// the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules.
+// Fall back to a no-op so the component never crashes when the export is absent.
 type _LivePreviewCtxResult = { isLivePreviewEnabled?: boolean; isLivePreviewing?: boolean }
-const _useLivePreviewContext = (
-  _PayloadUI as unknown as { useLivePreviewContext: () => _LivePreviewCtxResult }
-).useLivePreviewContext
+const _useLivePreviewContext: () => _LivePreviewCtxResult =
+  (_PayloadUI as unknown as { useLivePreviewContext?: () => _LivePreviewCtxResult })
+    .useLivePreviewContext ?? function useLivePreviewContextFallback() {
+    return {}
+  }
 
 interface ColorModeColors {
   background?: string
@@ -264,6 +267,9 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const configuredShowPreview =
     (field?.admin?.custom as unknown as { useThemePreviewField?: boolean })?.useThemePreviewField ??
     true
+  // isLivePreviewEnabled from context: if livePreview is actively running (editor open in iframe),
+  // hide the static panel to avoid duplication. The plugin already sets useThemePreviewField=false
+  // when livePreview.enabled=true, so this is a secondary runtime guard only.
   const { isLivePreviewEnabled } = _useLivePreviewContext()
   const showPreviewPanel = configuredShowPreview && !isLivePreviewEnabled
   // If the plugin provided theme presets via admin config, prefer those;
