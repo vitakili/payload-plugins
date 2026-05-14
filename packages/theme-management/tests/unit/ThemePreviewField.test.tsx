@@ -16,6 +16,10 @@ jest.mock('@payloadcms/ui', () => ({
     dispatchFields: mockDispatchFields,
   })),
   useFormFields: jest.fn((selector) => selector([{}])),
+  useLivePreviewContext: jest.fn(() => ({
+    isLivePreviewEnabled: undefined,
+    isLivePreviewing: undefined,
+  })),
 }))
 
 jest.mock('../../src/components/typographyPreviewUtils.js', () => ({

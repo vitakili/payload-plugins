@@ -1,5 +1,6 @@
 'use client'
-import { ThemeLivePreviewSync } from '@kilivi/payloadcms-theme-management/components/ThemeLivePreviewSync'
+
+import { ThemeLivePreviewSync } from '@kilivi-dev/payloadcms-theme-management/components/ThemeLivePreviewSync'
 import React from 'react'
 
 type LivePreviewListenerProps = {

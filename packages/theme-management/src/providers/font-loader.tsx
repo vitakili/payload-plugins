@@ -59,7 +59,7 @@
  * Use the helper functions below to generate font loader code:
  *
  * ```tsx
- * import { getFontLoaderCode } from '@kilivi/payloadcms-theme-management/providers/font-loader'
+ * import { getFontLoaderCode } from '@kilivi-dev/payloadcms-theme-management/providers/font-loader'
  *
  * const themeConfig = await getThemeConfig()
  * const fontCode = getFontLoaderCode(themeConfig)

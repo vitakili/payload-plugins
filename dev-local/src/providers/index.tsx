@@ -1,11 +1,10 @@
-import { AuthProvider } from '@/providers/Auth'
+import { ResolvedThemeConfiguration, ThemeProvider } from '@kilivi-dev/payloadcms-theme-management'
 import { EcommerceProvider } from '@payloadcms/plugin-ecommerce/client/react'
 import { stripeAdapterClient } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import React from 'react'
-
-import { HeaderThemeProvider } from './HeaderTheme'
+import { AuthProvider } from '@/providers/Auth'
 import { SonnerProvider } from '@/providers/Sonner'
-import { ResolvedThemeConfiguration, ThemeProvider } from '@kilivi/payloadcms-theme-management'
+import { HeaderThemeProvider } from './HeaderTheme'
 
 export const Providers: React.FC<{
   themeConfiguration?: ResolvedThemeConfiguration

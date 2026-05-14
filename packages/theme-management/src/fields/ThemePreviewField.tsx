@@ -2,6 +2,7 @@
 
 import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
+import * as _PayloadUI from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
@@ -15,6 +16,13 @@ import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { getTranslations } from '../translations.js'
 import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
+
+// useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
+// the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules
+type _LivePreviewCtxResult = { isLivePreviewEnabled?: boolean; isLivePreviewing?: boolean }
+const _useLivePreviewContext = (
+  _PayloadUI as unknown as { useLivePreviewContext: () => _LivePreviewCtxResult }
+).useLivePreviewContext
 
 interface ColorModeColors {
   background?: string
@@ -253,9 +261,11 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
 
 export default function ThemePreviewField(props: SelectFieldClientProps) {
   const { field, path } = props
-  const showPreviewPanel =
+  const configuredShowPreview =
     (field?.admin?.custom as unknown as { useThemePreviewField?: boolean })?.useThemePreviewField ??
     true
+  const { isLivePreviewEnabled } = _useLivePreviewContext()
+  const showPreviewPanel = configuredShowPreview && !isLivePreviewEnabled
   // If the plugin provided theme presets via admin config, prefer those;
   // support both `field.admin.themePresets` (legacy) and `field.admin.custom.themePresets`
   // otherwise fallback to `allThemePresets`.

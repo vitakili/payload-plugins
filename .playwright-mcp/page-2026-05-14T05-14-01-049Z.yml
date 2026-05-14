@@ -1,0 +1,43 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Zavřít Jídelní lístek" [ref=e4] [cursor=pointer]:
+      - generic "Sbalit" [ref=e6]:
+        - img [ref=e7]
+    - generic [ref=e10]:
+      - banner [ref=e11]:
+        - generic [ref=e14]:
+          - generic "Nástěnka" [ref=e18]:
+            - img [ref=e19]
+          - link "Účet" [ref=e22] [cursor=pointer]:
+            - /url: /admin/account
+            - img "yas" [ref=e23]
+        - button "Místní verze" [ref=e27] [cursor=pointer]:
+          - generic "Místní verze" [ref=e28]:
+            - generic [ref=e29]: "Místní verze:"
+            - generic [ref=e30]:
+              - generic [ref=e31]: cs
+              - img [ref=e32]
+      - generic [ref=e35]:
+        - heading "Appearance Settings" [level=1] [ref=e36]
+        - list [ref=e39]:
+          - generic "Upravit" [ref=e40]:
+            - generic:
+              - generic:
+                - generic: Upravit
+          - link "API" [ref=e41] [cursor=pointer]:
+            - /url: /admin/globals/appearance-settings/api
+            - generic:
+              - generic:
+                - generic: API
+      - main [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - list
+            - button "Uložit" [disabled] [ref=e50]:
+              - generic:
+                - generic: Uložit
+          - generic [ref=e61]:
+            - heading "Theme Configuration" [level=3] [ref=e62]
+            - generic [ref=e63]: Nakonfigurujte vzhled a stylování webu
+  - region "Notifications alt+T"

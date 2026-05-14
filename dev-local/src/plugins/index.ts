@@ -1,4 +1,4 @@
-import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
 import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
 import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'

@@ -1,0 +1,352 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e50]:
+    - button "Otevřít Jídelní lístek" [ref=e52] [cursor=pointer]:
+      - generic "Otevřít" [ref=e54]:
+        - img [ref=e55]
+    - generic [ref=e57]:
+      - complementary [ref=e58]:
+        - navigation [ref=e60]:
+          - generic [ref=e61]:
+            - button "Globální" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]: Globální
+              - img [ref=e65]
+            - generic [ref=e69]:
+              - link "Header" [ref=e70] [cursor=pointer]:
+                - /url: /admin/globals/header
+                - generic [ref=e71]: Header
+              - link "Footer" [ref=e72] [cursor=pointer]:
+                - /url: /admin/globals/footer
+                - generic [ref=e73]: Footer
+          - generic [ref=e74]:
+            - button "Users" [ref=e75] [cursor=pointer]:
+              - generic [ref=e76]: Users
+              - img [ref=e78]
+            - link "Users" [ref=e83] [cursor=pointer]:
+              - /url: /admin/collections/users
+              - generic [ref=e84]: Users
+          - generic [ref=e85]:
+            - button "Content" [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]: Content
+              - img [ref=e89]
+            - generic [ref=e93]:
+              - link "Pages" [ref=e94] [cursor=pointer]:
+                - /url: /admin/collections/pages
+                - generic [ref=e95]: Pages
+              - link "Categories" [ref=e96] [cursor=pointer]:
+                - /url: /admin/collections/categories
+                - generic [ref=e97]: Categories
+              - link "Media" [ref=e98] [cursor=pointer]:
+                - /url: /admin/collections/media
+                - generic [ref=e99]: Media
+              - link "Forms" [ref=e100] [cursor=pointer]:
+                - /url: /admin/collections/forms
+                - generic [ref=e101]: Forms
+              - link "Form Submissions" [ref=e102] [cursor=pointer]:
+                - /url: /admin/collections/form-submissions
+                - generic [ref=e103]: Form Submissions
+          - generic [ref=e104]:
+            - button "Ecommerce" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]: Ecommerce
+              - img [ref=e108]
+            - generic [ref=e112]:
+              - link "plugin-ecommerce:products" [ref=e113] [cursor=pointer]:
+                - /url: /admin/collections/products
+                - generic [ref=e114]: plugin-ecommerce:products
+              - link "plugin-ecommerce:carts" [ref=e115] [cursor=pointer]:
+                - /url: /admin/collections/carts
+                - generic [ref=e116]: plugin-ecommerce:carts
+              - link "plugin-ecommerce:orders" [ref=e117] [cursor=pointer]:
+                - /url: /admin/collections/orders
+                - generic [ref=e118]: plugin-ecommerce:orders
+              - link "plugin-ecommerce:transactions" [ref=e119] [cursor=pointer]:
+                - /url: /admin/collections/transactions
+                - generic [ref=e120]: plugin-ecommerce:transactions
+          - generic [ref=e121]:
+            - button "Settings" [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]: Settings
+              - img [ref=e125]
+            - generic [ref=e132]: Appearance Settings
+          - link "Odhlásit se" [ref=e134] [cursor=pointer]:
+            - /url: /admin/logout
+            - img [ref=e135]
+      - generic [ref=e139]:
+        - banner [ref=e140]:
+          - generic [ref=e143]:
+            - navigation [ref=e145]:
+              - link [ref=e146] [cursor=pointer]:
+                - /url: /admin
+                - generic "Nástěnka" [ref=e147]:
+                  - img [ref=e148]
+              - generic [ref=e151]: /
+              - generic [ref=e152]: Appearance Settings
+            - link "Účet" [ref=e153] [cursor=pointer]:
+              - /url: /admin/account
+              - img "yas" [ref=e154]
+          - button "Místní verze" [ref=e158] [cursor=pointer]:
+            - generic "Místní verze" [ref=e159]:
+              - generic [ref=e160]: "Místní verze:"
+              - generic [ref=e161]:
+                - generic [ref=e162]: cs
+                - img [ref=e163]
+        - generic [ref=e166]:
+          - heading "Appearance Settings" [level=1] [ref=e167]
+          - list [ref=e170]:
+            - generic "Upravit" [ref=e171]:
+              - generic:
+                - generic:
+                  - generic: Upravit
+            - link "API" [ref=e172] [cursor=pointer]:
+              - /url: /admin/globals/appearance-settings/api
+              - generic:
+                - generic:
+                  - generic: API
+        - main [ref=e173]:
+          - generic [ref=e174]:
+            - generic [ref=e176]:
+              - generic [ref=e177]:
+                - list
+              - generic [ref=e179]:
+                - button "Náhled" [ref=e180] [cursor=pointer]:
+                  - img [ref=e181]
+                - link "Náhled" [ref=e184] [cursor=pointer]:
+                  - /url: /api/theme/preview?pageSlug=home&pageCollection=pages&previewSecret=demo-draft-secret
+                  - img [ref=e185]
+                - button "Uložit" [disabled] [ref=e188]:
+                  - generic:
+                    - generic: Uložit
+            - generic [ref=e197]:
+              - generic [ref=e199]:
+                - heading "Theme Configuration" [level=3] [ref=e200]
+                - generic [ref=e201]: Nakonfigurujte vzhled a stylování webu
+              - generic [ref=e202]:
+                - generic [ref=e203]:
+                  - generic [ref=e204]: 🎨 Theme Selection
+                  - generic [ref=e206]:
+                    - generic [ref=e207]:
+                      - button "Cool & Professional cool" [ref=e208] [cursor=pointer]:
+                        - generic [ref=e209]:
+                          - generic [ref=e210]: Cool & Professional
+                          - generic [ref=e211]: cool
+                      - button "Brutal brutal" [ref=e218] [cursor=pointer]:
+                        - generic [ref=e219]:
+                          - generic [ref=e220]: Brutal
+                          - generic [ref=e221]: brutal
+                      - button "Neon Cyberpunk neon" [ref=e228] [cursor=pointer]:
+                        - generic [ref=e229]:
+                          - generic [ref=e230]: Neon Cyberpunk
+                          - generic [ref=e231]: neon
+                      - button "Solar solar" [ref=e238] [cursor=pointer]:
+                        - generic [ref=e239]:
+                          - generic [ref=e240]: Solar
+                          - generic [ref=e241]: solar
+                      - button "Dealership dealership" [ref=e248] [cursor=pointer]:
+                        - generic [ref=e249]:
+                          - generic [ref=e250]: Dealership
+                          - generic [ref=e251]: dealership
+                      - button "Real Estate Blue real-estate" [ref=e258] [cursor=pointer]:
+                        - generic [ref=e259]:
+                          - generic [ref=e260]: Real Estate Blue
+                          - generic [ref=e261]: real-estate
+                      - button "Real Estate Gold real-estate-gold" [ref=e268] [cursor=pointer]:
+                        - generic [ref=e269]:
+                          - generic [ref=e270]: Real Estate Gold
+                          - generic [ref=e271]: real-estate-gold
+                      - button "Real Estate Neutral real-estate-neutral" [ref=e278] [cursor=pointer]:
+                        - generic [ref=e279]:
+                          - generic [ref=e280]: Real Estate Neutral
+                          - generic [ref=e281]: real-estate-neutral
+                      - button "Cyberpunk Neon cyberpunk" [ref=e288] [cursor=pointer]:
+                        - generic [ref=e289]:
+                          - generic [ref=e290]: Cyberpunk Neon
+                          - generic [ref=e291]: cyberpunk
+                      - button "Minimal Clean minimal" [ref=e298] [cursor=pointer]:
+                        - generic [ref=e299]:
+                          - generic [ref=e300]: Minimal Clean
+                          - generic [ref=e301]: minimal
+                      - button "Retro Vintage retro" [ref=e308] [cursor=pointer]:
+                        - generic [ref=e309]:
+                          - generic [ref=e310]: Retro Vintage
+                          - generic [ref=e311]: retro
+                      - button "Pastel Soft pastel" [ref=e318] [cursor=pointer]:
+                        - generic [ref=e319]:
+                          - generic [ref=e320]: Pastel Soft
+                          - generic [ref=e321]: pastel
+                      - button "Ocean Deep ocean" [ref=e328] [cursor=pointer]:
+                        - generic [ref=e329]:
+                          - generic [ref=e330]: Ocean Deep
+                          - generic [ref=e331]: ocean
+                      - button "Forest Green forest" [ref=e338] [cursor=pointer]:
+                        - generic [ref=e339]:
+                          - generic [ref=e340]: Forest Green
+                          - generic [ref=e341]: forest
+                      - button "Sunset Warm sunset" [ref=e348] [cursor=pointer]:
+                        - generic [ref=e349]:
+                          - generic [ref=e350]: Sunset Warm
+                          - generic [ref=e351]: sunset
+                      - button "Lavender Dream lavender" [ref=e358] [cursor=pointer]:
+                        - generic [ref=e359]:
+                          - generic [ref=e360]: Lavender Dream
+                          - generic [ref=e361]: lavender
+                      - button "Neutral neutral" [ref=e368] [cursor=pointer]:
+                        - generic [ref=e369]:
+                          - generic [ref=e370]: Neutral
+                          - generic [ref=e371]: neutral
+                      - button "Blue blue" [ref=e378] [cursor=pointer]:
+                        - generic [ref=e379]:
+                          - generic [ref=e380]: Blue
+                          - generic [ref=e381]: blue
+                      - button "Green green" [ref=e388] [cursor=pointer]:
+                        - generic [ref=e389]:
+                          - generic [ref=e390]: Green
+                          - generic [ref=e391]: green
+                      - button "Red red" [ref=e398] [cursor=pointer]:
+                        - generic [ref=e399]:
+                          - generic [ref=e400]: Red
+                          - generic [ref=e401]: red
+                      - button "Orange orange" [ref=e408] [cursor=pointer]:
+                        - generic [ref=e409]:
+                          - generic [ref=e410]: Orange
+                          - generic [ref=e411]: orange
+                      - button "Rose rose" [ref=e418] [cursor=pointer]:
+                        - generic [ref=e419]:
+                          - generic [ref=e420]: Rose
+                          - generic [ref=e421]: rose
+                      - button "Violet violet" [ref=e428] [cursor=pointer]:
+                        - generic [ref=e429]:
+                          - generic [ref=e430]: Violet
+                          - generic [ref=e431]: violet
+                      - button "Zinc zinc" [ref=e438] [cursor=pointer]:
+                        - generic [ref=e439]:
+                          - generic [ref=e440]: Zinc
+                          - generic [ref=e441]: zinc
+                      - button "Slate slate" [ref=e448] [cursor=pointer]:
+                        - generic [ref=e449]:
+                          - generic [ref=e450]: Slate
+                          - generic [ref=e451]: slate
+                      - button "Stone stone" [ref=e458] [cursor=pointer]:
+                        - generic [ref=e459]:
+                          - generic [ref=e460]: Stone
+                          - generic [ref=e461]: stone
+                      - button "Gray gray" [ref=e468] [cursor=pointer]:
+                        - generic [ref=e469]:
+                          - generic [ref=e470]: Gray
+                          - generic [ref=e471]: gray
+                    - generic [ref=e478]:
+                      - generic [ref=e479]: Retro Vintage
+                      - generic [ref=e480]: "Primary color: #c43b15"
+                      - generic [ref=e481]: "Accent color: #e4762c"
+                      - generic [ref=e482]:
+                        - generic [ref=e485]: Primární
+                        - generic [ref=e488]: Sekundární
+                        - generic [ref=e491]: Akcent
+                        - generic [ref=e494]: Pozadí
+                        - generic [ref=e497]: Popředí
+                    - generic [ref=e498]: Select a theme to auto-populate color values. You can customize colors after selection.
+                - generic [ref=e500]:
+                  - generic [ref=e501]:
+                    - generic [ref=e502]: 📐 Zaoblení rohů
+                    - generic [ref=e504]:
+                      - log [ref=e506]
+                      - generic [ref=e507]:
+                        - generic "Střední (0.5rem)" [ref=e508]:
+                          - generic [ref=e509]:
+                            - generic [ref=e510]: Střední (0.5rem)
+                            - combobox [ref=e512]
+                        - generic [ref=e513]:
+                          - button [ref=e514] [cursor=pointer]:
+                            - img [ref=e515]
+                          - button [ref=e517] [cursor=pointer]:
+                            - img [ref=e518]
+                    - generic [ref=e520]: Výchozí zaoblení rohů pro UI prvky
+                  - generic [ref=e521]:
+                    - generic [ref=e522]: 📏 Škála rozestupů
+                    - generic [ref=e524]:
+                      - log [ref=e526]
+                      - generic [ref=e527]:
+                        - generic "Střední" [ref=e528]:
+                          - generic [ref=e529]:
+                            - generic [ref=e530]: Střední
+                            - combobox [ref=e532]
+                        - generic [ref=e533]:
+                          - button [ref=e534] [cursor=pointer]:
+                            - img [ref=e535]
+                          - button [ref=e537] [cursor=pointer]:
+                            - img [ref=e538]
+                    - generic [ref=e540]: Globální rozestupy mezi prvky
+                - generic [ref=e541]:
+                  - generic [ref=e542]:
+                    - generic [ref=e543]:
+                      - button "Přepnout blok" [ref=e544] [cursor=pointer]
+                      - generic:
+                        - generic:
+                          - generic: 🌗 Nastavení barevného režimu
+                      - generic:
+                        - generic:
+                          - img
+                    - generic [ref=e548]:
+                      - generic [ref=e550]:
+                        - generic [ref=e551]:
+                          - generic [ref=e552]: Výchozí barevný režim
+                          - generic [ref=e556]: Výchozí barevný režim pro návštěvníky
+                        - generic [ref=e557]:
+                          - generic [ref=e558]:
+                            - generic [ref=e559]:
+                              - checkbox "Povolit přepínač režimu" [checked] [ref=e560]
+                              - img [ref=e562]
+                            - generic [ref=e564]: Povolit přepínač režimu
+                          - generic [ref=e565]: Umožnit návštěvníkům přepínat režimy
+                      - generic [ref=e566]:
+                        - generic [ref=e568]:
+                          - button "Přepnout blok" [ref=e569] [cursor=pointer]
+                          - generic:
+                            - generic:
+                              - generic: ☀️ Barvy světlého režimu
+                          - generic:
+                            - generic:
+                              - img
+                        - generic [ref=e570]: Nakonfigurujte barvy pro světlý režim
+                      - generic [ref=e571]:
+                        - generic [ref=e573]:
+                          - button "Přepnout blok" [ref=e574] [cursor=pointer]
+                          - generic:
+                            - generic:
+                              - generic: 🌙 Barvy tmavého režimu
+                          - generic:
+                            - generic:
+                              - img
+                        - generic [ref=e575]: Nakonfigurujte barvy pro tmavý režim
+                  - generic [ref=e576]: Nakonfigurujte barvy světlého a tmavého režimu. Změny zde přepíší výběr tématu.
+                - generic [ref=e577]:
+                  - generic [ref=e579]:
+                    - button "Přepnout blok" [ref=e580] [cursor=pointer]
+                    - generic:
+                      - generic:
+                        - generic: 🅰️ Typografie
+                    - generic:
+                      - generic:
+                        - img
+                  - generic [ref=e581]: Zvolte rodiny písem a základní typografické nastavení. Hodnota "Použít výchozí" zachová nastavení motivu.
+                - generic [ref=e582]:
+                  - generic [ref=e584]:
+                    - button "Přepnout blok" [ref=e585] [cursor=pointer]
+                    - generic:
+                      - generic:
+                        - generic: 🧩 Vlastní motivy
+                    - generic:
+                      - generic:
+                        - img
+                  - generic [ref=e586]: Importujte další motivy pomocí JSONu a rozšiřte nebo přepište výchozí nabídku. Motivy budou ihned k dispozici ve výběru výše.
+                - generic [ref=e589]:
+                  - button "Přepnout blok" [ref=e590] [cursor=pointer]
+                  - generic:
+                    - generic:
+                      - generic: ⚙️ Pokročilé nastavení
+                  - generic:
+                    - generic:
+                      - img
+        - status [ref=e591]
+  - status [ref=e47]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e8] [cursor=pointer]:
+    - img [ref=e9]
+  - alert [ref=e2]: Úprava - Appearance Settings - Payload

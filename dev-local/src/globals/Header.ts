@@ -1,5 +1,4 @@
 import type { GlobalConfig } from 'payload'
-
 import { link } from '@/fields/link'
 
 export const Header: GlobalConfig = {
@@ -32,7 +31,7 @@ export const Header: GlobalConfig = {
           cs: 'Vyberte token barvy pozadí pro hlavičku',
         },
         components: {
-          Field: '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField',
+          Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemeTokenSelectField',
         },
       },
     },

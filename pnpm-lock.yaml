@@ -47,12 +47,12 @@ importers:
 
   dev-local:
     dependencies:
+      '@kilivi-dev/payloadcms-theme-management':
+        specifier: file:../packages/theme-management
+        version: file:packages/theme-management(@payloadcms/ui@3.68.5(@types/react@19.2.1)(monaco-editor@0.54.0)(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.2))(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@kilivi/payloadcms-localized-slugs':
         specifier: file:../packages/localized-slugs
         version: file:packages/localized-slugs(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))
-      '@kilivi/payloadcms-theme-management':
-        specifier: file:../packages/theme-management
-        version: file:packages/theme-management(@payloadcms/ui@3.68.5(@types/react@19.2.1)(monaco-editor@0.54.0)(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.2))(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@payloadcms/admin-bar':
         specifier: 3.68.5
         version: 3.68.5(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -1748,12 +1748,7 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
-  '@kilivi/payloadcms-localized-slugs@file:packages/localized-slugs':
-    resolution: {directory: packages/localized-slugs, type: directory}
-    peerDependencies:
-      payload: ^3.0.0
-
-  '@kilivi/payloadcms-theme-management@file:packages/theme-management':
+  '@kilivi-dev/payloadcms-theme-management@file:packages/theme-management':
     resolution: {directory: packages/theme-management, type: directory}
     engines: {node: '>=18.20.0'}
     peerDependencies:
@@ -1762,6 +1757,11 @@ packages:
       payload: ^3.0.0
       react: ^18.3.0 || ^19.0.0-rc
       react-dom: ^18.3.0 || ^19.0.0-rc
+
+  '@kilivi/payloadcms-localized-slugs@file:packages/localized-slugs':
+    resolution: {directory: packages/localized-slugs, type: directory}
+    peerDependencies:
+      payload: ^3.0.0
 
   '@lexical/clipboard@0.35.0':
     resolution: {integrity: sha512-ko7xSIIiayvDiqjNDX6fgH9RlcM6r9vrrvJYTcfGVBor5httx16lhIi0QJZ4+RNPvGtTjyFv4bwRmsixRRwImg==}
@@ -9535,11 +9535,7 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@kilivi/payloadcms-localized-slugs@file:packages/localized-slugs(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))':
-    dependencies:
-      payload: 3.68.5(graphql@16.11.0)(typescript@5.7.2)
-
-  '@kilivi/payloadcms-theme-management@file:packages/theme-management(@payloadcms/ui@3.68.5(@types/react@19.2.1)(monaco-editor@0.54.0)(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.2))(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
+  '@kilivi-dev/payloadcms-theme-management@file:packages/theme-management(@payloadcms/ui@3.68.5(@types/react@19.2.1)(monaco-editor@0.54.0)(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.2))(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)':
     dependencies:
       '@payloadcms/ui': 3.68.5(@types/react@19.2.1)(monaco-editor@0.54.0)(next@15.4.10(@babel/core@7.28.4)(@playwright/test@1.56.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(sass@1.77.4))(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.7.2)
       color: 5.0.3
@@ -9549,6 +9545,10 @@ snapshots:
       react-colorful: 5.6.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react-dom: 19.2.1(react@19.2.1)
       server-only: 0.0.1
+
+  '@kilivi/payloadcms-localized-slugs@file:packages/localized-slugs(payload@3.68.5(graphql@16.11.0)(typescript@5.7.2))':
+    dependencies:
+      payload: 3.68.5(graphql@16.11.0)(typescript@5.7.2)
 
   '@lexical/clipboard@0.35.0':
     dependencies:

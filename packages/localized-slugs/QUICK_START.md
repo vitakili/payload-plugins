@@ -76,7 +76,7 @@ The plugin will automatically:
 ### In Server Components / API Routes
 
 ```typescript
-import { fetchThemeConfiguration } from '@kilivi/payloadcms-theme-management'
+import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
 
 // Note: Use the Payload API directly for localized slugs
 const post = await payload.findByID({

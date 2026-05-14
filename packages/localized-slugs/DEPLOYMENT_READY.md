@@ -2,7 +2,7 @@
 
 ## Summary
 
-The `@kilivi/payloadcms-localized-slugs` plugin has been fully prepared for npm deployment with the same professional standards as `@kilivi/payloadcms-theme-management`.
+The `@kilivi/payloadcms-localized-slugs` plugin has been fully prepared for npm deployment with the same professional standards as `@kilivi-dev/payloadcms-theme-management`.
 
 ### What Was Done
 
