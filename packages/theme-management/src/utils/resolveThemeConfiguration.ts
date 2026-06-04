@@ -61,9 +61,16 @@ interface GenericThemeConfiguration {
   } | null
   componentStyles?: {
     buttonVariant?: string | null
+    buttonSize?: string | null
     cardStyle?: string | null
     cardHoverEffect?: string | null
+    imageStyle?: string | null
+    iconSet?: string | null
     navbarStyle?: string | null
+    footerStyle?: string | null
+    linkStyle?: string | null
+    enableScrollReveal?: boolean | null
+    enableHoverAnimations?: boolean | null
   } | null
 }
 
@@ -102,9 +109,16 @@ export interface ResolvedVisualEffects {
 
 export interface ResolvedComponentStyles {
   buttonVariant?: string | null
+  buttonSize?: string | null
   cardStyle?: string | null
   cardHoverEffect?: string | null
+  imageStyle?: string | null
+  iconSet?: string | null
   navbarStyle?: string | null
+  footerStyle?: string | null
+  linkStyle?: string | null
+  enableScrollReveal?: boolean | null
+  enableHoverAnimations?: boolean | null
 }
 
 export interface ResolvedThemeConfiguration {

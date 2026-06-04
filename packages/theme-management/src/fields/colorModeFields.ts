@@ -25,6 +25,9 @@ const colorFieldKeys = [
   'border',
   'input',
   'ring',
+  'gradientFrom',
+  'gradientVia',
+  'gradientTo',
 ] as const
 
 type ColorToken = (typeof colorFieldKeys)[number]
@@ -154,6 +157,30 @@ const colorFieldDefinitions: ColorFieldDefinition[] = [
     label: { en: 'Ring', cs: 'Prstenec' },
     description: { en: 'Focus ring color', cs: 'Barva focus prstence' },
   },
+  {
+    name: 'gradientFrom',
+    label: { en: 'Gradient · From', cs: 'Gradient · Od' },
+    description: {
+      en: 'Start colour of the brand gradient (--gradient-from)',
+      cs: 'Počáteční barva brandového gradientu (--gradient-from)',
+    },
+  },
+  {
+    name: 'gradientVia',
+    label: { en: 'Gradient · Via', cs: 'Gradient · Přes' },
+    description: {
+      en: 'Optional middle colour of the brand gradient (--gradient-via)',
+      cs: 'Volitelná prostřední barva gradientu (--gradient-via)',
+    },
+  },
+  {
+    name: 'gradientTo',
+    label: { en: 'Gradient · To', cs: 'Gradient · Do' },
+    description: {
+      en: 'End colour of the brand gradient (--gradient-to)',
+      cs: 'Koncová barva brandového gradientu (--gradient-to)',
+    },
+  },
 ]
 
 // Light Mode Default Colors (Shadcn UI inspired defaults)
@@ -177,6 +204,9 @@ export const lightModeDefaults: ColorPalette = {
   border: '#e4e4e7',
   input: '#e4e4e7',
   ring: '#18181b',
+  gradientFrom: '#9372f7',
+  gradientVia: '#7c6ff0',
+  gradientTo: '#22d3ee',
 }
 
 // Dark Mode Default Colors (Shadcn UI inspired defaults)
@@ -200,6 +230,9 @@ export const darkModeDefaults: ColorPalette = {
   border: '#27272a',
   input: '#27272a',
   ring: '#d4d4d8',
+  gradientFrom: '#9372f7',
+  gradientVia: '#7c6ff0',
+  gradientTo: '#22d3ee',
 }
 
 function createColorFields(defaults: ColorPalette): Field[] {

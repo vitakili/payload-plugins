@@ -115,6 +115,18 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   })
 
+  // Live appearance preview — always visible, reflects Visual Effects +
+  // Component Styles + colour choices in real time as the editor changes them.
+  fields.push({
+    name: 'appearancePreview',
+    type: 'ui',
+    admin: {
+      components: {
+        Field: '@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField',
+      },
+    },
+  })
+
   // Border Radius Configuration - Always visible
   fields.push({
     type: 'row',
@@ -633,31 +645,63 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         type: 'group',
         fields: [
           {
-            name: 'buttonVariant',
-            type: 'select',
-            label: {
-              en: 'Primary Button Style',
-              cs: 'Styl primárního tlačítka',
-            },
-            defaultValue: 'filled',
-            options: [
-              { label: { en: 'Filled (solid)', cs: 'Plné (solid)' }, value: 'filled' },
-              { label: { en: 'Outlined', cs: 'Ohraničené' }, value: 'outlined' },
-              { label: { en: 'Ghost (transparent)', cs: 'Průhledné' }, value: 'ghost' },
-              { label: { en: 'Gradient', cs: 'Přechodové' }, value: 'gradient' },
-              { label: { en: 'Pill (full rounded)', cs: 'Pill (plné zaoblení)' }, value: 'pill' },
+            type: 'row',
+            fields: [
               {
-                label: { en: 'Brutalist (thick border)', cs: 'Brutalistické (silný okraj)' },
-                value: 'brutal',
+                name: 'buttonVariant',
+                type: 'select',
+                label: {
+                  en: 'Primary Button Style',
+                  cs: 'Styl primárního tlačítka',
+                },
+                defaultValue: 'filled',
+                options: [
+                  { label: { en: 'Filled (solid)', cs: 'Plné (solid)' }, value: 'filled' },
+                  { label: { en: 'Outlined', cs: 'Ohraničené' }, value: 'outlined' },
+                  { label: { en: 'Ghost (transparent)', cs: 'Průhledné' }, value: 'ghost' },
+                  { label: { en: 'Gradient', cs: 'Přechodové' }, value: 'gradient' },
+                  {
+                    label: { en: 'Pill (full rounded)', cs: 'Pill (plné zaoblení)' },
+                    value: 'pill',
+                  },
+                  {
+                    label: { en: 'Brutalist (thick border)', cs: 'Brutalistické (silný okraj)' },
+                    value: 'brutal',
+                  },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default visual style of primary action buttons.',
+                    cs: 'Výchozí vizuální styl primárních tlačítek.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'button_variant',
+              },
+              {
+                name: 'buttonSize',
+                type: 'select',
+                label: {
+                  en: 'Button Size',
+                  cs: 'Velikost tlačítka',
+                },
+                defaultValue: 'medium',
+                options: [
+                  { label: { en: 'Small', cs: 'Malé' }, value: 'small' },
+                  { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+                  { label: { en: 'Large', cs: 'Velké' }, value: 'large' },
+                  { label: { en: 'XL', cs: 'XL' }, value: 'xl' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default padding / font-size of buttons.',
+                    cs: 'Výchozí odsazení a velikost písma tlačítek.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'button_size',
               },
             ],
-            admin: {
-              description: {
-                en: 'Default visual style of primary action buttons.',
-                cs: 'Výchozí vizuální styl primárních tlačítek.',
-              },
-            },
-            dbName: 'button_variant',
           },
           {
             type: 'row',
@@ -718,36 +762,167 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
 
           {
-            name: 'navbarStyle',
-            type: 'select',
-            label: {
-              en: 'Navbar Style',
-              cs: 'Styl navigace',
-            },
-            defaultValue: 'solid',
-            options: [
-              { label: { en: 'Solid', cs: 'Plná' }, value: 'solid' },
+            type: 'row',
+            fields: [
               {
-                label: { en: 'Transparent (on hero)', cs: 'Průhledná (nad hero)' },
-                value: 'transparent',
-              },
-              { label: { en: 'Blurred glass', cs: 'Rozmazané sklo' }, value: 'blur' },
-              { label: { en: 'Floating', cs: 'Plovoucí' }, value: 'floating' },
-              {
+                name: 'navbarStyle',
+                type: 'select',
                 label: {
-                  en: 'Minimal (bottom border only)',
-                  cs: 'Minimalistická (jen spodní okraj)',
+                  en: 'Navbar Style',
+                  cs: 'Styl navigace',
                 },
-                value: 'minimal',
+                defaultValue: 'solid',
+                options: [
+                  { label: { en: 'Solid', cs: 'Plná' }, value: 'solid' },
+                  {
+                    label: { en: 'Transparent (on hero)', cs: 'Průhledná (nad hero)' },
+                    value: 'transparent',
+                  },
+                  { label: { en: 'Blurred glass', cs: 'Rozmazané sklo' }, value: 'blur' },
+                  { label: { en: 'Floating', cs: 'Plovoucí' }, value: 'floating' },
+                  {
+                    label: {
+                      en: 'Minimal (bottom border only)',
+                      cs: 'Minimalistická (jen spodní okraj)',
+                    },
+                    value: 'minimal',
+                  },
+                ],
+                admin: {
+                  description: {
+                    en: 'Navigation bar visual style.',
+                    cs: 'Vizuální styl navigační lišty.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'navbar_style',
+              },
+              {
+                name: 'footerStyle',
+                type: 'select',
+                label: {
+                  en: 'Footer Style',
+                  cs: 'Styl patičky',
+                },
+                defaultValue: 'standard',
+                options: [
+                  { label: { en: 'Standard', cs: 'Standardní' }, value: 'standard' },
+                  { label: { en: 'Minimal', cs: 'Minimalistická' }, value: 'minimal' },
+                  { label: { en: 'Dark', cs: 'Tmavá' }, value: 'dark' },
+                  {
+                    label: { en: 'Gradient top edge', cs: 'Gradient horní hrana' },
+                    value: 'gradient-top',
+                  },
+                  { label: { en: 'Full colour', cs: 'Plná barva' }, value: 'full-color' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Footer visual style.',
+                    cs: 'Vizuální styl patičky.',
+                  },
+                  width: '50%',
+                },
+                dbName: 'footer_style',
               },
             ],
-            admin: {
-              description: {
-                en: 'Navigation bar visual style.',
-                cs: 'Vizuální styl navigační lišty.',
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'imageStyle',
+                type: 'select',
+                label: {
+                  en: 'Image Style',
+                  cs: 'Styl obrázků',
+                },
+                defaultValue: 'default',
+                options: [
+                  { label: { en: 'Default', cs: 'Výchozí' }, value: 'default' },
+                  { label: { en: 'Rounded', cs: 'Zaoblené' }, value: 'rounded' },
+                  { label: { en: 'Circle', cs: 'Kruhové' }, value: 'circle' },
+                  { label: { en: 'Vignette', cs: 'Vinětace' }, value: 'vignette' },
+                  { label: { en: 'Grayscale', cs: 'Černobílé' }, value: 'grayscale' },
+                  { label: { en: 'Duotone', cs: 'Duotón' }, value: 'duotone' },
+                  { label: { en: 'Polaroid', cs: 'Polaroid' }, value: 'polaroid' },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default treatment for content images (applied via [data-img] / .themed-image).',
+                    cs: 'Výchozí úprava obsahových obrázků (přes [data-img] / .themed-image).',
+                  },
+                  width: '50%',
+                },
+                dbName: 'image_style',
               },
-            },
-            dbName: 'navbar_style',
+              {
+                name: 'linkStyle',
+                type: 'select',
+                label: {
+                  en: 'Link Style',
+                  cs: 'Styl odkazů',
+                },
+                defaultValue: 'underline-hover',
+                options: [
+                  { label: { en: 'Always underlined', cs: 'Vždy podtržené' }, value: 'underline' },
+                  {
+                    label: { en: 'Underline on hover', cs: 'Podtržení při najetí' },
+                    value: 'underline-hover',
+                  },
+                  { label: { en: 'No underline', cs: 'Bez podtržení' }, value: 'none' },
+                  { label: { en: 'Highlight', cs: 'Zvýraznění' }, value: 'highlight' },
+                  {
+                    label: { en: 'Animated underline', cs: 'Animované podtržení' },
+                    value: 'animated',
+                  },
+                ],
+                admin: {
+                  description: {
+                    en: 'Default style for in-content links (applied via [data-link] / .themed-link).',
+                    cs: 'Výchozí styl odkazů v obsahu (přes [data-link] / .themed-link).',
+                  },
+                  width: '50%',
+                },
+                dbName: 'link_style',
+              },
+            ],
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'enableScrollReveal',
+                type: 'checkbox',
+                label: {
+                  en: 'Scroll reveal animations',
+                  cs: 'Animace při scrollování',
+                },
+                defaultValue: true,
+                admin: {
+                  description: {
+                    en: 'Reveal elements as they enter the viewport.',
+                    cs: 'Odhalovat prvky při vstupu do viewportu.',
+                  },
+                  width: '50%',
+                },
+              },
+              {
+                name: 'enableHoverAnimations',
+                type: 'checkbox',
+                label: {
+                  en: 'Hover micro-animations',
+                  cs: 'Hover mikro-animace',
+                },
+                defaultValue: true,
+                admin: {
+                  description: {
+                    en: 'Subtle motion on interactive elements when hovered.',
+                    cs: 'Jemný pohyb interaktivních prvků při najetí.',
+                  },
+                  width: '50%',
+                },
+              },
+            ],
           },
         ],
       },

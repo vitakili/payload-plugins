@@ -722,8 +722,14 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                   color: 'var(--theme-elevation-800)',
                 }}
               >
-                {/* safe translations for preview header */}
-                <span>{getTranslations('en').livePreview.smallTitle}</span>
+                {/* Role label — this panel is dedicated to COLOURS + TYPOGRAPHY.
+                    Effects & component structure live in the separate
+                    "Effects & components" preview (AppearancePreviewField). */}
+                <span>
+                  {getAdminLanguage() === 'cs'
+                    ? '🎨 Barvy & typografie'
+                    : '🎨 Colours & typography'}
+                </span>
                 <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
                   {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
                 </span>

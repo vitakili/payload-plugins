@@ -252,9 +252,16 @@ type VEConfig = {
 
 type CSConfig = {
   buttonVariant?: string | null
+  buttonSize?: string | null
   cardStyle?: string | null
   cardHoverEffect?: string | null
+  imageStyle?: string | null
+  iconSet?: string | null
   navbarStyle?: string | null
+  footerStyle?: string | null
+  linkStyle?: string | null
+  enableScrollReveal?: boolean | null
+  enableHoverAnimations?: boolean | null
 }
 
 function getVE(config: ThemeConfiguration): VEConfig | null {
@@ -297,6 +304,9 @@ function applyVisualEffectsCSSVars(rules: string[], config: ThemeConfiguration):
   if (ve.backdropBlur) {
     const blurPx = BLUR_PX_MAP[ve.backdropBlur] ?? '0px'
     rules.push(`  --backdrop-blur: ${blurPx};`)
+    // Token form (none|slight|...) — read by the client ThemeProvider to mirror
+    // the SSR data-backdrop-blur attribute.
+    rules.push(`  --backdrop-blur-level: ${ve.backdropBlur};`)
   }
   if (ve.borderStyle) rules.push(`  --border-style: ${ve.borderStyle};`)
   if (ve.borderWidth) rules.push(`  --border-width: ${ve.borderWidth};`)
@@ -320,13 +330,34 @@ function applyVisualEffectsCSSVars(rules: string[], config: ThemeConfiguration):
  * CSS custom properties for component styles (emitted inside :root {})
  */
 function applyComponentStyleCSSVars(rules: string[], config: ThemeConfiguration): void {
+  // Brand gradient composite — always emitted so gradient buttons / cards / text
+  // can reference a single token. Falls back to primary→accent when the editor
+  // has not set explicit gradient stops.
+  rules.push(
+    '  --gradient-brand: linear-gradient(' +
+      'var(--gradient-angle, 135deg), ' +
+      'var(--gradient-from, var(--primary)), ' +
+      'var(--gradient-via, var(--gradient-from, var(--primary))), ' +
+      'var(--gradient-to, var(--accent)));',
+  )
+
   const cs = getCS(config)
   if (!cs) return
 
   if (cs.buttonVariant) rules.push(`  --button-variant: ${cs.buttonVariant};`)
+  if (cs.buttonSize) rules.push(`  --button-size: ${cs.buttonSize};`)
   if (cs.cardStyle) rules.push(`  --card-style: ${cs.cardStyle};`)
   if (cs.cardHoverEffect) rules.push(`  --card-hover-effect: ${cs.cardHoverEffect};`)
+  if (cs.imageStyle) rules.push(`  --image-style: ${cs.imageStyle};`)
   if (cs.navbarStyle) rules.push(`  --navbar-style: ${cs.navbarStyle};`)
+  if (cs.footerStyle) rules.push(`  --footer-style: ${cs.footerStyle};`)
+  if (cs.linkStyle) rules.push(`  --link-style: ${cs.linkStyle};`)
+  if (cs.enableScrollReveal != null) {
+    rules.push(`  --scroll-reveal: ${cs.enableScrollReveal ? '1' : '0'};`)
+  }
+  if (cs.enableHoverAnimations != null) {
+    rules.push(`  --hover-animations: ${cs.enableHoverAnimations ? '1' : '0'};`)
+  }
 }
 
 /**
@@ -504,9 +535,7 @@ function applyEffectElementRules(rules: string[], config: ThemeConfiguration): v
   if (cs?.cardStyle === 'gradient-border') {
     rules.push(`html[data-card-style='gradient-border'] [data-card],`)
     rules.push(`html[data-card-style='gradient-border'] .glass-card {`)
-    rules.push(
-      `  border-image: linear-gradient(135deg, var(--primary), var(--accent)) 1 !important;`,
-    )
+    rules.push(`  border-image: var(--gradient-brand) 1 !important;`)
     rules.push(`  border-width: 2px !important;`)
     rules.push(`  border-style: solid !important;`)
     rules.push(`}`)
@@ -603,6 +632,107 @@ function applyEffectElementRules(rules: string[], config: ThemeConfiguration): v
     rules.push(`html[data-card-hover='tilt'] .glass-card:hover {`)
     rules.push(`  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) !important;`)
     rules.push(`}`)
+  }
+
+  // ── Button variant: gradient ───────────────────────────────────────────
+  if (cs?.buttonVariant === 'gradient') {
+    rules.push(`html[data-button-variant='gradient'] [data-btn] {`)
+    rules.push(`  background-image: var(--gradient-brand) !important;`)
+    rules.push(`  background-color: transparent !important;`)
+    rules.push(`  color: var(--primary-foreground) !important;`)
+    rules.push(`  border: none !important;`)
+    rules.push(`}`)
+  }
+
+  // ── Button sizes ────────────────────────────────────────────────────────
+  if (cs?.buttonSize) {
+    const sizeMap: Record<string, { py: string; px: string; fs: string }> = {
+      small: { py: '0.375rem', px: '0.75rem', fs: '0.8125rem' },
+      medium: { py: '0.5rem', px: '1rem', fs: '0.875rem' },
+      large: { py: '0.625rem', px: '1.5rem', fs: '1rem' },
+      xl: { py: '0.875rem', px: '2rem', fs: '1.125rem' },
+    }
+    const s = sizeMap[cs.buttonSize] ?? sizeMap.medium!
+    rules.push(`html[data-button-size='${cs.buttonSize}'] [data-btn] {`)
+    rules.push(`  padding: ${s.py} ${s.px} !important;`)
+    rules.push(`  font-size: ${s.fs} !important;`)
+    rules.push(`}`)
+  }
+
+  // ── Image styles ───────────────────────────────────────────────────────
+  // Target both [data-img] attributes and the .themed-image helper class.
+  if (cs?.imageStyle && cs.imageStyle !== 'default') {
+    const style = cs.imageStyle
+    const sel = `html[data-image-style='${style}'] [data-img], html[data-image-style='${style}'] .themed-image`
+    const hoverSel = `html[data-image-style='${style}'] [data-img]:hover, html[data-image-style='${style}'] .themed-image:hover`
+    if (style === 'rounded') {
+      rules.push(`${sel} { border-radius: var(--radius-large, 1rem) !important; overflow: hidden; }`)
+    } else if (style === 'circle') {
+      rules.push(
+        `${sel} { border-radius: 9999px !important; aspect-ratio: 1 / 1; object-fit: cover; }`,
+      )
+    } else if (style === 'grayscale') {
+      rules.push(`${sel} { filter: grayscale(1); transition: filter 300ms ease; }`)
+      rules.push(`${hoverSel} { filter: grayscale(0); }`)
+    } else if (style === 'duotone') {
+      rules.push(`${sel} { filter: grayscale(1) contrast(1.05); mix-blend-mode: luminosity; }`)
+    } else if (style === 'vignette') {
+      rules.push(`${sel} { box-shadow: inset 0 0 60px rgba(0,0,0,0.45); }`)
+    } else if (style === 'polaroid') {
+      rules.push(
+        `${sel} { background: #fff; padding: 10px 10px 36px; box-shadow: 0 6px 16px rgba(0,0,0,0.18); border-radius: 2px; }`,
+      )
+    }
+  }
+
+  // ── Link styles ─────────────────────────────────────────────────────────
+  if (cs?.linkStyle) {
+    const style = cs.linkStyle
+    const sel = `html[data-link-style='${style}'] [data-link], html[data-link-style='${style}'] .themed-link`
+    const hoverSel = `html[data-link-style='${style}'] [data-link]:hover, html[data-link-style='${style}'] .themed-link:hover`
+    if (style === 'underline') {
+      rules.push(`${sel} { text-decoration: underline; text-underline-offset: 0.15em; }`)
+    } else if (style === 'none') {
+      rules.push(`${sel} { text-decoration: none; }`)
+    } else if (style === 'underline-hover') {
+      rules.push(`${sel} { text-decoration: none; }`)
+      rules.push(`${hoverSel} { text-decoration: underline; text-underline-offset: 0.15em; }`)
+    } else if (style === 'highlight') {
+      rules.push(
+        `${sel} { text-decoration: none; background-image: linear-gradient(transparent 60%, color-mix(in srgb, var(--primary) 28%, transparent) 0); }`,
+      )
+    } else if (style === 'animated') {
+      rules.push(
+        `${sel} { text-decoration: none; background-image: var(--gradient-brand); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 300ms ease; }`,
+      )
+      rules.push(`${hoverSel} { background-size: 100% 2px; }`)
+    }
+  }
+
+  // ── Footer styles ─────────────────────────────────────────────────────────
+  if (cs?.footerStyle === 'dark') {
+    rules.push(
+      `html[data-footer-style='dark'] footer { background-color: var(--foreground) !important; color: var(--background) !important; }`,
+    )
+  } else if (cs?.footerStyle === 'full-color') {
+    rules.push(
+      `html[data-footer-style='full-color'] footer { background-color: var(--primary) !important; color: var(--primary-foreground) !important; }`,
+    )
+  } else if (cs?.footerStyle === 'gradient-top') {
+    rules.push(
+      `html[data-footer-style='gradient-top'] footer { border-top: 3px solid transparent; border-image: var(--gradient-brand) 1; }`,
+    )
+  } else if (cs?.footerStyle === 'minimal') {
+    rules.push(
+      `html[data-footer-style='minimal'] footer { background: transparent !important; border-top: 1px solid var(--border) !important; box-shadow: none !important; }`,
+    )
+  }
+
+  // ── Hover animations off — neutralise interactive transforms ──────────────
+  if (cs?.enableHoverAnimations === false) {
+    rules.push(
+      `html[data-hover-animations='off'] [data-card]:hover, html[data-hover-animations='off'] .glass-card:hover, html[data-hover-animations='off'] [data-btn]:hover { transform: none !important; }`,
+    )
   }
 }
 

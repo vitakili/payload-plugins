@@ -18,6 +18,9 @@ interface ColorMode {
   border?: string | null
   input?: string | null
   ring?: string | null
+  gradientFrom?: string | null
+  gradientVia?: string | null
+  gradientTo?: string | null
 }
 
 export interface ThemeColors {
@@ -49,6 +52,9 @@ const COLOR_VARIABLE_MAP: Array<{ key: keyof ColorMode; variable: string }> = [
   { key: 'border', variable: '--border' },
   { key: 'input', variable: '--input' },
   { key: 'ring', variable: '--ring' },
+  { key: 'gradientFrom', variable: '--gradient-from' },
+  { key: 'gradientVia', variable: '--gradient-via' },
+  { key: 'gradientTo', variable: '--gradient-to' },
 ]
 
 export function hexToHsl(hex: string): string {

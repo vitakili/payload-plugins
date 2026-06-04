@@ -104,6 +104,7 @@ export interface ThemeComponentStyles {
   iconSet?: 'lucide' | 'heroicons' | 'phosphor' | 'tabler' | 'font-awesome' | null
   navbarStyle?: 'solid' | 'transparent' | 'blur' | 'floating' | 'minimal' | null
   footerStyle?: 'standard' | 'minimal' | 'dark' | 'gradient-top' | 'full-color' | null
+  linkStyle?: 'underline' | 'underline-hover' | 'none' | 'highlight' | 'animated' | null
   enableScrollReveal?: boolean | null
   enableHoverAnimations?: boolean | null
 }

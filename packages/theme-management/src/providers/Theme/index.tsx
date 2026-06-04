@@ -62,23 +62,31 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         document.documentElement.style.setProperty('--color-mode', resolvedMode)
 
         // Synchronise data attributes for effect/component styles from CSS vars
-        // (set by ServerThemeInjector; this ensures client hydration matches SSR)
+        // (set by ServerThemeInjector; this ensures client hydration matches SSR).
+        // Each entry maps a CSS custom property to the data attribute that the
+        // generated CSS selectors target. Attributes are only set when the var
+        // has a value, so we never clobber server-rendered attributes with empties.
         const computedStyle = getComputedStyle(document.documentElement)
-        const effectStyle = computedStyle.getPropertyValue('--effect-style').trim()
-        const cardStyle = computedStyle.getPropertyValue('--card-style').trim()
-        const buttonVariant = computedStyle.getPropertyValue('--button-variant').trim()
-        const navbarStyle = computedStyle.getPropertyValue('--navbar-style').trim()
-        const cardHoverEffect = computedStyle.getPropertyValue('--card-hover-effect').trim()
-        const borderWidth = computedStyle.getPropertyValue('--border-width').trim()
+        const cssVarToAttr: Array<[cssVar: string, attr: string]> = [
+          ['--effect-style', 'data-effect-style'],
+          ['--shadow-intensity', 'data-shadow-intensity'],
+          ['--backdrop-blur-level', 'data-backdrop-blur'],
+          ['--border-style', 'data-border-style'],
+          ['--border-width', 'data-border-width'],
+          ['--card-style', 'data-card-style'],
+          ['--card-hover-effect', 'data-card-hover'],
+          ['--button-variant', 'data-button-variant'],
+          ['--button-size', 'data-button-size'],
+          ['--navbar-style', 'data-navbar-style'],
+          ['--footer-style', 'data-footer-style'],
+          ['--image-style', 'data-image-style'],
+          ['--link-style', 'data-link-style'],
+        ]
 
-        if (effectStyle) document.documentElement.setAttribute('data-effect-style', effectStyle)
-        if (cardStyle) document.documentElement.setAttribute('data-card-style', cardStyle)
-        if (buttonVariant)
-          document.documentElement.setAttribute('data-button-variant', buttonVariant)
-        if (navbarStyle) document.documentElement.setAttribute('data-navbar-style', navbarStyle)
-        if (cardHoverEffect)
-          document.documentElement.setAttribute('data-card-hover', cardHoverEffect)
-        if (borderWidth) document.documentElement.setAttribute('data-border-width', borderWidth)
+        for (const [cssVar, attr] of cssVarToAttr) {
+          const value = computedStyle.getPropertyValue(cssVar).trim()
+          if (value) document.documentElement.setAttribute(attr, value)
+        }
 
         // Force repaint to ensure CSS variables update
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions

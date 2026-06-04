@@ -5,6 +5,12 @@ import { getAllTweakCNPresets } from '../../src/utils/tweakcnConverter.js'
 
 describe('TweakCN Theme Compatibility', () => {
   const colorKeys = Object.keys(lightModeDefaults) as Array<keyof typeof lightModeDefaults>
+  // Optional brand tokens — presets are not required to define them; they fall
+  // back to primary→accent via the --gradient-brand CSS variable at runtime.
+  const OPTIONAL_TOKENS = ['gradientFrom', 'gradientVia', 'gradientTo']
+  const requiredColorKeys = colorKeys.filter(
+    (key) => !OPTIONAL_TOKENS.includes(key as string),
+  ) as Array<keyof typeof lightModeDefaults>
   const tweakcnPresets = getAllTweakCNPresets()
 
   describe('Converter Output', () => {
@@ -30,7 +36,7 @@ describe('TweakCN Theme Compatibility', () => {
       const missingTokens: Array<{ preset: string; missing: string[] }> = []
 
       tweakcnPresets.forEach((preset) => {
-        const missing = colorKeys.filter((key) => !preset.lightMode?.[key])
+        const missing = requiredColorKeys.filter((key) => !preset.lightMode?.[key])
         if (missing.length > 0) {
           missingTokens.push({ preset: preset.name, missing })
         }
@@ -50,7 +56,7 @@ describe('TweakCN Theme Compatibility', () => {
       const missingTokens: Array<{ preset: string; missing: string[] }> = []
 
       tweakcnPresets.forEach((preset) => {
-        const missing = colorKeys.filter((key) => !preset.darkMode?.[key])
+        const missing = requiredColorKeys.filter((key) => !preset.darkMode?.[key])
         if (missing.length > 0) {
           missingTokens.push({ preset: preset.name, missing })
         }
@@ -89,7 +95,7 @@ describe('TweakCN Theme Compatibility', () => {
 
     it('should have valid color values (HEX format like Real Estate Gold)', () => {
       tweakcnPresets.slice(0, 5).forEach((preset) => {
-        colorKeys.forEach((key) => {
+        requiredColorKeys.forEach((key) => {
           const lightValue = preset.lightMode?.[key]
           const darkValue = preset.darkMode?.[key]
 

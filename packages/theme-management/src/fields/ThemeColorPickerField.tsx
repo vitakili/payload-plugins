@@ -55,6 +55,29 @@ function cssColorToHex(cssColor: string): string {
   }
 }
 
+/**
+ * WCAG contrast ratio between two CSS colours (1–21). Returns null if either
+ * colour cannot be parsed. Uses the `color` package, falling back to the
+ * canvas-derived hex for modern formats (oklch etc.).
+ */
+function contrastRatio(a: string, b: string): number | null {
+  try {
+    return Number(Color(a).contrast(Color(b)).toFixed(2))
+  } catch {
+    try {
+      return Number(Color(cssColorToHex(a)).contrast(Color(cssColorToHex(b))).toFixed(2))
+    } catch {
+      return null
+    }
+  }
+}
+
+function contrastTone(ratio: number): { bg: string; fg: string; label: string } {
+  if (ratio >= 4.5) return { bg: '#dcfce7', fg: '#166534', label: 'AA' }
+  if (ratio >= 3) return { bg: '#fef9c3', fg: '#854d0e', label: 'AA Large' }
+  return { bg: '#fee2e2', fg: '#991b1b', label: 'Low' }
+}
+
 const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
   const [localValue, setLocalValue] = useState(value || '')
@@ -136,6 +159,41 @@ const ThemeColorPickerField: TextFieldClientComponent = ({ field, path }) => {
             className="color-text-input"
           />
         </div>
+
+        {(() => {
+          const sample = localValue || hexValue
+          const onWhite = contrastRatio(sample, '#ffffff')
+          const onBlack = contrastRatio(sample, '#000000')
+          if (onWhite == null && onBlack == null) return null
+          return (
+            <div className="color-contrast-row" aria-label="WCAG contrast">
+              {[
+                { ratio: onWhite, on: '#ffffff', text: '#000000', tip: 'on white' },
+                { ratio: onBlack, on: '#000000', text: '#ffffff', tip: 'on black' },
+              ].map(({ ratio, on, text, tip }) =>
+                ratio == null ? null : (
+                  <span key={tip} className="contrast-chip" title={`Contrast ${tip}: ${ratio}:1`}>
+                    <span
+                      className="contrast-sample"
+                      style={{ background: on, color: text, borderColor: 'rgba(0,0,0,0.15)' }}
+                    >
+                      Aa
+                    </span>
+                    <span
+                      className="contrast-ratio"
+                      style={{
+                        background: contrastTone(ratio).bg,
+                        color: contrastTone(ratio).fg,
+                      }}
+                    >
+                      {ratio.toFixed(1)} · {contrastTone(ratio).label}
+                    </span>
+                  </span>
+                ),
+              )}
+            </div>
+          )
+        })()}
 
         {showPicker && (
           <div

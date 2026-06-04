@@ -1,6 +1,10 @@
 # Appearance Controls Reference
 
-Added in **v1.2.0** — three new collapsible configuration sections that extend the Appearance Settings tab with granular UI customisation options.
+Added in **v1.2.0** — collapsible configuration sections that extend the Appearance Settings tab with granular UI customisation options.
+
+> **v1.4.0 — applied automatically.** `getThemeHtmlAttributes(resolved)` now emits **all** of the style data-attributes the generated CSS targets (`data-effect-style`, `data-shadow-intensity`, `data-backdrop-blur`, `data-border-style`, `data-border-width`, `data-card-style`, `data-card-hover`, `data-button-variant`, `data-button-size`, `data-navbar-style`, `data-footer-style`, `data-image-style`, `data-link-style`, plus `data-hover-animations="off"` / `data-scroll-reveal="off"` when disabled). Spreading it onto `<html>` makes Visual Effects + Component Styles render correctly on the **server** with no flash of unstyled content — no manual wiring required. The client `ThemeProvider` keeps these in sync after hydration.
+>
+> **Hero & Background is consumer-owned.** The plugin intentionally does **not** add hero/background fields (section 2 below documents the data-attribute contract you can wire into *your own* hero block/field). Hero styling is page/section-specific and belongs at that level, not in the global theme.
 
 ---
 
@@ -59,10 +63,16 @@ Controls the physical rendering style of cards, panels and interactive UI elemen
 
 ---
 
-## 2. Hero & Background
+## 2. Hero & Background _(consumer-side pattern — not a plugin field)_
 
-**Admin field path:** `themeConfiguration.heroBackground`  
-**DB name prefix:** `hero_*`, `gradient_*`, `overlay_*`, `background_*`, `pattern_*`, `section_*`
+> ⚠️ The plugin does **not** register these fields. Hero/background styling is
+> page- and section-specific, so it belongs on **your own** hero block/field.
+> This section documents a recommended data-attribute contract you can adopt if
+> you add such fields yourself. The `--gradient-from` / `--gradient-via` /
+> `--gradient-to` brand tokens (and the composed `--gradient-brand`) emitted by
+> the plugin are designed to feed exactly this kind of hero gradient.
+
+**Suggested field path (in your config):** `heroBackground`  
 
 Controls the visual style of the page hero section and decorative background effects on any section.
 
@@ -130,8 +140,16 @@ Fine-grained control over the visual style of reusable UI components across the 
 | `iconSet`               | select   | `lucide`   | `lucide`, `heroicons`, `phosphor`, `tabler`, `font-awesome`                    |
 | `navbarStyle`           | select   | `solid`    | `solid`, `transparent`, `blur`, `floating`, `minimal`                          |
 | `footerStyle`           | select   | `standard` | `standard`, `minimal`, `dark`, `gradient-top`, `full-color`                    |
+| `linkStyle`             | select   | `underline-hover` | `underline`, `underline-hover`, `none`, `highlight`, `animated`         |
 | `enableScrollReveal`    | checkbox | `true`     | animate elements on scroll                                                     |
 | `enableHoverAnimations` | checkbox | `true`     | micro-animations on hover                                                      |
+
+> **Built-in CSS.** As of v1.4.0 the plugin ships ready-to-use rules for
+> `buttonVariant` (incl. `gradient`), `buttonSize`, `footerStyle`, `imageStyle`
+> and `linkStyle`, scoped by the `data-*` attributes above. Mark elements with
+> `[data-btn]`, `[data-card]`, `[data-img]` / `.themed-image`, `[data-link]` /
+> `.themed-link` (and standard `header` / `footer`) and they pick up the tenant's
+> choices automatically — no extra CSS needed.
 
 ### Button variant descriptions
 
@@ -253,31 +271,43 @@ interface ThemeComponentStyles {
 
 ## 5. Accessing Values in Next.js
 
-```typescript
-// app/layout.tsx (or per-page layout)
-import { fetchThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
-
-const theme = await fetchThemeConfiguration({
-  collectionSlug: 'site-settings',
-})
-
-const { visualEffects, heroBackground, componentStyles } = theme ?? {}
-
-// Use to set HTML data attributes so CSS selectors can pick them up:
-const effectAttr = visualEffects?.effectStyle ?? 'flat'
-const patternAttr = heroBackground?.backgroundPattern ?? 'none'
-const buttonVariant = componentStyles?.buttonVariant ?? 'filled'
-```
+The recommended path resolves the configuration once and spreads the generated
+attributes onto `<html>`. Every Visual Effects + Component Styles data-attribute
+is emitted for you, so the server-rendered markup already matches the CSS:
 
 ```tsx
-// In your <html> tag:
-<html
-  data-effect={effectAttr}
-  data-pattern={patternAttr}
-  data-button={buttonVariant}
-  data-navbar={componentStyles?.navbarStyle ?? 'solid'}
->
+// app/layout.tsx
+import {
+  fetchThemeConfiguration,
+  resolveThemeConfiguration,
+  getThemeHtmlAttributes,
+  ServerThemeInjector,
+} from '@kilivi-dev/payloadcms-theme-management'
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const themeConfiguration = await fetchThemeConfiguration({ collectionSlug: 'site-settings' })
+  const resolved = resolveThemeConfiguration(themeConfiguration)
+  const htmlAttrs = getThemeHtmlAttributes(resolved)
+
+  return (
+    <html {...htmlAttrs}>
+      <head>
+        <ServerThemeInjector themeConfiguration={themeConfiguration} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
 ```
+
+`htmlAttrs` includes `data-theme`, `data-theme-mode`, `data-border-radius`,
+`data-font-scale`, `data-spacing`, `data-animation-level`,
+`data-allow-color-mode-toggle` **and** the style attributes
+(`data-effect-style`, `data-card-style`, `data-button-variant`,
+`data-button-size`, `data-navbar-style`, `data-footer-style`,
+`data-image-style`, `data-link-style`, `data-card-hover`, `data-shadow-intensity`,
+`data-backdrop-blur`, `data-border-style`, `data-border-width`). You do not need
+to set these by hand anymore.
 
 ### Full resolver example
 
