@@ -776,7 +776,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
                     tags: normalizedCacheRevalidation.tags,
                     paths: normalizedCacheRevalidation.paths,
                     enableLogging,
-                    logger: req?.payload?.logger,
+                    logger: req?.payload?.logger as PluginLogger | undefined,
                   })
                 } catch {
                   // no-op: logging is handled in executeThemeRevalidation
