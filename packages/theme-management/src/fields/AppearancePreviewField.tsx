@@ -1,9 +1,22 @@
 'use client'
 
 import { useFormFields } from '@payloadcms/ui'
+import { Monitor, Moon, Smartphone, Sparkles, Sun, Tablet, type LucideIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
+import {
+  DEFAULT_DEVICE_PREVIEW_ID,
+  DEVICE_PREVIEWS,
+  getDevicePreview,
+  type DevicePreviewId,
+} from '../constants/devicePreviews.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { getAdminLanguage } from '../utils/getAdminLanguage.js'
+
+const DEVICE_ICONS: Record<DevicePreviewId, LucideIcon> = {
+  mobile: Smartphone,
+  tablet: Tablet,
+  desktop: Monitor,
+}
 
 /**
  * Live, reactive preview of the Visual Effects + Component Styles + colour
@@ -244,7 +257,10 @@ export default function AppearancePreviewField() {
   >
   const lang = getAdminLanguage() as 'en' | 'cs'
   const [mode, setMode] = useState<Mode>('light')
+  const [device, setDevice] = useState<DevicePreviewId>(DEFAULT_DEVICE_PREVIEW_ID)
   const uid = useId().replace(/[:]/g, '')
+
+  const activeDevice = getDevicePreview(device)
 
   const str = (key: string, fallback: string): string => {
     const v = formFields?.[`themeConfiguration.${key}`]?.value
@@ -351,7 +367,7 @@ export default function AppearancePreviewField() {
   }`
 
   const t = {
-    title: lang === 'cs' ? '✨ Efekty & komponenty' : '✨ Effects & components',
+    title: lang === 'cs' ? 'Efekty & komponenty' : 'Effects & components',
     subtitle:
       lang === 'cs'
         ? 'Náhled povrchů, tlačítek, navbaru a patičky. Barvy a typografie se vybírají u motivu výše.'
@@ -367,6 +383,7 @@ export default function AppearancePreviewField() {
     primary: lang === 'cs' ? 'Primární' : 'Primary',
     secondary: lang === 'cs' ? 'Sekundární' : 'Secondary',
     footer: lang === 'cs' ? 'Patička' : 'Footer',
+    viewport: lang === 'cs' ? 'Náhled zařízení' : 'Device preview',
   }
 
   const chips: Array<[string, string]> = [
@@ -413,42 +430,109 @@ export default function AppearancePreviewField() {
         }}
       >
         <div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--theme-elevation-800)' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--theme-elevation-800)',
+            }}
+          >
+            <Sparkles size={14} aria-hidden />
             {t.title}
           </div>
           <div style={{ fontSize: '11px', color: 'var(--theme-elevation-500)' }}>{t.subtitle}</div>
         </div>
-        <div style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--theme-elevation-200)' }}>
-          {(['light', 'dark'] as Mode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              style={{
-                padding: '5px 12px',
-                fontSize: '11px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                border: 'none',
-                background: mode === m ? 'var(--theme-elevation-800)' : 'transparent',
-                color: mode === m ? 'var(--theme-elevation-0)' : 'var(--theme-elevation-600)',
-              }}
-            >
-              {m === 'light' ? `☀️ ${t.light}` : `🌙 ${t.dark}`}
-            </button>
-          ))}
+        <div style={{ display: 'inline-flex', gap: '8px', flexWrap: 'wrap' }}>
+          {/* Device / viewport switcher */}
+          <div
+            role="group"
+            aria-label={t.viewport}
+            style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--theme-elevation-200)' }}
+          >
+            {DEVICE_PREVIEWS.map((d) => {
+              const Icon = DEVICE_ICONS[d.id]
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setDevice(d.id)}
+                  title={`${lang === 'cs' ? d.labelCs : d.label} — ${d.width}×${d.height}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 10px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: 'none',
+                    background: device === d.id ? 'var(--theme-elevation-800)' : 'transparent',
+                    color: device === d.id ? 'var(--theme-elevation-0)' : 'var(--theme-elevation-600)',
+                  }}
+                >
+                  <Icon size={13} aria-hidden />
+                  {lang === 'cs' ? d.labelCs : d.label}
+                </button>
+              )
+            })}
+          </div>
+          {/* Light / dark switcher */}
+          <div style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--theme-elevation-200)' }}>
+            {(['light', 'dark'] as Mode[]).map((m) => {
+              const Icon = m === 'light' ? Sun : Moon
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMode(m)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: 'none',
+                    background: mode === m ? 'var(--theme-elevation-800)' : 'transparent',
+                    color: mode === m ? 'var(--theme-elevation-0)' : 'var(--theme-elevation-600)',
+                  }}
+                >
+                  <Icon size={13} aria-hidden />
+                  {m === 'light' ? t.light : t.dark}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
+      {/* Viewport wrapper — constrains the frame to the active device width */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          background: 'var(--theme-elevation-50)',
+          borderRadius: '14px',
+          padding: device === 'desktop' ? '0' : '16px',
+          transition: 'padding 0.25s ease',
+        }}
+      >
       {/* Browser-like frame */}
       <div
         style={{
+          width: '100%',
+          maxWidth: device === 'desktop' ? '100%' : `${activeDevice.width}px`,
           borderRadius: '14px',
           overflow: 'hidden',
           border: '1px solid var(--theme-elevation-200)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
           background: palette.background,
           color: palette.foreground,
+          transition: 'max-width 0.25s ease',
         }}
       >
         <nav style={nav}>
@@ -507,6 +591,7 @@ export default function AppearancePreviewField() {
         <div style={{ padding: '12px 16px', fontSize: '11px', ...footerStyleCss }}>
           © {new Date().getFullYear()} Acme — {t.footer}
         </div>
+      </div>
       </div>
 
       {/* Active spec chips */}

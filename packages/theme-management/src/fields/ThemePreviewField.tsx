@@ -3,6 +3,7 @@
 import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import * as _PayloadUI from '@payloadcms/ui'
+import { Moon, Palette, Sun, type LucideIcon } from 'lucide-react'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
@@ -70,7 +71,7 @@ const colorKeys = Object.keys(lightModeDefaults) as (keyof ColorModeColors)[]
 // translations and swatches will be computed inside the component to respect admin language at runtime
 
 interface ModePreviewProps {
-  icon: string
+  icon: LucideIcon
   title: string
   colors: ColorModeColors
   typography: ResolvedTypographyPreview
@@ -81,7 +82,7 @@ interface ModePreviewProps {
   }
 }
 
-function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModePreviewProps>) {
+function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly<ModePreviewProps>) {
   const t = getTranslations(getAdminLanguage())
   const background = colors.background ?? '#ffffff'
   const foreground = colors.foreground ?? '#0a0a0a'
@@ -127,8 +128,9 @@ function ModePreview({ icon, title, colors, typography, radius }: Readonly<ModeP
           opacity: 0.7,
         }}
       >
-        <span>
-          {icon} {title}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <Icon size={13} aria-hidden />
+          {title}
         </span>
         <span style={{ fontFamily: 'monospace', fontSize: '11px' }}>
           {background.toUpperCase()}
@@ -725,10 +727,11 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                 {/* Role label — this panel is dedicated to COLOURS + TYPOGRAPHY.
                     Effects & component structure live in the separate
                     "Effects & components" preview (AppearancePreviewField). */}
-                <span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Palette size={14} aria-hidden />
                   {getAdminLanguage() === 'cs'
-                    ? '🎨 Barvy & typografie'
-                    : '🎨 Colours & typography'}
+                    ? 'Barvy & typografie'
+                    : 'Colours & typography'}
                 </span>
                 <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
                   {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
@@ -742,14 +745,14 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                 }}
               >
                 <ModePreview
-                  icon="☀️"
+                  icon={Sun}
                   title={getTranslations('en').ui.lightMode}
                   colors={lightModeColors}
                   typography={previewTypography}
                   radius={previewRadius}
                 />
                 <ModePreview
-                  icon="🌙"
+                  icon={Moon}
                   title={getTranslations('en').ui.darkMode}
                   colors={darkModeColors}
                   typography={previewTypography}

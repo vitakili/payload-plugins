@@ -253,8 +253,8 @@ function createColorFields(defaults: ColorPalette): Field[] {
 export const lightModeField: Field = {
   type: 'collapsible',
   label: {
-    en: '☀️ Light Mode Colors',
-    cs: '☀️ Barvy světlého režimu',
+    en: 'Light Mode Colors',
+    cs: 'Barvy světlého režimu',
   },
   admin: {
     initCollapsed: true,
@@ -275,8 +275,8 @@ export const lightModeField: Field = {
 export const darkModeField: Field = {
   type: 'collapsible',
   label: {
-    en: '🌙 Dark Mode Colors',
-    cs: '🌙 Barvy tmavého režimu',
+    en: 'Dark Mode Colors',
+    cs: 'Barvy tmavého režimu',
   },
   admin: {
     initCollapsed: true,

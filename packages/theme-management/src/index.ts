@@ -1,4 +1,5 @@
 import type { CollectionConfig, Config, Field, GlobalConfig, Plugin, TabsField } from 'payload'
+import { DEFAULT_LIVE_PREVIEW_BREAKPOINTS } from './constants/devicePreviews.js'
 import { createThemeConfigurationField } from './fields/themeConfigurationField.js'
 import type { ThemeTab } from './fields/themeConfigurationField.js'
 import type { SiteThemeConfiguration } from './payload-types.js'
@@ -166,7 +167,7 @@ const normalizeLivePreviewOptions = (
     fallbackToFirstPage: raw.fallbackToFirstPage ?? true,
     tenantField: raw.tenantField ?? 'tenant',
     tenantQueryParam: raw.tenantQueryParam ?? 'tenant',
-    breakpoints: raw.breakpoints,
+    breakpoints: raw.breakpoints ?? DEFAULT_LIVE_PREVIEW_BREAKPOINTS,
     url: raw.url,
   }
 }
