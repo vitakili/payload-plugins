@@ -4,6 +4,27 @@ Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, stand
 
 > **Note:** This package was previously published under `@kilivi/payloadcms-theme-management`. It is now maintained under the `@kilivi-dev` scope starting from v1.0.0.
 
+## Version 1.6.0 — Visitor components, accessibility & export
+
+### New in this release
+
+- **Visitor components** — `ColorModeToggle` (light/dark/auto with a View
+  Transitions ripple) and `ThemeSwitcher` (runtime preset switching), imported from
+  `@kilivi-dev/payloadcms-theme-management/components/*`.
+- **Palette generator** — build a full light + dark palette from one brand colour
+  or an uploaded logo, right in the admin (`generatePaletteFromColor`,
+  `extractDominantColors`).
+- **WCAG accessibility audit** — live contrast check of the whole palette in both
+  modes, with one-click fixes (`auditThemePalette`, `suggestAccessibleColor`).
+- **Design token & Tailwind export** — W3C Design Tokens JSON + Tailwind v4
+  `@theme inline` / v3 config (`generateDesignTokens`, `generateTailwindV4Theme`).
+- **SSR polish** — `<meta name="theme-color">` and `color-scheme` emitted by
+  `ServerThemeInjector`; `getThemeHtmlAttributes` for one-spread `<html>` setup.
+- **Native Payload i18n** — admin strings via the `theme-management` namespace,
+  extensible/overridable (`mergeThemeManagementI18n`, `i18n` plugin option).
+
+See the in-repo Claude skills under `.claude/skills/` for task-focused guides.
+
 ## Version 1.2.0 — Extended Presets & Appearance Controls
 
 ### New in this release
