@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef } from 'react'
 import type { GoogleFont } from '../../../app/api/google-fonts/route'
+import { useThemeLanguage } from '../../../hooks/useThemeTranslations.js'
 import { getTranslations } from '../../../translations.js'
-import { getAdminLanguage } from '../../../utils/getAdminLanguage.js'
 
 export type PreviewVariant =
   | 'h1'
@@ -34,6 +34,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
   const shadowHostRef = useRef<HTMLDivElement>(null)
   const shadowRootRef = useRef<ShadowRoot | null>(null)
   const fontLoadedRef = useRef(false)
+  const adminLang = useThemeLanguage()
 
   useEffect(() => {
     if (!shadowHostRef.current) return
@@ -90,7 +91,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
       `
 
       let content: HTMLElement
-      const t = getTranslations(getAdminLanguage())
+      const t = getTranslations(adminLang)
 
       switch (variant) {
         case 'h1':
@@ -267,7 +268,7 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
         shadowRoot.innerHTML = ''
       }
     }
-  }, [font, variant, text, onLoad])
+  }, [font, variant, text, onLoad, adminLang])
 
   return <div ref={shadowHostRef} style={{ width: '100%', minHeight: '20px' }} />
 }

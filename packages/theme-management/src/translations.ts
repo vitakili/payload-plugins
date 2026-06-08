@@ -1,5 +1,12 @@
 export type Language = string
 
+/**
+ * i18n namespace under which all plugin translations are registered inside
+ * Payload's `config.i18n.translations`. Consumers can reference keys via
+ * `t('theme-management:...')` and override them by merging into the same namespace.
+ */
+export const THEME_MANAGEMENT_I18N_NAMESPACE = 'theme-management' as const
+
 export interface PluginTranslations {
   tabLabel: string
   standaloneCollectionLabel: string
@@ -16,6 +23,10 @@ export interface PluginTranslations {
     usePreset: string
     specifyCustom: string
     sampleSentence: string
+    showPreview: string
+    hidePreview: string
+    colorsAndTypography: string
+    clearSelection: string
   }
   colors: {
     primary: string
@@ -61,6 +72,10 @@ const translations: Record<Language, PluginTranslations> = {
       usePreset: 'Use theme preset font',
       specifyCustom: 'Specify custom font below',
       sampleSentence: 'The quick brown fox jumps over the lazy dog',
+      showPreview: 'Preview',
+      hidePreview: 'Hide preview',
+      colorsAndTypography: 'Colours & typography',
+      clearSelection: 'Clear selection',
     },
     colors: {
       primary: 'Primary',
@@ -104,6 +119,10 @@ const translations: Record<Language, PluginTranslations> = {
       usePreset: 'Použít písmo motivu',
       specifyCustom: 'Zadejte vlastní písmo níže',
       sampleSentence: 'Rychlá hnědá liška přeskočila líného psa',
+      showPreview: 'Náhled',
+      hidePreview: 'Skrýt náhled',
+      colorsAndTypography: 'Barvy & typografie',
+      clearSelection: 'Zrušit výběr',
     },
     colors: {
       primary: 'Primární',
@@ -133,11 +152,11 @@ const translations: Record<Language, PluginTranslations> = {
   },
 }
 
-type DeepPartial<T> = {
+export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
 }
 
-function deepMerge<T extends object>(base: T, partial: DeepPartial<T>): T {
+export function deepMerge<T extends object>(base: T, partial: DeepPartial<T>): T {
   const out: Record<string, unknown> = { ...(base as Record<string, unknown>) }
   for (const key of Object.keys(partial)) {
     const val = (partial as Record<string, unknown>)[key]
@@ -160,14 +179,11 @@ export function getTranslations(lang: Language = 'en'): PluginTranslations {
 }
 
 export function registerTranslations(
-  newTranslations: Record<Language, Partial<PluginTranslations>>,
+  newTranslations: Record<Language, DeepPartial<PluginTranslations>>,
 ) {
   for (const lang of Object.keys(newTranslations)) {
     const existing = (translations[lang] as PluginTranslations) || ({} as PluginTranslations)
-    translations[lang] = deepMerge(
-      existing,
-      newTranslations[lang] as DeepPartial<PluginTranslations>,
-    )
+    translations[lang] = deepMerge(existing, newTranslations[lang])
   }
 }
 

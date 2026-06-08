@@ -3,8 +3,7 @@
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientComponent } from 'payload'
 import { useEffect, useState } from 'react'
-import { getTranslations } from '../translations.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
+import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 
 type LocalizedLabel = Record<string, string>
 
@@ -18,6 +17,7 @@ interface FontOption {
 const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
   const [isOpen, setIsOpen] = useState(false)
+  const lang = useThemeLanguage()
 
   const options = (field.options as FontOption[]) || []
   const selectedOption = options.find((opt) => opt.value === value)
@@ -25,7 +25,6 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
 
   const getOptionLabel = (opt: FontOption) => {
     if (typeof opt.label === 'string') return opt.label
-    const lang = getAdminLanguage()
     return opt.label[lang] || opt.label.en || opt.label.cs || 'Font'
   }
 
@@ -73,12 +72,12 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
     }
   }, [isOpen])
 
-  const t = getTranslations(getAdminLanguage())
+  const t = useThemeTranslations()
   const label =
     typeof field.label === 'string'
       ? field.label
       : typeof field.label === 'object'
-        ? field.label?.en || field.label?.cs
+        ? field.label?.[lang] || field.label?.en || field.label?.cs
         : field.label || 'Font'
 
   return (

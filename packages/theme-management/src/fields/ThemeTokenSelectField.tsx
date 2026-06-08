@@ -7,7 +7,7 @@ import { allThemePresets, fetchThemeConfiguration } from '../index.js'
 import type { SiteThemeConfiguration } from '../payload-types.js'
 import type { ThemePreset } from '../presets.js'
 import type { FetchThemeConfigurationOptions } from '../types.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
+import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
 import { inferTenant } from '../utils/inferTenant.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
@@ -111,6 +111,8 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
 
   const [options, setOptions] = useState<ThemeColorOption[]>(FALLBACK_TOKENS)
   const selectedValue = value || 'background'
+  // Active Payload admin language (reactive via Payload's i18n context).
+  const adminLang = useThemeLanguage()
 
   // Get themePresets from admin.custom or use defaults
   const themePresets = useMemo(() => {
@@ -155,9 +157,6 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     })()
 
     const inferredTenant = tenantFromForm ?? custom?.tenantSlug ?? inferTenant()
-
-    // Determine admin language to pass as `locale` to fetch, if not provided
-    const adminLang = getAdminLanguage()
 
     // Normalize fetch options so that even when callers provide an empty object ("{}"),
     // we still ensure `tenantSlug` and `locale` are set to sensible defaults (inferred/form/adminLang).
@@ -229,7 +228,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     return () => {
       controller.abort()
     }
-  }, [themePresets, field.admin?.custom, formThemeConfiguration, formTenant])
+  }, [themePresets, field.admin?.custom, formThemeConfiguration, formTenant, adminLang])
 
   const handleSelect = useCallback(
     (nextValue: string) => {
@@ -237,21 +236,6 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     },
     [setValue],
   )
-
-  // Make admin language reactive so switching admin UI language updates labels
-  const initialAdminLang = getAdminLanguage()
-  const [adminLang, setAdminLang] = useState<string>(initialAdminLang)
-
-  useEffect(() => {
-    if (typeof document === 'undefined' || !('MutationObserver' in window)) return
-    const el = document.documentElement
-    const obs = new MutationObserver(() => {
-      const next = getAdminLanguage()
-      if (next !== adminLang) setAdminLang(next)
-    })
-    obs.observe(el, { attributes: true, attributeFilter: ['lang'] })
-    return () => obs.disconnect()
-  }, [adminLang])
 
   const label =
     typeof field.label === 'string'

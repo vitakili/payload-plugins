@@ -10,4 +10,8 @@ declare module '@payloadcms/ui' {
   export function useField<T = any>(opts: any): { value: T; setValue: (v: T) => void }
   export function useForm(): any
   export function useFormFields<T = any>(selector?: (args: any) => T): T
+  export function useTranslation(): {
+    t: (key: string, options?: Record<string, unknown>) => string
+    i18n: { language: string; [key: string]: any }
+  }
 }
