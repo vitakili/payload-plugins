@@ -3,8 +3,8 @@
 import { useForm, useFormFields } from '@payloadcms/ui'
 import { AlertTriangle, Check, ShieldCheck, Wand2 } from 'lucide-react'
 import { useMemo } from 'react'
+import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
 import { auditThemePalette, type AuditColors, type ContrastPairResult } from '../utils/contrast.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 /**
  * Live WCAG accessibility audit for the configured colour palette. Mounted as a
@@ -28,7 +28,7 @@ export default function AccessibilityAuditField() {
     { value?: unknown } | undefined
   >
   const { dispatchFields } = useForm()
-  const lang = getAdminLanguage() as 'en' | 'cs'
+  const lang = useThemeLanguage() as 'en' | 'cs'
 
   const readMode = (mode: Mode): AuditColors => {
     const colors: AuditColors = {}

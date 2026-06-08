@@ -3,12 +3,12 @@
 import { useFormFields } from '@payloadcms/ui'
 import { Braces, Copy, Download, FileCode } from 'lucide-react'
 import { useCallback, useState } from 'react'
+import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
 import {
   generateDesignTokensJson,
   generateTailwindV3Theme,
   generateTailwindV4Theme,
 } from '../utils/exportTokens.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 const COLOR_KEYS = [
   'background',
@@ -41,7 +41,7 @@ export default function ThemeExportField() {
     string,
     { value?: unknown } | undefined
   >
-  const lang = getAdminLanguage() as 'en' | 'cs'
+  const lang = useThemeLanguage() as 'en' | 'cs'
   const [copied, setCopied] = useState(false)
 
   const buildConfig = useCallback(() => {

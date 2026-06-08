@@ -271,6 +271,15 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
             },
           },
         },
+        {
+          name: 'themeExport',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemeExportField',
+            },
+          },
+        },
       ],
     })
   }

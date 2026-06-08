@@ -4,12 +4,12 @@ import { useForm, useFormFields } from '@payloadcms/ui'
 import { ImageUp, Sparkles, Wand2 } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
+import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
 import {
   extractDominantColors,
   generatePaletteFromColor,
   type GeneratedColorMode,
 } from '../utils/generatePalette.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 /**
  * Admin tool that generates a full light + dark palette from a single brand
@@ -22,7 +22,7 @@ export default function PaletteGeneratorField() {
     { value?: unknown } | undefined
   >
   const { dispatchFields } = useForm()
-  const lang = getAdminLanguage() as 'en' | 'cs'
+  const lang = useThemeLanguage() as 'en' | 'cs'
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const currentPrimary = (() => {

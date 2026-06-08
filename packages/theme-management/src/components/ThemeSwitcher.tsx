@@ -88,7 +88,7 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         applyPreset(preset)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentionally run once on mount to restore the persisted preset.
   }, [])
 
   const handleChange = useCallback(
