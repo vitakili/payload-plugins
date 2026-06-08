@@ -339,6 +339,7 @@ const tenantThemeConfiguration = await fetchThemeConfiguration({
 | `enableLogging`             | `boolean`                                            | `false`                      | Logs plugin actions                                |
 | `livePreview`               | `boolean \| ThemeManagementLivePreviewOptions`       | `true`                       | Live preview URL behavior                          |
 | `cacheRevalidation`         | `boolean \| ThemeManagementCacheRevalidationOptions` | auto (standalone default on) | Cache invalidation endpoint/tags/paths             |
+| `i18n`                      | `ThemeManagementI18nOptions`                         | `undefined`                  | Extend/override admin translations (see below)     |
 
 ### `livePreview` options
 
@@ -365,6 +366,32 @@ const tenantThemeConfiguration = await fetchThemeConfiguration({
 | `secret`      | `string`   | `undefined`                             |
 | `tags`        | `string[]` | `[global_{slug}]`                       |
 | `paths`       | `string[]` | `[]`                                    |
+
+## Internationalization (i18n)
+
+The plugin ships with **English (`en`)** and **Czech (`cs`)** translations and registers
+them into Payload's native `config.i18n` under the `theme-management` namespace. Field
+labels are localized out of the box and the dynamic admin UI follows the active admin
+language.
+
+Add languages or override individual strings via the `i18n` option (deep-merged over the
+built-ins; missing keys fall back to English):
+
+```ts
+import { de } from '@payloadcms/translations/languages/de'
+
+themeManagementPlugin({
+  i18n: {
+    translations: {
+      de: { tabLabel: 'Darstellung', ui: { lightMode: 'Heller Modus' } },
+      en: { tabLabel: 'Theme' }, // override a built-in string
+    },
+    supportedLanguages: { de }, // optional: register a brand-new admin language
+  },
+})
+```
+
+Full guide: [docs/TRANSLATIONS.md](./docs/TRANSLATIONS.md)
 
 ## Appearance Controls (v1.2.0)
 

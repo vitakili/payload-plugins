@@ -20,6 +20,10 @@ jest.mock('@payloadcms/ui', () => ({
     isLivePreviewEnabled: undefined,
     isLivePreviewing: undefined,
   })),
+  useTranslation: jest.fn(() => ({
+    t: (key: string) => key,
+    i18n: { language: 'en' },
+  })),
 }))
 
 jest.mock('../../src/components/typographyPreviewUtils.js', () => ({

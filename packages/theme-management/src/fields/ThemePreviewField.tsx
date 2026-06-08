@@ -13,9 +13,8 @@ import type {
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
 import { allThemePresets } from '../index.js'
 import type { ThemePreset, ThemeTypographyPreset } from '../presets.js'
+import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
-import { getTranslations } from '../translations.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
 // useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
@@ -83,7 +82,7 @@ interface ModePreviewProps {
 }
 
 function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly<ModePreviewProps>) {
-  const t = getTranslations(getAdminLanguage())
+  const t = useThemeTranslations()
   const background = colors.background ?? '#ffffff'
   const foreground = colors.foreground ?? '#0a0a0a'
   const borderColor = colors.border ?? 'rgba(148, 163, 184, 0.35)'
@@ -502,8 +501,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
     pill: borderRadiusCSS['--radius-xl'] ?? borderRadiusCSS['--radius-large'] ?? '999px',
   }
 
-  // Translate labels at runtime based on admin language
-  const t = getTranslations(getAdminLanguage())
+  // Translate labels at runtime based on the active Payload admin language
+  const t = useThemeTranslations()
   // Explicitly type keys as `keyof ColorModeColors` to satisfy TypeScript when indexing `lightMode`/`darkMode`
   const highlightSwatches: { key: keyof ColorModeColors; label: string }[] = [
     { key: 'primary', label: t.colors.primary },
@@ -554,13 +553,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             }}
           >
             <span style={{ fontSize: '9px', lineHeight: 1 }}>{previewOpen ? '▼' : '▶'}</span>
-            {previewOpen
-              ? getAdminLanguage() === 'cs'
-                ? 'Skrýt náhled'
-                : 'Hide preview'
-              : getAdminLanguage() === 'cs'
-                ? 'Náhled'
-                : 'Preview'}
+            {previewOpen ? t.ui.hidePreview : t.ui.showPreview}
           </button>
         )}
       </div>
@@ -729,12 +722,10 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                     "Effects & components" preview (AppearancePreviewField). */}
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <Palette size={14} aria-hidden />
-                  {getAdminLanguage() === 'cs'
-                    ? 'Barvy & typografie'
-                    : 'Colours & typography'}
+                  {t.ui.colorsAndTypography}
                 </span>
                 <span style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>
-                  {activePreset ? activePreset.label : getTranslations('en').preview.customPalette}
+                  {activePreset ? activePreset.label : t.preview.customPalette}
                 </span>
               </div>
 
@@ -746,14 +737,14 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
               >
                 <ModePreview
                   icon={Sun}
-                  title={getTranslations('en').ui.lightMode}
+                  title={t.ui.lightMode}
                   colors={lightModeColors}
                   typography={previewTypography}
                   radius={previewRadius}
                 />
                 <ModePreview
                   icon={Moon}
-                  title={getTranslations('en').ui.darkMode}
+                  title={t.ui.darkMode}
                   colors={darkModeColors}
                   typography={previewTypography}
                   radius={previewRadius}

@@ -8,9 +8,10 @@ import type {
   GoogleFont,
   LanguageSubset,
 } from '../../../app/api/google-fonts/route.js'
+import { useThemeLanguage } from '../../../hooks/useThemeTranslations.js'
 import { FontPreview } from './FontPreview.js'
 import { PreviewContent, type PreviewTab } from './PreviewContent.js'
-import { getTranslations, type Language } from './translations.js'
+import { getTranslations, translations, type Language } from './translations.js'
 
 // Import CSS for styling
 if (typeof window !== 'undefined') {
@@ -38,7 +39,9 @@ export interface FontPickerProps {
 const FontPickerField: React.FC<TextFieldClientProps> = (props) => {
   const { path } = props
   const { value, setValue } = useField<string>({ path })
-  const language: Language = 'en' // Could be extracted from admin config
+  const adminLang = useThemeLanguage()
+  // FontPicker ships its own en/cs strings; fall back to English for any other locale.
+  const language: Language = adminLang in translations ? (adminLang as Language) : 'en'
 
   const handleChange = useCallback(
     (fontFamily: string) => {

@@ -11,6 +11,10 @@ jest.mock('@payloadcms/ui', () => ({
     if (path === 'themeConfiguration') return { value: null }
     return { value: undefined, setValue: mockSetValue }
   }),
+  useTranslation: jest.fn(() => ({
+    t: (key: string) => key,
+    i18n: { language: 'en' },
+  })),
 }))
 
 jest.mock('../../src/index.js', () => ({

@@ -3,9 +3,9 @@
 import { useField, useForm } from '@payloadcms/ui'
 import type { TextFieldClientProps } from 'payload'
 import { useCallback, useMemo } from 'react'
+import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { allStylePresets, stylePresetCategories } from '../style-presets.js'
 import type { StylePreset } from '../style-presets.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 const VF_KEYS = [
   'effectStyle',
@@ -126,7 +126,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
   const { path } = props
   const { value: selectedPreset, setValue } = useField<string>({ path })
   const { dispatchFields } = useForm()
-  const lang = getAdminLanguage() as 'en' | 'cs'
+  const lang = useThemeLanguage() as 'en' | 'cs'
+  const t = useThemeTranslations()
 
   const applyStylePreset = useCallback(
     (preset: StylePreset) => {
@@ -215,7 +216,10 @@ export default function StylePresetField(props: TextFieldClientProps) {
 
       {groupedPresets.map((category) => {
         const accent = CATEGORY_ACCENT[category.name] ?? '#64748b'
-        const catLabel = typeof category.label === 'object' ? category.label[lang] : category.label
+        const catLabel =
+          typeof category.label === 'object'
+            ? (category.label[lang] ?? category.label.en)
+            : category.label
         return (
           <div key={category.name} style={{ marginBottom: '20px' }}>
             {/* Category header */}
@@ -260,10 +264,12 @@ export default function StylePresetField(props: TextFieldClientProps) {
               {category.presets.map((preset) => {
                 const isSelected = selectedPreset === preset.name
                 const labelText =
-                  typeof preset.label === 'object' ? preset.label[lang] : preset.label
+                  typeof preset.label === 'object'
+                    ? (preset.label[lang] ?? preset.label.en)
+                    : preset.label
                 const descText =
                   typeof preset.description === 'object'
-                    ? preset.description[lang]
+                    ? (preset.description[lang] ?? preset.description.en)
                     : preset.description
                 const previewStyle = getPreviewStyle(preset)
                 const containerBg = getContainerBg(preset)
@@ -528,7 +534,7 @@ export default function StylePresetField(props: TextFieldClientProps) {
             transition: 'background 120ms ease',
           }}
         >
-          {lang === 'cs' ? '✕ Zrušit výběr' : '✕ Clear selection'}
+          {`✕ ${t.ui.clearSelection}`}
         </button>
       )}
     </div>
