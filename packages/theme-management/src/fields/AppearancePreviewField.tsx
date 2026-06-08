@@ -9,7 +9,7 @@ import {
   getDevicePreview,
   type DevicePreviewId,
 } from '../constants/devicePreviews.js'
-import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
+import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 
 const DEVICE_ICONS: Record<DevicePreviewId, LucideIcon> = {
@@ -256,6 +256,7 @@ export default function AppearancePreviewField() {
     { value?: unknown } | undefined
   >
   const lang = useThemeLanguage() as 'en' | 'cs'
+  const t = useThemeTranslations().appearancePreview
   const [mode, setMode] = useState<Mode>('light')
   const [device, setDevice] = useState<DevicePreviewId>(DEFAULT_DEVICE_PREVIEW_ID)
   const uid = useId().replace(/[:]/g, '')
@@ -365,26 +366,6 @@ export default function AppearancePreviewField() {
       ? `.${uid} .tm-prev-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 ${palette.foreground}}`
       : ''
   }`
-
-  const t = {
-    title: lang === 'cs' ? 'Efekty & komponenty' : 'Effects & components',
-    subtitle:
-      lang === 'cs'
-        ? 'Náhled povrchů, tlačítek, navbaru a patičky. Barvy a typografie se vybírají u motivu výše.'
-        : 'Preview of surfaces, buttons, navbar and footer. Colours & typography are chosen at the theme above.',
-    light: lang === 'cs' ? 'Světlý' : 'Light',
-    dark: lang === 'cs' ? 'Tmavý' : 'Dark',
-    heading: lang === 'cs' ? 'Ukázkový nadpis' : 'Sample heading',
-    body:
-      lang === 'cs'
-        ? 'Příliš žluťoučký kůň úpěl ďábelské ódy. Tady je '
-        : 'The quick brown fox jumps over the lazy dog. Here is an ',
-    link: lang === 'cs' ? 'odkaz' : 'inline link',
-    primary: lang === 'cs' ? 'Primární' : 'Primary',
-    secondary: lang === 'cs' ? 'Sekundární' : 'Secondary',
-    footer: lang === 'cs' ? 'Patička' : 'Footer',
-    viewport: lang === 'cs' ? 'Náhled zařízení' : 'Device preview',
-  }
 
   const chips: Array<[string, string]> = [
     ['effect', choices.effectStyle],

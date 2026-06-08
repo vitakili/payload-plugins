@@ -4,7 +4,7 @@ import { useForm, useFormFields } from '@payloadcms/ui'
 import { ImageUp, Sparkles, Wand2 } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
-import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
+import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import {
   extractDominantColors,
   generatePaletteFromColor,
@@ -22,7 +22,7 @@ export default function PaletteGeneratorField() {
     { value?: unknown } | undefined
   >
   const { dispatchFields } = useForm()
-  const lang = useThemeLanguage() as 'en' | 'cs'
+  const t = useThemeTranslations().paletteGenerator
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const currentPrimary = (() => {
@@ -33,21 +33,6 @@ export default function PaletteGeneratorField() {
   const [seed, setSeed] = useState<string>(currentPrimary)
   const [swatches, setSwatches] = useState<string[]>([])
   const [open, setOpen] = useState(false)
-
-  const t = {
-    title: lang === 'cs' ? 'Generátor palety' : 'Palette generator',
-    subtitle:
-      lang === 'cs'
-        ? 'Z jedné značkové barvy (nebo z loga) vytvoří kompletní světlou i tmavou paletu.'
-        : 'Builds a complete light & dark palette from one brand colour (or a logo).',
-    generate: lang === 'cs' ? 'Vygenerovat paletu' : 'Generate palette',
-    fromImage: lang === 'cs' ? 'Extrahovat z obrázku' : 'Extract from image',
-    pick: lang === 'cs' ? 'Vyber barvu z loga:' : 'Pick a colour from the logo:',
-    hint:
-      lang === 'cs'
-        ? 'Přepíše barvy ve světlém i tmavém režimu.'
-        : 'Overwrites light & dark mode colours.',
-  }
 
   const applyPalette = useCallback(() => {
     const palette = generatePaletteFromColor(seed)

@@ -3,7 +3,7 @@
 import { useFormFields } from '@payloadcms/ui'
 import { Braces, Copy, Download, FileCode } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
+import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import {
   generateDesignTokensJson,
   generateTailwindV3Theme,
@@ -41,7 +41,7 @@ export default function ThemeExportField() {
     string,
     { value?: unknown } | undefined
   >
-  const lang = useThemeLanguage() as 'en' | 'cs'
+  const t = useThemeTranslations().themeExport
   const [copied, setCopied] = useState(false)
 
   const buildConfig = useCallback(() => {
@@ -77,18 +77,6 @@ export default function ThemeExportField() {
     a.remove()
     URL.revokeObjectURL(url)
   }, [])
-
-  const t = {
-    title: lang === 'cs' ? 'Export tématu' : 'Export theme',
-    subtitle:
-      lang === 'cs'
-        ? 'Stáhni barvy jako design tokeny nebo Tailwind konfiguraci.'
-        : 'Download colours as design tokens or Tailwind config.',
-    tokens: lang === 'cs' ? 'Design tokeny (JSON)' : 'Design tokens (JSON)',
-    tw4: 'Tailwind v4 (@theme)',
-    tw3: 'Tailwind v3 config',
-    copy: copied ? (lang === 'cs' ? 'Zkopírováno!' : 'Copied!') : lang === 'cs' ? 'Kopírovat v4' : 'Copy v4',
-  }
 
   const onCopyV4 = useCallback(async () => {
     const css = generateTailwindV4Theme(buildConfig())
@@ -143,7 +131,7 @@ export default function ThemeExportField() {
           }
         >
           <Braces size={14} aria-hidden />
-          {t.tokens}
+          {t.designTokens}
         </button>
         <button
           type="button"
@@ -153,11 +141,11 @@ export default function ThemeExportField() {
           }
         >
           <Download size={14} aria-hidden />
-          {t.tw4}
+          {t.tailwindV4}
         </button>
         <button type="button" style={btnStyle} onClick={onCopyV4}>
           <Copy size={14} aria-hidden />
-          {t.copy}
+          {copied ? t.copied : t.copyV4}
         </button>
         <button
           type="button"
@@ -171,7 +159,7 @@ export default function ThemeExportField() {
           }
         >
           <Download size={14} aria-hidden />
-          {t.tw3}
+          {t.tailwindV3}
         </button>
       </div>
     </div>

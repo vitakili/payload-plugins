@@ -7,7 +7,7 @@ import { allThemePresets, fetchThemeConfiguration } from '../index.js'
 import type { SiteThemeConfiguration } from '../payload-types.js'
 import type { ThemePreset } from '../presets.js'
 import type { FetchThemeConfigurationOptions } from '../types.js'
-import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
+import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { inferTenant } from '../utils/inferTenant.js'
 import { resolveThemeConfiguration } from '../utils/resolveThemeConfiguration.js'
 
@@ -113,6 +113,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
   const selectedValue = value || 'background'
   // Active Payload admin language (reactive via Payload's i18n context).
   const adminLang = useThemeLanguage()
+  const t = useThemeTranslations()
 
   // Get themePresets from admin.custom or use defaults
   const themePresets = useMemo(() => {
@@ -483,7 +484,7 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
           }}
         >
           <span style={{ fontWeight: 600 }}>
-            {adminLang === 'cs' ? 'Vybraná barva:' : 'Selected color:'}
+            {t.ui.selectedColor}
           </span>{' '}
           {selectedLabel}
           {selectedColor && selectedColor !== '' && (

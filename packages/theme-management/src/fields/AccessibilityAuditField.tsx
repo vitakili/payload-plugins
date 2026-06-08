@@ -3,7 +3,7 @@
 import { useForm, useFormFields } from '@payloadcms/ui'
 import { AlertTriangle, Check, ShieldCheck, Wand2 } from 'lucide-react'
 import { useMemo } from 'react'
-import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
+import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { auditThemePalette, type AuditColors, type ContrastPairResult } from '../utils/contrast.js'
 
 /**
@@ -28,7 +28,8 @@ export default function AccessibilityAuditField() {
     { value?: unknown } | undefined
   >
   const { dispatchFields } = useForm()
-  const lang = useThemeLanguage() as 'en' | 'cs'
+  const tr = useThemeTranslations()
+  const t = tr.accessibility
 
   const readMode = (mode: Mode): AuditColors => {
     const colors: AuditColors = {}
@@ -60,19 +61,19 @@ export default function AccessibilityAuditField() {
   const lightAudit = useMemo(() => auditThemePalette(lightColors), [JSON.stringify(lightColors)])
   const darkAudit = useMemo(() => auditThemePalette(darkColors), [JSON.stringify(darkColors)])
 
-  const t = {
-    title: lang === 'cs' ? 'Přístupnost (WCAG kontrast)' : 'Accessibility (WCAG contrast)',
-    subtitle:
-      lang === 'cs'
-        ? 'Kontrola čitelnosti barevných párů v obou režimech. AA = 4.5:1.'
-        : 'Readability check of colour pairs in both modes. AA = 4.5:1.',
-    light: lang === 'cs' ? 'Světlý režim' : 'Light mode',
-    dark: lang === 'cs' ? 'Tmavý režim' : 'Dark mode',
-    pass: lang === 'cs' ? 'v pořádku' : 'pass',
-    fail: lang === 'cs' ? 'nevyhovuje' : 'fail',
-    fix: lang === 'cs' ? 'Opravit' : 'Fix',
-    allGood: lang === 'cs' ? 'Vše vyhovuje AA 👍' : 'All pairs pass AA 👍',
-    noData: lang === 'cs' ? 'Žádné barvy k vyhodnocení.' : 'No colours to evaluate.',
+  // Map each audited pair (by its foreground token) to a localized label.
+  const pairLabel = (result: ContrastPairResult): string => {
+    const map: Record<string, keyof typeof t.pairs> = {
+      foreground: 'bodyText',
+      mutedForeground: 'mutedText',
+      primaryForeground: 'primaryButton',
+      secondaryForeground: 'secondaryButton',
+      accentForeground: 'accent',
+      cardForeground: 'cardText',
+      destructiveForeground: 'destructive',
+    }
+    const key = map[result.foregroundKey]
+    return key ? t.pairs[key] : result.label
   }
 
   const applyFix = (mode: Mode, result: ContrastPairResult) => {
@@ -152,7 +153,7 @@ export default function AccessibilityAuditField() {
                 >
                   Aa
                 </span>
-                <span style={{ flex: 1, color: 'var(--theme-elevation-700)' }}>{r.label}</span>
+                <span style={{ flex: 1, color: 'var(--theme-elevation-700)' }}>{pairLabel(r)}</span>
                 <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--theme-elevation-600)' }}>
                   {r.ratio}:1
                 </span>
@@ -221,8 +222,8 @@ export default function AccessibilityAuditField() {
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-        {renderSection(t.light, 'lightMode', lightAudit)}
-        {renderSection(t.dark, 'darkMode', darkAudit)}
+        {renderSection(tr.ui.lightMode, 'lightMode', lightAudit)}
+        {renderSection(tr.ui.darkMode, 'darkMode', darkAudit)}
       </div>
     </div>
   )

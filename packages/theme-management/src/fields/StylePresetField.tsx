@@ -209,9 +209,7 @@ export default function StylePresetField(props: TextFieldClientProps) {
           lineHeight: 1.6,
         }}
       >
-        {lang === 'cs'
-          ? 'Vyberte vizuální styl. Nastaví efekty, stíny a styly komponent — barvy zůstanou nezměněny.'
-          : 'Pick a visual style — sets effects, shadows and component styles. Colours stay unchanged.'}
+        {t.stylePreset.description}
       </p>
 
       {groupedPresets.map((category) => {

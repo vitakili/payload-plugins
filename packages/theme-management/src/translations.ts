@@ -27,6 +27,10 @@ export interface PluginTranslations {
     hidePreview: string
     colorsAndTypography: string
     clearSelection: string
+    selectedColor: string
+  }
+  stylePreset: {
+    description: string
   }
   colors: {
     primary: string
@@ -52,6 +56,52 @@ export interface PluginTranslations {
     customPalette: string
     footer: string
   }
+  paletteGenerator: {
+    title: string
+    subtitle: string
+    generate: string
+    fromImage: string
+    pick: string
+    hint: string
+  }
+  accessibility: {
+    title: string
+    subtitle: string
+    fix: string
+    allGood: string
+    noData: string
+    pairs: {
+      bodyText: string
+      mutedText: string
+      primaryButton: string
+      secondaryButton: string
+      accent: string
+      cardText: string
+      destructive: string
+    }
+  }
+  themeExport: {
+    title: string
+    subtitle: string
+    designTokens: string
+    tailwindV4: string
+    tailwindV3: string
+    copyV4: string
+    copied: string
+  }
+  appearancePreview: {
+    title: string
+    subtitle: string
+    light: string
+    dark: string
+    heading: string
+    body: string
+    link: string
+    primary: string
+    secondary: string
+    footer: string
+    viewport: string
+  }
 }
 
 // Mutable translations object to allow runtime registration/extension
@@ -76,6 +126,11 @@ const translations: Record<Language, PluginTranslations> = {
       hidePreview: 'Hide preview',
       colorsAndTypography: 'Colours & typography',
       clearSelection: 'Clear selection',
+      selectedColor: 'Selected color:',
+    },
+    stylePreset: {
+      description:
+        'Pick a visual style — sets effects, shadows and component styles. Colours stay unchanged.',
     },
     colors: {
       primary: 'Primary',
@@ -102,6 +157,53 @@ const translations: Record<Language, PluginTranslations> = {
       customPalette: 'Custom palette',
       footer: '© 2025 Your Website. Powered by PayloadCMS.',
     },
+    paletteGenerator: {
+      title: 'Palette generator',
+      subtitle: 'Builds a complete light & dark palette from one brand colour (or a logo).',
+      generate: 'Generate palette',
+      fromImage: 'Extract from image',
+      pick: 'Pick a colour from the logo:',
+      hint: 'Overwrites light & dark mode colours.',
+    },
+    accessibility: {
+      title: 'Accessibility (WCAG contrast)',
+      subtitle: 'Readability check of colour pairs in both modes. AA = 4.5:1.',
+      fix: 'Fix',
+      allGood: 'All pairs pass AA',
+      noData: 'No colours to evaluate.',
+      pairs: {
+        bodyText: 'Body text',
+        mutedText: 'Muted text',
+        primaryButton: 'Primary button',
+        secondaryButton: 'Secondary button',
+        accent: 'Accent',
+        cardText: 'Card text',
+        destructive: 'Destructive',
+      },
+    },
+    themeExport: {
+      title: 'Export theme',
+      subtitle: 'Download colours as design tokens or Tailwind config.',
+      designTokens: 'Design tokens (JSON)',
+      tailwindV4: 'Tailwind v4 (@theme)',
+      tailwindV3: 'Tailwind v3 config',
+      copyV4: 'Copy v4',
+      copied: 'Copied!',
+    },
+    appearancePreview: {
+      title: 'Effects & components',
+      subtitle:
+        'Preview of surfaces, buttons, navbar and footer. Colours & typography are chosen at the theme above.',
+      light: 'Light',
+      dark: 'Dark',
+      heading: 'Sample heading',
+      body: 'The quick brown fox jumps over the lazy dog. Here is an ',
+      link: 'inline link',
+      primary: 'Primary',
+      secondary: 'Secondary',
+      footer: 'Footer',
+      viewport: 'Device preview',
+    },
   },
   cs: {
     tabLabel: 'Nastavení vzhledu',
@@ -123,6 +225,11 @@ const translations: Record<Language, PluginTranslations> = {
       hidePreview: 'Skrýt náhled',
       colorsAndTypography: 'Barvy & typografie',
       clearSelection: 'Zrušit výběr',
+      selectedColor: 'Vybraná barva:',
+    },
+    stylePreset: {
+      description:
+        'Vyberte vizuální styl. Nastaví efekty, stíny a styly komponent — barvy zůstanou nezměněny.',
     },
     colors: {
       primary: 'Primární',
@@ -148,6 +255,53 @@ const translations: Record<Language, PluginTranslations> = {
       sampleCardTitle: 'Ukázková karta',
       customPalette: 'Vlastní paleta',
       footer: '© 2025 Váš web. Poháněno PayloadCMS.',
+    },
+    paletteGenerator: {
+      title: 'Generátor palety',
+      subtitle: 'Z jedné značkové barvy (nebo z loga) vytvoří kompletní světlou i tmavou paletu.',
+      generate: 'Vygenerovat paletu',
+      fromImage: 'Extrahovat z obrázku',
+      pick: 'Vyber barvu z loga:',
+      hint: 'Přepíše barvy ve světlém i tmavém režimu.',
+    },
+    accessibility: {
+      title: 'Přístupnost (WCAG kontrast)',
+      subtitle: 'Kontrola čitelnosti barevných párů v obou režimech. AA = 4.5:1.',
+      fix: 'Opravit',
+      allGood: 'Vše vyhovuje AA',
+      noData: 'Žádné barvy k vyhodnocení.',
+      pairs: {
+        bodyText: 'Tělo textu',
+        mutedText: 'Tlumený text',
+        primaryButton: 'Primární tlačítko',
+        secondaryButton: 'Sekundární tlačítko',
+        accent: 'Akcent',
+        cardText: 'Text karty',
+        destructive: 'Destruktivní',
+      },
+    },
+    themeExport: {
+      title: 'Export tématu',
+      subtitle: 'Stáhni barvy jako design tokeny nebo Tailwind konfiguraci.',
+      designTokens: 'Design tokeny (JSON)',
+      tailwindV4: 'Tailwind v4 (@theme)',
+      tailwindV3: 'Tailwind v3 konfigurace',
+      copyV4: 'Kopírovat v4',
+      copied: 'Zkopírováno!',
+    },
+    appearancePreview: {
+      title: 'Efekty & komponenty',
+      subtitle:
+        'Náhled povrchů, tlačítek, navbaru a patičky. Barvy a typografie se vybírají u motivu výše.',
+      light: 'Světlý',
+      dark: 'Tmavý',
+      heading: 'Ukázkový nadpis',
+      body: 'Příliš žluťoučký kůň úpěl ďábelské ódy. Tady je ',
+      link: 'odkaz',
+      primary: 'Primární',
+      secondary: 'Sekundární',
+      footer: 'Patička',
+      viewport: 'Náhled zařízení',
     },
   },
 }
