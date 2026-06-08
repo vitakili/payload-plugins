@@ -1,5 +1,8 @@
 import type { Field } from 'payload'
+import type { ThemeManagementI18nOptions } from './i18n.js'
 import type { ThemePreset } from './presets.js'
+
+export type { ThemeManagementI18nOptions, ThemeManagementI18nTranslations } from './i18n.js'
 
 export interface ThemeManagementLivePreviewUrlArgs {
   /** Resolved preview page document (if found) */
@@ -109,6 +112,13 @@ export interface ThemeManagementPluginOptions {
   livePreview?: boolean | ThemeManagementLivePreviewOptions
   /** Configure cache revalidation route and tags for Next.js `unstable_cache` usage */
   cacheRevalidation?: boolean | ThemeManagementCacheRevalidationOptions
+  /**
+   * Extend or override the plugin's admin i18n. Built-in languages are English (`en`)
+   * and Czech (`cs`); add more or override individual strings here. Translations are
+   * merged into Payload's native `config.i18n.translations` under the
+   * `theme-management` namespace.
+   */
+  i18n?: ThemeManagementI18nOptions
 }
 
 export interface FetchThemeConfigurationOptions {

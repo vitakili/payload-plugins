@@ -23,6 +23,10 @@
       "import": "./dist/fields/*.js",
       "types": "./dist/fields/*.d.ts"
     },
+    "./hooks/*": {
+      "import": "./dist/hooks/*.js",
+      "types": "./dist/hooks/*.d.ts"
+    },
     "./views/*": {
       "import": "./dist/views/*.js",
       "types": "./dist/views/*.d.ts"

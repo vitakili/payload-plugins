@@ -5,6 +5,7 @@ import type { ThemeTab } from './fields/themeConfigurationField.js'
 import type { SiteThemeConfiguration } from './payload-types.js'
 import type { ThemePreset } from './presets.js'
 import { allThemePresets } from './presets.js'
+import { mergeThemeManagementI18n } from './i18n.js'
 import { getTranslations, translations } from './translations.js'
 import type {
   FetchThemeConfigurationOptions,
@@ -660,6 +661,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       enableLogging = false,
       livePreview = true,
       cacheRevalidation,
+      i18n,
     } = options
 
     const normalizedLivePreview = normalizeLivePreviewOptions(livePreview)
@@ -674,6 +676,14 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         console.log('Theme Management Plugin: disabled via options, skipping.')
       }
       return config
+    }
+
+    // Register the plugin's translations into Payload's native i18n
+    // (`theme-management` namespace), merging in any user-provided extensions or
+    // overrides. This config is used as the base for every return path below.
+    const configWithI18n: Config = {
+      ...config,
+      i18n: mergeThemeManagementI18n(config.i18n, i18n),
     }
 
     const themeTab = createThemeConfigurationField({
@@ -789,7 +799,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         },
       }
 
-      const globals = Array.isArray(config.globals) ? config.globals : []
+      const globals = Array.isArray(configWithI18n.globals) ? configWithI18n.globals : []
 
       // Check if global already exists
       const existingIndex = globals.findIndex((g) => g.slug === standaloneCollectionSlug)
@@ -800,10 +810,10 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
             `Theme Management Plugin: global "${standaloneCollectionSlug}" already exists, skipping creation.`,
           )
         }
-        return config
+        return configWithI18n
       }
 
-      const currentEndpoints = ensureEndpointsArray(config.endpoints)
+      const currentEndpoints = ensureEndpointsArray(configWithI18n.endpoints)
       const livePreviewEndpoint = createLivePreviewEndpoint({
         livePreview: normalizedLivePreview,
         enableLogging,
@@ -816,7 +826,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       endpoints = mergeEndpoint(endpoints, cacheEndpoint)
 
       return {
-        ...config,
+        ...configWithI18n,
         endpoints,
         globals: [...globals, standaloneGlobal],
       }
@@ -825,7 +835,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     // Otherwise, add as tab to existing collection
     let collectionTouched = false
 
-    const collections = ensureCollectionsArray(config.collections).map((collection) => {
+    const collections = ensureCollectionsArray(configWithI18n.collections).map((collection) => {
       if (collection.slug !== targetCollection) {
         return collection
       }
@@ -858,10 +868,10 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
           `Theme Management Plugin: collection "${targetCollection}" was not found, leaving config untouched.`,
         )
       }
-      return config
+      return configWithI18n
     }
 
-    const currentEndpoints = ensureEndpointsArray(config.endpoints)
+    const currentEndpoints = ensureEndpointsArray(configWithI18n.endpoints)
     const livePreviewEndpoint = createLivePreviewEndpoint({
       livePreview: normalizedLivePreview,
       enableLogging,
@@ -874,7 +884,7 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
     endpoints = mergeEndpoint(endpoints, cacheEndpoint)
 
     return {
-      ...config,
+      ...configWithI18n,
       endpoints,
       collections,
     }
@@ -1054,6 +1064,18 @@ export {
   getTranslations,
   registerTranslations,
   availableLanguages,
+  THEME_MANAGEMENT_I18N_NAMESPACE,
 } from './translations.js'
+export type { PluginTranslations, Language, DeepPartial } from './translations.js'
+
+// Native Payload i18n helpers (theme-management namespace)
+export {
+  mergeThemeManagementI18n,
+  getThemeManagementI18nTranslations,
+} from './i18n.js'
+export type {
+  ThemeManagementI18nOptions,
+  ThemeManagementI18nTranslations,
+} from './i18n.js'
 
 export default themeManagementPlugin

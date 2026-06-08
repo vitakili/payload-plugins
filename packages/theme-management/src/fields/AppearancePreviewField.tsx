@@ -9,8 +9,8 @@ import {
   getDevicePreview,
   type DevicePreviewId,
 } from '../constants/devicePreviews.js'
+import { useThemeLanguage } from '../hooks/useThemeTranslations.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
-import { getAdminLanguage } from '../utils/getAdminLanguage.js'
 
 const DEVICE_ICONS: Record<DevicePreviewId, LucideIcon> = {
   mobile: Smartphone,
@@ -255,7 +255,7 @@ export default function AppearancePreviewField() {
     string,
     { value?: unknown } | undefined
   >
-  const lang = getAdminLanguage() as 'en' | 'cs'
+  const lang = useThemeLanguage() as 'en' | 'cs'
   const [mode, setMode] = useState<Mode>('light')
   const [device, setDevice] = useState<DevicePreviewId>(DEFAULT_DEVICE_PREVIEW_ID)
   const uid = useId().replace(/[:]/g, '')
