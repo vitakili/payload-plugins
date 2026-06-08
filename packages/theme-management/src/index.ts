@@ -1029,7 +1029,7 @@ export {
 export { getThemeDynamicCSS, getAllDynamicThemesCSS } from './utils/themeCSS.js'
 
 export type { Mode, ThemeDefaults } from './providers/Theme/types.js'
-export { ThemeProvider } from './providers/Theme/index.js'
+export { ThemeProvider, useTheme } from './providers/Theme/index.js'
 
 // Font loading utilities for Next.js integration
 export {

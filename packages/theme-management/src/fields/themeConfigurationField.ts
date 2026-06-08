@@ -251,8 +251,26 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
             },
           ],
         },
+        {
+          name: 'paletteGenerator',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@kilivi-dev/payloadcms-theme-management/fields/PaletteGeneratorField',
+            },
+          },
+        },
         lightModeField,
         darkModeField,
+        {
+          name: 'accessibilityAudit',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@kilivi-dev/payloadcms-theme-management/fields/AccessibilityAuditField',
+            },
+          },
+        },
       ],
     })
   }

@@ -1,0 +1,42 @@
+/* View Transitions ripple for ColorModeToggle.
+   Disable the default cross-fade so the clip-path circle reveal is clean. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* New (incoming) theme sits on top and is revealed by the expanding circle. */
+::view-transition-new(root) {
+  z-index: 1;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+.tm-color-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tm-color-mode-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

@@ -1,10 +1,10 @@
 'use client'
 
 import { useField } from '@payloadcms/ui'
-import Color from 'color'
 import type { TextFieldClientComponent } from 'payload'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { cssColorToHex as toHex, getContrastRatio } from '../utils/contrast.js'
 
 // Import CSS for styling
 if (typeof window !== 'undefined') {
@@ -28,49 +28,17 @@ function resolveLocalizedValue(value: unknown, fallback: string) {
 }
 
 /**
- * Convert any CSS color string to hex for the picker.
- * Uses 'color' package for hex/rgb/hsl; falls back to canvas
- * for modern formats (oklch, oklab, lch, etc.) which all
- * modern browsers support in fillStyle.
+ * Convert any CSS color string to hex for the picker, with a neutral fallback so
+ * the swatch always renders. Delegates to the shared {@link toHex} util
+ * (color package + canvas fallback for oklch/lch).
  */
 function cssColorToHex(cssColor: string): string {
   if (!cssColor) return '#000000'
-  try {
-    return Color(cssColor).hex().toString()
-  } catch {}
-  // Canvas fallback — Chrome 111+, Firefox 113+, Safari 16.4+ all support oklch in fillStyle
-  if (typeof document === 'undefined') return '#888888'
-  try {
-    const cv = document.createElement('canvas')
-    cv.width = 1
-    cv.height = 1
-    const ctx = cv.getContext('2d')
-    if (!ctx) return '#888888'
-    ctx.fillStyle = cssColor
-    ctx.fillRect(0, 0, 1, 1)
-    const [r, g, b] = Array.from(ctx.getImageData(0, 0, 1, 1).data)
-    return '#' + [r, g, b].map((n) => (n as number).toString(16).padStart(2, '0')).join('')
-  } catch {
-    return '#888888'
-  }
+  return toHex(cssColor) ?? '#888888'
 }
 
-/**
- * WCAG contrast ratio between two CSS colours (1–21). Returns null if either
- * colour cannot be parsed. Uses the `color` package, falling back to the
- * canvas-derived hex for modern formats (oklch etc.).
- */
-function contrastRatio(a: string, b: string): number | null {
-  try {
-    return Number(Color(a).contrast(Color(b)).toFixed(2))
-  } catch {
-    try {
-      return Number(Color(cssColorToHex(a)).contrast(Color(cssColorToHex(b))).toFixed(2))
-    } catch {
-      return null
-    }
-  }
-}
+/** WCAG contrast ratio between two CSS colours (1–21), or null if unparseable. */
+const contrastRatio = getContrastRatio
 
 function contrastTone(ratio: number): { bg: string; fg: string; label: string } {
   if (ratio >= 4.5) return { bg: '#dcfce7', fg: '#166534', label: 'AA' }

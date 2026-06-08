@@ -90,8 +90,19 @@ ${borderRadiusCSS}
   const colorModesCSS = generateThemeColorsCss({ themeName: theme, lightMode, darkMode })
   const customCSSBlock = typeof customCSS === 'string' ? customCSS.trim() : ''
 
+  // `color-scheme` makes native UI (form controls, scrollbars) match the theme and
+  // avoids a white flash on dark sites. Fixed mode → single scheme; toggle/auto → both.
+  const colorScheme =
+    allowColorModeToggle === false
+      ? colorMode === 'dark'
+        ? 'dark'
+        : 'light'
+      : 'light dark'
+  const colorSchemeBlock = `:root {\n  color-scheme: ${colorScheme};\n}`
+
   const combinedCSS = [
     criticalCSS,
+    colorSchemeBlock,
     borderRadiusBlock,
     themeConfigurationCSS,
     colorModesCSS,
@@ -100,9 +111,35 @@ ${borderRadiusCSS}
     .filter((block) => Boolean(block?.trim?.().length))
     .join('\n\n')
 
+  // <meta name="theme-color"> colours the mobile browser chrome to match the page
+  // background. Emit per-scheme variants when the mode can change, otherwise a
+  // single tag matching the fixed mode.
+  const pick = (mode: typeof lightMode, key: 'background'): string | undefined => {
+    const value = (mode as Record<string, unknown> | null | undefined)?.[key]
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined
+  }
+  const lightBg = pick(lightMode, 'background')
+  const darkBg = pick(darkMode, 'background')
+  const emitBothSchemes = allowColorModeToggle !== false || colorMode === 'auto'
+
   return (
     <>
       <InitTheme />
+      {emitBothSchemes ? (
+        <>
+          {lightBg ? (
+            <meta name="theme-color" media="(prefers-color-scheme: light)" content={lightBg} />
+          ) : null}
+          {darkBg ? (
+            <meta name="theme-color" media="(prefers-color-scheme: dark)" content={darkBg} />
+          ) : null}
+        </>
+      ) : (
+        (() => {
+          const fixed = colorMode === 'dark' ? darkBg : lightBg
+          return fixed ? <meta name="theme-color" content={fixed} /> : null
+        })()
+      )}
       <style
         id="theme-critical-css"
         dangerouslySetInnerHTML={{
