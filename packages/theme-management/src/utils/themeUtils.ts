@@ -405,7 +405,13 @@ function applyEffectElementRules(rules: string[], config: ThemeConfiguration): v
       `  box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15) !important;`,
     )
     rules.push(`}`)
-    rules.push(`html[data-effect-style='glass'] header, html[data-effect-style='glass'] nav {`)
+    // Apply the glass surface to the navbar container, but never to a <nav>
+    // nested inside a <header> (or <footer>) — otherwise the inner nav paints a
+    // second glass layer on top of the header's, producing a visible double-tint.
+    // A standalone top-level <nav> (header-less layouts) still gets the surface.
+    rules.push(
+      `html[data-effect-style='glass'] header, html[data-effect-style='glass'] nav:not(header nav):not(footer nav) {`,
+    )
     rules.push(
       `  background-color: color-mix(in srgb, var(--background) 65%, transparent) !important;`,
     )
