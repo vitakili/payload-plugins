@@ -45,6 +45,9 @@ tests/**/*.d.ts.map
 temp/
 *.log
 
+# Local pack tarballs (used for file: linking into consumer apps)
+*.tgz
+
 # Generated test/runtime caches
 jest_0/
 **/jest_[0-9]*/
