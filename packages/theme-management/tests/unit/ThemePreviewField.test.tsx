@@ -26,6 +26,14 @@ jest.mock('@payloadcms/ui', () => ({
   })),
 }))
 
+// PaletteGeneratorField (rendered inside the preset column) pulls in the ESM-only
+// `color` package, which Jest cannot transform. These tests cover the preset picker,
+// not the generator, so render it as a stub.
+jest.mock('../../src/fields/PaletteGeneratorField.js', () => ({
+  __esModule: true,
+  default: () => null,
+}))
+
 jest.mock('../../src/components/typographyPreviewUtils.js', () => ({
   resolveTypographyPreview: jest.fn(() => ({
     bodyFont: 'Inter',
@@ -176,7 +184,14 @@ describe('ThemePreviewField', () => {
     path: 'themeConfiguration.theme',
   } satisfies Partial<SelectFieldClientProps>
 
-  it('uses admin.themePresets when provided', () => {
+// The preset list is collapsed by default — open it before querying preset buttons.
+const openPresetList = async () => {
+  const user = userEvent.setup()
+  await user.click(screen.getByRole('button', { name: /choose a preset/i }))
+  return user
+}
+
+  it('uses admin.themePresets when provided', async () => {
     const customPresets = [
       {
         name: 'hotpink',
@@ -207,13 +222,15 @@ describe('ThemePreviewField', () => {
     } as SelectFieldClientProps
 
     render(<ThemePreviewField {...props} />)
+    await openPresetList()
 
     const hotpinkButton = screen.getByRole('button', { name: /Hot Pink/i })
     expect(hotpinkButton).toBeInTheDocument()
   })
 
-  it('renders theme options with color swatches', () => {
+  it('renders theme options with color swatches', async () => {
     render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
+    await openPresetList()
 
     const coolButton = screen.getByRole('button', { name: /Cool & Professional/i })
     const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
@@ -225,7 +242,7 @@ describe('ThemePreviewField', () => {
     expect(swatches.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('still supports legacy admin.themePresets for compatibility', () => {
+  it('still supports legacy admin.themePresets for compatibility', async () => {
     const legacyProps = {
       ...baseProps,
       field: {
@@ -252,6 +269,7 @@ describe('ThemePreviewField', () => {
     } as SelectFieldClientProps
 
     render(<ThemePreviewField {...legacyProps} />)
+    await openPresetList()
 
     const legacyButton = screen.getByRole('button', { name: /Legacy Theme/i })
     expect(legacyButton).toBeInTheDocument()
@@ -259,9 +277,9 @@ describe('ThemePreviewField', () => {
 
   it('updates value and dispatches preset when a theme is selected', async () => {
     render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
+    const user = await openPresetList()
 
     const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
-    const user = userEvent.setup()
     await user.click(neonButton)
 
     expect(mockSetValue).toHaveBeenCalledWith('neon')

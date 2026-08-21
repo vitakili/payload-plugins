@@ -28,6 +28,9 @@ export interface PluginTranslations {
     colorsAndTypography: string
     clearSelection: string
     selectedColor: string
+    themePresets: string
+    choosePreset: string
+    presetCount: string
   }
   stylePreset: {
     description: string
@@ -127,6 +130,9 @@ const translations: Record<Language, PluginTranslations> = {
       colorsAndTypography: 'Colours & typography',
       clearSelection: 'Clear selection',
       selectedColor: 'Selected color:',
+      themePresets: 'Theme presets',
+      choosePreset: 'Choose a preset',
+      presetCount: 'presets',
     },
     stylePreset: {
       description:
@@ -226,6 +232,9 @@ const translations: Record<Language, PluginTranslations> = {
       colorsAndTypography: 'Barvy & typografie',
       clearSelection: 'Zrušit výběr',
       selectedColor: 'Vybraná barva:',
+      themePresets: 'Motivy',
+      choosePreset: 'Vyberte motiv',
+      presetCount: 'motivů',
     },
     stylePreset: {
       description:

@@ -4,6 +4,26 @@ Theme Management plugin for Payload CMS v3 with SSR-ready theme variables, stand
 
 > **Note:** This package was previously published under `@kilivi/payloadcms-theme-management`. It is now maintained under the `@kilivi-dev` scope starting from v1.0.0.
 
+**Repository:** [github.com/vitakili/payload-plugins → packages/theme-management](https://github.com/vitakili/payload-plugins/tree/main/packages/theme-management) · [Changelog](https://github.com/vitakili/payload-plugins/blob/main/packages/theme-management/CHANGELOG.md) · [Issues](https://github.com/vitakili/payload-plugins/issues)
+
+## Version 2.1.0 — Cleaner Appearance Settings UI
+
+### New in this release
+
+- **Palette generator sits inside Theme Selection** — it is no longer a separate
+  field buried in *Color Mode Settings*. It renders at the top of the preset
+  column, so you generate a palette from a brand colour or logo and pick or
+  fine-tune a preset directly below it.
+- **Collapsible preset list** — a summary row shows the active preset with its
+  colour swatches and opens the full scrollable list on click. Collapsed by
+  default, so the live preview stays the focal point.
+- **Preset column and live preview always share one row** — the layout moved from
+  `flex-wrap` to CSS grid, so the preview can no longer drop below the preset
+  list; it stacks into a single column below 1024px.
+- **Theme Selection is localized** — its label and description now follow the
+  active Payload admin language instead of always falling back to English.
+  Consumer-supplied label objects are respected, with `en` as the fallback.
+
 ## Version 1.6.0 — Visitor components, accessibility & export
 
 ### New in this release

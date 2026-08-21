@@ -3,7 +3,7 @@
 import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import * as _PayloadUI from '@payloadcms/ui'
-import { Moon, Palette, Sun, type LucideIcon } from 'lucide-react'
+import { ChevronDown, ChevronRight, Moon, Palette, Sun, type LucideIcon } from 'lucide-react'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
@@ -13,7 +13,8 @@ import type {
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
 import { allThemePresets } from '../index.js'
 import type { ThemePreset, ThemeTypographyPreset } from '../presets.js'
-import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
+import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
+import PaletteGeneratorField from './PaletteGeneratorField.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
 
@@ -311,6 +312,9 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const formFields = useFormFields(([formState]: any) => formState)
   const hasAppliedInitialPresetRef = useRef(false)
   const [previewOpen, setPreviewOpen] = useState(true)
+  // Preset list starts collapsed once a theme is already selected so the
+  // preview panel — not the long preset list — dominates the layout.
+  const [presetsOpen, setPresetsOpen] = useState(false)
 
   const applyPreset = useCallback(
     (presetName: string) => {
@@ -512,8 +516,32 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
     { key: 'foreground', label: t.colors.foreground },
   ]
 
-  const fieldLabel =
-    typeof field.label === 'string' ? field.label : field.label?.en || field.label?.cs || 'Theme'
+  const presetCount = Object.keys(runtimeThemePresets).length
+  const summarySwatches = highlightSwatches
+    .map(({ key }) => (activePreset ? activePreset.lightMode[key] : lightModeColors[key]))
+    .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
+
+  // Field labels/descriptions arrive as `{ en, cs, … }` objects. Resolve them
+  // against the active admin language (Payload i18n) instead of hard-coding `en`,
+  // otherwise the theme selection stays English in every locale.
+  const adminLanguage = useThemeLanguage()
+  const resolveLocalized = (
+    value: string | Record<string, string> | null | undefined,
+    fallback = '',
+  ): string => {
+    if (typeof value === 'string') return value
+    if (!value) return fallback
+    const base = adminLanguage.split('-')[0]
+    return value[adminLanguage] ?? value[base] ?? value.en ?? Object.values(value)[0] ?? fallback
+  }
+
+  const fieldLabel = resolveLocalized(
+    field.label as string | Record<string, string> | undefined,
+    'Theme',
+  )
+  const fieldDescription = resolveLocalized(
+    field.admin?.description as string | Record<string, string> | undefined,
+  )
 
   return (
     <div style={{ marginBottom: '24px' }}>
@@ -538,138 +566,97 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           <button
             type="button"
             onClick={() => setPreviewOpen((v) => !v)}
-            style={{
-              fontSize: '11px',
-              fontWeight: 500,
-              padding: '3px 10px',
-              borderRadius: '6px',
-              border: '1px solid var(--theme-elevation-200, #e2e8f0)',
-              background: 'var(--theme-elevation-50, #f8fafc)',
-              cursor: 'pointer',
-              color: 'var(--theme-elevation-600, #475569)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-            }}
+            className="theme-preview-toggle"
           >
-            <span style={{ fontSize: '9px', lineHeight: 1 }}>{previewOpen ? '▼' : '▶'}</span>
+            {previewOpen ? (
+              <ChevronDown size={12} aria-hidden />
+            ) : (
+              <ChevronRight size={12} aria-hidden />
+            )}
             {previewOpen ? t.ui.hidePreview : t.ui.showPreview}
           </button>
         )}
       </div>
 
       <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '16px',
-          alignItems: 'flex-start',
-        }}
+        className={`theme-preview-layout${
+          showPreviewPanel && previewOpen ? '' : ' theme-preview-layout--single'
+        }`}
       >
-        <div
-          style={{
-            flex: '0 0 auto',
-            minWidth: '220px',
-            maxWidth: '320px',
-            display: 'grid',
-            gap: '10px',
-          }}
-        >
-          <div className="theme-preset-list">
-            {Object.entries(runtimeThemePresets).map(([key, preset]) => {
-              const isSelected = key === selectedTheme
-              const swatches = highlightSwatches
-                .map(({ key: colorKey }) => preset.lightMode[colorKey] as string | undefined)
-                .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
+        <div className="theme-preset-column">
+          {/* Palette generator lives in the same column as the preset picker:
+              editors either generate a palette from a brand colour / logo, or
+              pick a ready-made preset right below it. */}
+          <PaletteGeneratorField />
 
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => handleThemeSelect(key)}
-                  className={`theme-preset-button ${isSelected ? 'selected' : ''}`}
-                >
-                  <div className="theme-info">
-                    <span className="theme-label">{preset.label}</span>
-                    <span className="theme-name">{key}</span>
-                  </div>
-                  <div className="theme-swatches" aria-hidden="true">
-                    {swatches.map((color, index) => (
-                      <span
-                        key={`${key}-swatch-${color}-${index}`}
-                        className="color-swatch"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
+          {/* Collapsible preset picker — collapsed by default so the live preview
+              stays the focal point; the summary row keeps the active preset visible. */}
+          <button
+            type="button"
+            className={`theme-preset-summary${presetsOpen ? ' is-open' : ''}`}
+            onClick={() => setPresetsOpen((v) => !v)}
+            aria-expanded={presetsOpen}
+            aria-label={t.ui.choosePreset}
+          >
+            {presetsOpen ? (
+              <ChevronDown size={14} aria-hidden />
+            ) : (
+              <ChevronRight size={14} aria-hidden />
+            )}
+            <span className="theme-preset-summary__info">
+              <span className="theme-label">{activePreset?.label ?? t.ui.choosePreset}</span>
+              <span className="theme-name">
+                {presetsOpen
+                  ? `${presetCount} ${t.ui.presetCount}`
+                  : (selectedTheme ?? t.ui.themePresets)}
+              </span>
+            </span>
+            <span className="theme-swatches" aria-hidden="true">
+              {summarySwatches.map((color, index) => (
+                <span
+                  key={`summary-swatch-${color}-${index}`}
+                  className="color-swatch"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </span>
+          </button>
 
-          {activePreset && (
-            <div
-              style={{
-                padding: '12px',
-                borderRadius: '10px',
-                border: '1px solid var(--theme-elevation-200)',
-                backgroundColor: 'var(--theme-elevation-50)',
-                display: 'grid',
-                gap: '8px',
-                fontSize: '12px',
-                color: 'var(--theme-elevation-600)',
-              }}
-            >
-              <div style={{ fontWeight: 600, color: 'var(--theme-elevation-800)' }}>
-                {activePreset.label}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '12px',
-                  marginTop: '4px',
-                }}
-              >
-                {highlightSwatches.map(({ key, label }) => {
-                  const swatchValue = activePreset.lightMode[key]
+          {presetsOpen && (
+            <div className="theme-preset-list">
+              {Object.entries(runtimeThemePresets).map(([key, preset]) => {
+                const isSelected = key === selectedTheme
+                const swatches = highlightSwatches
+                  .map(({ key: colorKey }) => preset.lightMode[colorKey] as string | undefined)
+                  .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
 
-                  if (!swatchValue) {
-                    return null
-                  }
-
-                  return (
-                    <div
-                      key={key}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        minWidth: 'fit-content',
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '999px',
-                          border: '1px solid rgba(15, 23, 42, 0.12)',
-                          backgroundColor: swatchValue,
-                          boxShadow: 'inset 0 1px 2px rgba(15, 23, 42, 0.08)',
-                        }}
-                        aria-hidden="true"
-                      />
-                      <span style={{ fontSize: '11px', color: 'var(--theme-elevation-700)' }}>
-                        {label}
-                      </span>
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleThemeSelect(key)}
+                    className={`theme-preset-button ${isSelected ? 'selected' : ''}`}
+                  >
+                    <div className="theme-info">
+                      <span className="theme-label">{preset.label}</span>
+                      <span className="theme-name">{key}</span>
                     </div>
-                  )
-                })}
-              </div>
+                    <div className="theme-swatches" aria-hidden="true">
+                      {swatches.map((color, index) => (
+                        <span
+                          key={`${key}-swatch-${color}-${index}`}
+                          className="color-swatch"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           )}
 
-          {field.admin?.description && (
+          {fieldDescription && (
             <div
               style={{
                 fontSize: '12px',
@@ -677,23 +664,13 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                 lineHeight: 1.5,
               }}
             >
-              {typeof field.admin.description === 'string'
-                ? field.admin.description
-                : field.admin.description?.en || field.admin.description?.cs || ''}
+              {fieldDescription}
             </div>
           )}
         </div>
 
         {showPreviewPanel && previewOpen && (
-          <div
-            style={{
-              flex: '1 1 400px',
-              minWidth: '260px',
-              position: 'sticky',
-              top: '96px',
-              alignSelf: 'flex-start',
-            }}
-          >
+          <div className="theme-preview-panel">
             <div
               style={{
                 width: '100%',

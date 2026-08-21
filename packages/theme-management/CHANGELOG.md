@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.0] - 2026-08-21
+
+### 🎨 Cleaner Appearance Settings UI
+
+- **Palette generator moved into the Theme Selection field.** It is no longer a separate UI field inside *Color Mode Settings*; `ThemePreviewField` renders it at the top of the preset column, as its own card — editors start from a brand colour / logo and pick or fine-tune a preset directly below it.
+- **The theme preset list is collapsible.** A summary row shows the active preset (label, key and its colour swatches) and opens the scrollable preset list on click. Collapsed by default so the live preview stays the focal point. The duplicated "active preset swatches" card was removed — that information now lives in the summary row and in the preview itself.
+- **The preset column and the live preview always share one row.** The layout moved from `flex-wrap` to CSS grid (`minmax(260px, 360px) / 1fr`), so the preview panel can no longer drop below the preset list; it collapses to a single column below 1024px.
+- **Theme Selection is localized.** Its label and description are now resolved against the active Payload admin language instead of always falling back to `en` — previously it was the only part of the tab that stayed English. Consumer-supplied label objects are respected, with `en` as the fallback.
+- Chevron toggles use lucide icons instead of text glyphs; the preview toggle moved from inline styles into `ThemePreviewField.css`.
+- New i18n keys (en + cs): `ui.themePresets`, `ui.choosePreset`, `ui.presetCount`.
+
 ## [1.2.0] - 2026-05-04
 
 ### ✨ New: Extended Theme Presets & Appearance Controls

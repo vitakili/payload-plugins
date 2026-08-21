@@ -51,6 +51,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   } = options
 
   const fields: Field[] = [
+    // NOTE: the palette generator is rendered *inside* ThemePreviewField (in the
+    // preset column, above the preset list) — it is not a separate UI field.
     {
       name: 'theme',
       type: 'text',
@@ -250,15 +252,6 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
               },
             },
           ],
-        },
-        {
-          name: 'paletteGenerator',
-          type: 'ui',
-          admin: {
-            components: {
-              Field: '@kilivi-dev/payloadcms-theme-management/fields/PaletteGeneratorField',
-            },
-          },
         },
         lightModeField,
         darkModeField,

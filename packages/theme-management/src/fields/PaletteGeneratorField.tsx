@@ -64,7 +64,14 @@ export default function PaletteGeneratorField() {
   }, [])
 
   return (
-    <div style={{ marginBottom: '20px' }}>
+    <div
+      style={{
+        padding: '16px',
+        borderRadius: '12px',
+        border: '1px solid var(--theme-elevation-200)',
+        backgroundColor: 'var(--theme-elevation-25)',
+      }}
+    >
       <div
         style={{
           display: 'inline-flex',

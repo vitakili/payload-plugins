@@ -1,4 +1,4 @@
-import { dirname, resolve } from 'path'
+import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { withPayload } from '@payloadcms/next/withPayload'
 import redirects from './redirects.js'
@@ -38,12 +38,13 @@ const nextConfig = {
       '.mjs': ['.mts', '.mjs'],
     }
 
-    // Bypass pnpm virtual store (stale hard-linked copy) — point directly to the live source
-    webpackConfig.resolve.alias = {
-      '@kilivi-dev/payloadcms-theme-management': resolve(__dirname, '../packages/theme-management'),
-      '@kilivi/payloadcms-localized-slugs': resolve(__dirname, '../packages/localized-slugs'),
-      ...webpackConfig.resolve.alias,
-    }
+    // NOTE: no resolve.alias for the local plugins.
+    // Aliasing the bare package name to the source folder bypasses the package
+    // "exports" map, so subpath imports (/components/*, /fields/*) would look for
+    // `<pkg>/components/...` instead of `<pkg>/dist/components/...` and fail.
+    // Instead the plugins are consumed exactly like a published package via the
+    // `file:` dependency — after changing plugin source run:
+    //   pnpm --filter @kilivi-dev/payloadcms-theme-management build && (cd dev-local && pnpm ii)
 
     return webpackConfig
   },

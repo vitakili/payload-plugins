@@ -1,9 +1,105 @@
 /* Theme Preview Field Styles */
 
+/* ─── Layout: preset column + live preview always share one row ────────────
+   Grid (not flex-wrap) so the preview panel can never drop below the preset
+   list on wide screens; it collapses to a single column only on narrow admin
+   viewports.
+   ───────────────────────────────────────────────────────────────────────── */
+.theme-preview-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.theme-preview-layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 1024px) {
+  .theme-preview-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.theme-preset-column {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.theme-preview-panel {
+  min-width: 0;
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+
+/* ─── Collapsible preset picker header ───────────────────────────────────── */
+.theme-preset-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--theme-elevation-200, #e2e8f0);
+  background-color: var(--theme-elevation-50, #f8fafc);
+  color: var(--theme-elevation-800, #1e293b);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.theme-preset-summary:hover {
+  border-color: var(--theme-elevation-300, #cbd5e1);
+  background-color: var(--theme-elevation-100, #f1f5f9);
+}
+
+.theme-preset-summary.is-open {
+  border-color: var(--theme-elevation-300, #cbd5e1);
+}
+
+.theme-preset-summary__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.theme-preset-summary .theme-swatches {
+  flex: 0 0 auto;
+}
+
+.theme-preset-summary .color-swatch {
+  width: 16px;
+  height: 16px;
+}
+
+/* ─── Preview visibility toggle ──────────────────────────────────────────── */
+.theme-preview-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--theme-elevation-200, #e2e8f0);
+  background: var(--theme-elevation-50, #f8fafc);
+  color: var(--theme-elevation-600, #475569);
+  cursor: pointer;
+}
+
+.theme-preview-toggle:hover {
+  border-color: var(--theme-elevation-300, #cbd5e1);
+}
+
 .theme-preset-list {
   display: grid;
   gap: 6px;
-  max-height: 480px;
+  max-height: 420px;
   overflow-y: auto;
   padding-right: 8px;
   

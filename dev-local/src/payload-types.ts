@@ -1850,6 +1850,7 @@ export interface AppearanceSetting {
      * Select a theme to auto-populate color values. You can customize colors after selection.
      */
     theme: string;
+    stylePreset?: string | null;
     /**
      * Default corner rounding for UI elements
      */
@@ -1943,6 +1944,18 @@ export interface AppearanceSetting {
        * Focus ring color
        */
       ring?: string | null;
+      /**
+       * Start colour of the brand gradient (--gradient-from)
+       */
+      gradientFrom?: string | null;
+      /**
+       * Optional middle colour of the brand gradient (--gradient-via)
+       */
+      gradientVia?: string | null;
+      /**
+       * End colour of the brand gradient (--gradient-to)
+       */
+      gradientTo?: string | null;
     };
     darkMode?: {
       /**
@@ -2021,6 +2034,18 @@ export interface AppearanceSetting {
        * Focus ring color
        */
       ring?: string | null;
+      /**
+       * Start colour of the brand gradient (--gradient-from)
+       */
+      gradientFrom?: string | null;
+      /**
+       * Optional middle colour of the brand gradient (--gradient-via)
+       */
+      gradientVia?: string | null;
+      /**
+       * End colour of the brand gradient (--gradient-to)
+       */
+      gradientTo?: string | null;
     };
     typography?: {
       bodyFont?:
@@ -2052,6 +2077,68 @@ export interface AppearanceSetting {
       | number
       | boolean
       | null;
+    visualEffects?: {
+      /**
+       * Visual style applied to cards, panels and interactive elements.
+       */
+      effectStyle?: ('flat' | 'elevated' | 'glass' | 'neumorphic' | 'clay') | null;
+      /**
+       * Global shadow depth for elevated elements.
+       */
+      shadowIntensity?: ('none' | 'subtle' | 'medium' | 'strong' | 'dramatic') | null;
+      /**
+       * Blur effect behind translucent elements (requires glass effect style).
+       */
+      backdropBlur?: ('none' | 'slight' | 'medium' | 'strong' | 'heavy') | null;
+      /**
+       * Default border style for cards, inputs and dividers.
+       */
+      borderStyle?: ('none' | 'solid' | 'dashed' | 'dotted' | 'double') | null;
+      borderWidth?: ('0px' | '1px' | '2px' | '3px' | '4px') | null;
+      /**
+       * Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).
+       */
+      glassOpacity?: number | null;
+    };
+    componentStyles?: {
+      /**
+       * Default visual style of primary action buttons.
+       */
+      buttonVariant?: ('filled' | 'outlined' | 'ghost' | 'gradient' | 'pill' | 'brutal') | null;
+      /**
+       * Default padding / font-size of buttons.
+       */
+      buttonSize?: ('small' | 'medium' | 'large' | 'xl') | null;
+      /**
+       * Default card/panel visual style across the website.
+       */
+      cardStyle?: ('elevated' | 'flat' | 'bordered' | 'glass' | 'neumorphic' | 'gradient-border') | null;
+      cardHoverEffect?: ('none' | 'lift' | 'scale' | 'shadow' | 'glow' | 'tilt') | null;
+      /**
+       * Navigation bar visual style.
+       */
+      navbarStyle?: ('solid' | 'transparent' | 'blur' | 'floating' | 'minimal') | null;
+      /**
+       * Footer visual style.
+       */
+      footerStyle?: ('standard' | 'minimal' | 'dark' | 'gradient-top' | 'full-color') | null;
+      /**
+       * Default treatment for content images (applied via [data-img] / .themed-image).
+       */
+      imageStyle?: ('default' | 'rounded' | 'circle' | 'vignette' | 'grayscale' | 'duotone' | 'polaroid') | null;
+      /**
+       * Default style for in-content links (applied via [data-link] / .themed-link).
+       */
+      linkStyle?: ('underline' | 'underline-hover' | 'none' | 'highlight' | 'animated') | null;
+      /**
+       * Reveal elements as they enter the viewport.
+       */
+      enableScrollReveal?: boolean | null;
+      /**
+       * Subtle motion on interactive elements when hovered.
+       */
+      enableHoverAnimations?: boolean | null;
+    };
     /**
      * Control website animations and transitions
      */
@@ -2120,6 +2207,7 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
     | T
     | {
         theme?: T;
+        stylePreset?: T;
         borderRadius?: T;
         spacing?: T;
         colorMode?: T;
@@ -2146,6 +2234,9 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
               border?: T;
               input?: T;
               ring?: T;
+              gradientFrom?: T;
+              gradientVia?: T;
+              gradientTo?: T;
             };
         darkMode?:
           | T
@@ -2169,6 +2260,9 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
               border?: T;
               input?: T;
               ring?: T;
+              gradientFrom?: T;
+              gradientVia?: T;
+              gradientTo?: T;
             };
         typography?:
           | T
@@ -2181,6 +2275,30 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
               lineHeight?: T;
             };
         customThemePresets?: T;
+        visualEffects?:
+          | T
+          | {
+              effectStyle?: T;
+              shadowIntensity?: T;
+              backdropBlur?: T;
+              borderStyle?: T;
+              borderWidth?: T;
+              glassOpacity?: T;
+            };
+        componentStyles?:
+          | T
+          | {
+              buttonVariant?: T;
+              buttonSize?: T;
+              cardStyle?: T;
+              cardHoverEffect?: T;
+              navbarStyle?: T;
+              footerStyle?: T;
+              imageStyle?: T;
+              linkStyle?: T;
+              enableScrollReveal?: T;
+              enableHoverAnimations?: T;
+            };
         animationLevel?: T;
         customCSS?: T;
       };
