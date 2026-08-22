@@ -27,7 +27,7 @@ export default function AccessibilityAuditField() {
     string,
     { value?: unknown } | undefined
   >
-  const { dispatchFields } = useForm()
+  const { dispatchFields, setModified } = useForm()
   const tr = useThemeTranslations()
   const t = tr.accessibility
 
@@ -83,6 +83,8 @@ export default function AccessibilityAuditField() {
       path: `themeConfiguration.${mode}.${result.foregroundKey}`,
       value: result.suggestion,
     })
+    // Mark the form dirty so Save stays enabled after an auto-fix.
+    setModified(true)
   }
 
   const renderSection = (title: string, mode: Mode, audit: ContrastPairResult[]) => {

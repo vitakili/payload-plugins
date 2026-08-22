@@ -21,7 +21,7 @@ export default function PaletteGeneratorField() {
     string,
     { value?: unknown } | undefined
   >
-  const { dispatchFields } = useForm()
+  const { dispatchFields, setModified } = useForm()
   const t = useThemeTranslations().paletteGenerator
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -46,7 +46,10 @@ export default function PaletteGeneratorField() {
         })
       })
     })
-  }, [seed, dispatchFields])
+    // `dispatchFields` alone does not flip the form's dirty flag, so Payload
+    // would keep the Save button disabled after generating a palette.
+    setModified(true)
+  }, [seed, dispatchFields, setModified])
 
   const handleFile = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
