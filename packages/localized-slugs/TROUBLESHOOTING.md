@@ -102,7 +102,7 @@ await req.payload.update({
 **Řešení:** Update na nejnovější verzi:
 
 ```bash
-pnpm update @kilivi/payloadcms-localized-slugs@latest
+pnpm update @kilivi-dev/payloadcms-localized-slugs@latest
 ```
 
 #### 2. **Vlastní hook + `req.payload.update()`**
@@ -179,7 +179,7 @@ export const myHook = (): CollectionAfterChangeHook => {
 
 ```typescript
 // ✅ SPRÁVNĚ
-import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 
 // ❌ ŠPATNĚ - Plugin chybí
 export default buildConfig({
@@ -416,7 +416,7 @@ Pokud máš problém:
 3. Zkontroluj kontrolní seznam výše
 4. Otevři issue na GitHub s:
    - Logs (sanitizované osobní údaje)
-   - Verze pluginu: `npm list @kilivi/payloadcms-localized-slugs`
+   - Verze pluginu: `npm list @kilivi-dev/payloadcms-localized-slugs`
    - Payload verze: `npm list payload`
    - Collection config (slug + fullPath definice)
    - Multitenant? Ano/Ne

@@ -4,7 +4,7 @@
 
 ```typescript
 // This will NOT work!
-import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs'
+import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs'
 ```
 
 **Why?** The main export is for server-side use only (Payload config). It cannot contain client components.
@@ -15,7 +15,7 @@ import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs'
 
 ```typescript
 // payload.config.ts
-import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -36,18 +36,18 @@ import {
   ClientSlugHandler,
   SlugProvider,
   useSlugContext,
-} from '@kilivi/payloadcms-localized-slugs/client'
+} from '@kilivi-dev/payloadcms-localized-slugs/client'
 ```
 
 ## 📦 Available Exports
 
-### From `@kilivi/payloadcms-localized-slugs` (Server)
+### From `@kilivi-dev/payloadcms-localized-slugs` (Server)
 
 - `localizedSlugsPlugin` - The main plugin function
 - `createLocalizedSlugField` - Field creator
 - Utility functions for server-side use
 
-### From `@kilivi/payloadcms-localized-slugs/client` (Client)
+### From `@kilivi-dev/payloadcms-localized-slugs/client` (Client)
 
 - `ClientSlugHandler` - Client component
 - `SlugProvider` - Context provider
@@ -62,7 +62,7 @@ import {
 ```typescript
 // app/layout.tsx
 'use client'
-import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client'
+import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export default function Layout({ children }) {
   return <SlugProvider>{children}</SlugProvider>
@@ -73,7 +73,7 @@ export default function Layout({ children }) {
 
 ```typescript
 // app/posts/[slug]/page.tsx (Server Component)
-import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
+import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export default async function Page() {
   const post = await fetchPost()
@@ -86,7 +86,7 @@ export default async function Page() {
 ```typescript
 // components/LanguageSwitcher.tsx (Client Component)
 'use client'
-import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client'
+import { useSlugContext } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export function LanguageSwitcher() {
   const { state } = useSlugContext()

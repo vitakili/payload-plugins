@@ -33,7 +33,7 @@
 ### 📋 Konfigurace pluginu
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 
 const payload = await getPayloadClient({
   config: buildConfig({

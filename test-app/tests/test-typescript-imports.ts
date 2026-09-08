@@ -1,11 +1,11 @@
 // Test direct imports from source files
-import { localizedSlugsPlugin as PublishedLocalizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin as PublishedLocalizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 // Test imports from published package
-import { ClientSlugHandler as PublishedClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
+import { ClientSlugHandler as PublishedClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs/client'
 import {
   SlugProvider as PublishedSlugProvider,
   useSlugContext as PublishedUseSlugContext,
-} from '@kilivi/payloadcms-localized-slugs/client/react'
+} from '@kilivi-dev/payloadcms-localized-slugs/client/react'
 import { localizedSlugsPlugin } from '../../packages/localized-slugs/src'
 import { ClientSlugHandler } from '../../packages/localized-slugs/src/exports/client'
 import {

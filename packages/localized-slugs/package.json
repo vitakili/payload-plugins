@@ -1,6 +1,6 @@
 {
-  "name": "@kilivi/payloadcms-localized-slugs",
-  "version": "1.1.6",
+  "name": "@kilivi-dev/payloadcms-localized-slugs",
+  "version": "1.1.7",
   "description": "Localized slugs plugin for Payload CMS v3 with multi-locale support",
   "type": "module",
   "main": "./src/index.ts",
@@ -73,6 +73,15 @@
   ],
   "author": "Kilián Vít",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitakili/payload-plugins.git",
+    "directory": "packages/localized-slugs"
+  },
+  "bugs": {
+    "url": "https://github.com/vitakili/payload-plugins/issues"
+  },
+  "homepage": "https://github.com/vitakili/payload-plugins/tree/main/packages/localized-slugs#readme",
   "peerDependencies": {
     "payload": "^3.0.0"
   },
