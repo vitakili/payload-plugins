@@ -1,8 +1,8 @@
-# @kilivi/payloadcms-localized-slugs - NPM Deployment Complete ✅
+# @kilivi-dev/payloadcms-localized-slugs - NPM Deployment Complete ✅
 
 ## Summary
 
-The `@kilivi/payloadcms-localized-slugs` plugin has been fully prepared for npm deployment with the same professional standards as `@kilivi-dev/payloadcms-theme-management`.
+The `@kilivi-dev/payloadcms-localized-slugs` plugin has been fully prepared for npm deployment with the same professional standards as `@kilivi-dev/payloadcms-theme-management`.
 
 ### What Was Done
 
@@ -63,7 +63,7 @@ $ pnpm build
 
 | Property    | Value                                |
 | ----------- | ------------------------------------ |
-| **Name**    | `@kilivi/payloadcms-localized-slugs` |
+| **Name**    | `@kilivi-dev/payloadcms-localized-slugs` |
 | **Version** | `0.1.0`                              |
 | **Type**    | ESM Module                           |
 | **License** | MIT                                  |
@@ -86,11 +86,11 @@ Allows flexible imports:
 
 ```typescript
 // Main plugin
-import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 // Submodules
-import { createLocalizedSlugField } from '@kilivi/payloadcms-localized-slugs/fields'
-import { createPopulateLocalizedSlugsHook } from '@kilivi/payloadcms-localized-slugs/hooks'
-import { generateSlugFromTitle } from '@kilivi/payloadcms-localized-slugs/utils'
+import { createLocalizedSlugField } from '@kilivi-dev/payloadcms-localized-slugs/fields'
+import { createPopulateLocalizedSlugsHook } from '@kilivi-dev/payloadcms-localized-slugs/hooks'
+import { generateSlugFromTitle } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 ```
 
 ### Files Ready for npm
@@ -106,8 +106,8 @@ import { generateSlugFromTitle } from '@kilivi/payloadcms-localized-slugs/utils'
 
 ```bash
 # From repository root:
-git tag @kilivi/payloadcms-localized-slugs@0.1.0
-git push origin @kilivi/payloadcms-localized-slugs@0.1.0
+git tag @kilivi-dev/payloadcms-localized-slugs@0.1.0
+git push origin @kilivi-dev/payloadcms-localized-slugs@0.1.0
 ```
 
 **GitHub Actions will:**
@@ -195,13 +195,13 @@ The plugin is **production-ready** for npm publication:
 2. **Publish:**
 
    ```bash
-   git tag @kilivi/payloadcms-localized-slugs@0.1.0
+   git tag @kilivi-dev/payloadcms-localized-slugs@0.1.0
    git push origin --tags
    ```
 
 3. **Verify on npm:**
    ```bash
-   npm view @kilivi/payloadcms-localized-slugs
+   npm view @kilivi-dev/payloadcms-localized-slugs
    ```
 
 ### File Summary

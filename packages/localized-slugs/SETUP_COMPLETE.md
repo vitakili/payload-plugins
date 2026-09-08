@@ -42,7 +42,7 @@ A new entry point that re-exports all client-side code:
 
 ```typescript
 // payload.config.ts
-import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -60,14 +60,14 @@ export default buildConfig({
 ```typescript
 // app/layout.tsx
 'use client'
-import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client'
+import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export default function Layout({ children }) {
   return <SlugProvider>{children}</SlugProvider>
 }
 
 // app/posts/[slug]/page.tsx
-import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
+import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export default async function Page() {
   const post = await getPost()
@@ -76,7 +76,7 @@ export default async function Page() {
 
 // components/LanguageSwitcher.tsx
 'use client'
-import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client'
+import { useSlugContext } from '@kilivi-dev/payloadcms-localized-slugs/client'
 
 export function LanguageSwitcher() {
   const { state } = useSlugContext()
@@ -91,8 +91,8 @@ export function LanguageSwitcher() {
 3. **`src/client.ts` is client-only** - re-exports from files with "use client"
 4. **Individual component files** have "use client" directive
 5. **Import pattern matters**:
-   - Server: `from '@kilivi/payloadcms-localized-slugs'`
-   - Client: `from '@kilivi/payloadcms-localized-slugs/client'`
+   - Server: `from '@kilivi-dev/payloadcms-localized-slugs'`
+   - Client: `from '@kilivi-dev/payloadcms-localized-slugs/client'`
 
 ## ✨ Benefits
 

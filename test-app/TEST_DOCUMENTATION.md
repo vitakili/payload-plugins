@@ -2,7 +2,7 @@
 
 ## Overview
 
-This test suite validates that both plugins (`@kilivi/payloadcms-localized-slugs` and `@kilivi/payloadcms-theme-management`) are properly built and ready for use in Next.js applications.
+This test suite validates that both plugins (`@kilivi-dev/payloadcms-localized-slugs` and `@kilivi/payloadcms-theme-management`) are properly built and ready for use in Next.js applications.
 
 ## Test Results ✅
 

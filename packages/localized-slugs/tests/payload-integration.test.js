@@ -216,11 +216,14 @@ describe('PayloadCMS Document Lifecycle - Real World Operations', () => {
     // Should not crash, should handle gracefully when slug/fullPath are undefined
     const result = await hook(operationContext)
 
-    // Since slug and fullPath are undefined, localizedSlugs should have empty strings
+    // The current locale ('en', since req.locale is unset it falls back to the first
+    // configured locale) is read directly from `doc` rather than re-fetched, so a
+    // findByID failure never affects it - since doc.slug/doc.fullPath are undefined,
+    // no entry is recorded for it at all. Other locales ('cs') still go through
+    // findByID, which throws here and falls back to empty strings.
     expect(result.slug).toBeUndefined()
     expect(result.fullPath).toBeUndefined()
     expect(result.localizedSlugs).toEqual({
-      en: { slug: '', fullPath: '' },
       cs: { slug: '', fullPath: '' },
     })
   })

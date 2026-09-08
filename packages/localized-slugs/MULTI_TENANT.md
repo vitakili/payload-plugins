@@ -1,6 +1,6 @@
 # Multi-Tenant Slug Management
 
-The `@kilivi/payloadcms-localized-slugs` plugin includes built-in support for multi-tenant applications with the `ensureUniqueSlug` field hook.
+The `@kilivi-dev/payloadcms-localized-slugs` plugin includes built-in support for multi-tenant applications with the `ensureUniqueSlug` field hook.
 
 ## Overview
 
@@ -17,7 +17,7 @@ The `ensureUniqueSlug` function is a Payload field hook that ensures slugs are u
 ### Single-Tenant Application
 
 ```typescript
-import { ensureUniqueSlug } from '@kilivi/payloadcms-localized-slugs/utils'
+import { ensureUniqueSlug } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -41,7 +41,7 @@ export const Posts: CollectionConfig = {
 ### Multi-Tenant Application
 
 ```typescript
-import { ensureUniqueSlug } from '@kilivi/payloadcms-localized-slugs/utils'
+import { ensureUniqueSlug } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -172,7 +172,7 @@ ensureUniqueSlug('posts', {
 ### Combined with Auto-Generation
 
 ```typescript
-import { ensureUniqueSlug, generateSlugFromTitle } from '@kilivi/payloadcms-localized-slugs/utils'
+import { ensureUniqueSlug, generateSlugFromTitle } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -277,7 +277,7 @@ isValidSlug(slug: string): boolean
 ### Blog with Tenant-Scoped Slugs
 
 ```typescript
-import { ensureUniqueSlug } from '@kilivi/payloadcms-localized-slugs/utils'
+import { ensureUniqueSlug } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 
 const BlogPosts: CollectionConfig = {
   slug: 'blog-posts',
@@ -313,7 +313,7 @@ const BlogPosts: CollectionConfig = {
 ### Documentation Site with Hierarchy
 
 ```typescript
-import { ensureUniqueSlug, generateSlugFromTitle } from '@kilivi/payloadcms-localized-slugs/utils'
+import { ensureUniqueSlug, generateSlugFromTitle } from '@kilivi-dev/payloadcms-localized-slugs/utils'
 
 const Docs: CollectionConfig = {
   slug: 'docs',
@@ -391,7 +391,7 @@ const Docs: CollectionConfig = {
 
 If upgrading from an older version:
 
-1. Update import path: `@kilivi/payloadcms-localized-slugs/utils`
+1. Update import path: `@kilivi-dev/payloadcms-localized-slugs/utils`
 2. Change to field hook usage (was: standalone function)
 3. Add `multiTenant` option if using multi-tenant
 

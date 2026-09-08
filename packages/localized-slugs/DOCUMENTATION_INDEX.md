@@ -95,4 +95,4 @@ Expected result: **38/38 tests passing** ✅
 ---
 
 Generated: 2024
-Plugin: @kilivi/payloadcms-localized-slugs
+Plugin: @kilivi-dev/payloadcms-localized-slugs

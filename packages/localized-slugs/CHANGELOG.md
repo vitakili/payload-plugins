@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-09-08
+
+### ⚠️ Package Renamed
+
+- **npm scope changed from `@kilivi` to `@kilivi-dev`** - the package is now published as
+  `@kilivi-dev/payloadcms-localized-slugs` (npm ownership moved to the `kilivi-dev` account).
+  Update your `package.json` and imports:
+
+  ```diff
+  - pnpm add @kilivi/payloadcms-localized-slugs
+  + pnpm add @kilivi-dev/payloadcms-localized-slugs
+  ```
+
+  ```diff
+  - import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
+  + import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+  ```
+
+## [1.1.6] - 2026-09-08
+
+### 🐛 Fixed
+
+- **Slug no longer stale after the first save** - `afterChange` re-fetched the current
+  locale's document via `findByID` without passing `req`, so the read could race the
+  still-open transaction of the very save that triggered the hook and come back with
+  the *previous* value. In practice this made `localizedSlugs` appear to populate
+  correctly only on document creation, then stop reflecting further slug edits.
+  The hook now reads the current locale directly from the already-saved `doc`
+  (always accurate, no extra round-trip) and passes `req` through to the remaining
+  `findByID`/`update` calls for other locales so they stay inside the same
+  transaction.
+
 ## [1.1.0] - 2025-11-07
 
 ### ✨ New Features & Configuration API
@@ -99,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 If upgrading from an earlier version:
 
-1. Update: `pnpm update @kilivi/payloadcms-localized-slugs@latest`
+1. Update: `pnpm update @kilivi-dev/payloadcms-localized-slugs@latest`
 2. Configuration stays the same
 3. Plugin still works the same way for end users
 4. If you have custom hooks, ensure they return documents instead of calling `req.payload.update()`
@@ -119,7 +151,7 @@ If upgrading from an earlier version:
 
 ### Added
 
-- Initial release of `@kilivi/payloadcms-localized-slugs`
+- Initial release of `@kilivi-dev/payloadcms-localized-slugs`
 - Multi-locale slug support (Czech, English, and extensible)
 - Automatic slug generation from title fields
 - Diacritic character mapping and normalization

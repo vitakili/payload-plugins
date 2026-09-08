@@ -123,17 +123,30 @@ export const createPopulateLocalizedSlugsHook = (
       const docId = doc.id
       const localizedSlugs: Record<string, { slug?: string; fullPath?: string }> = {}
 
+      // The locale actually being saved in this request. `doc` always reflects the
+      // just-saved data for this locale, so use it directly instead of re-fetching it -
+      // a separate findByID for the current locale can race the still-open transaction
+      // of this very save and read back the *previous* value, which is why the slug
+      // used to appear to only ever populate on the very first save.
+      const currentLocale = (req?.locale as string | undefined) || locales[0]
+
       // ✅ CRITICAL: Fetch EACH locale and build localizedSlugs
       for (const locale of locales) {
         try {
           let localizedDoc: Record<string, unknown>
 
-          if (req?.payload?.findByID) {
-            // Fetch this locale's version
+          if (locale === currentLocale) {
+            // Use the freshly-saved doc for the locale being edited - it is always
+            // up to date and avoids any transaction/read-consistency issues.
+            localizedDoc = doc as Record<string, unknown>
+          } else if (req?.payload?.findByID) {
+            // Fetch other locales' versions, passing `req` so the read stays inside
+            // the same transaction as this save (otherwise it can read stale data).
             const fetched = await req.payload.findByID({
               collection: collection.slug,
               id: docId,
               locale,
+              req,
             })
 
             // Use fetched if available, otherwise fall back to doc
@@ -181,8 +194,6 @@ export const createPopulateLocalizedSlugsHook = (
       // Try to use req.payload.update() if available (production)
       if (req?.payload?.update && docId) {
         try {
-          const currentLocale = req?.locale || locales[0]
-
           await req.payload.update({
             collection: collection.slug,
             id: docId,
@@ -194,6 +205,7 @@ export const createPopulateLocalizedSlugsHook = (
             context: {
               skipLocalizedSlugHook: true,
             },
+            req,
           })
 
           // Update other locales too
@@ -211,6 +223,7 @@ export const createPopulateLocalizedSlugsHook = (
                   context: {
                     skipLocalizedSlugHook: true,
                   },
+                  req,
                 })
               } catch (error) {
                 if (enableLogging) {

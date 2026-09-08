@@ -15,12 +15,12 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@kilivi/payloadcms-localized-slugs": ["../packages/localized-slugs/src/index.ts"],
-      "@kilivi/payloadcms-localized-slugs/*": ["../packages/localized-slugs/src/*"],
-      "@kilivi/payloadcms-localized-slugs/client": [
+      "@kilivi-dev/payloadcms-localized-slugs": ["../packages/localized-slugs/src/index.ts"],
+      "@kilivi-dev/payloadcms-localized-slugs/*": ["../packages/localized-slugs/src/*"],
+      "@kilivi-dev/payloadcms-localized-slugs/client": [
         "../packages/localized-slugs/src/exports/client/index.ts"
       ],
-      "@kilivi/payloadcms-localized-slugs/client/react": [
+      "@kilivi-dev/payloadcms-localized-slugs/client/react": [
         "../packages/localized-slugs/src/exports/client/react.ts"
       ]
     }
