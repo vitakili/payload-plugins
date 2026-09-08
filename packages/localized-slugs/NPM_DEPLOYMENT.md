@@ -1,4 +1,4 @@
-# NPM Deployment Checklist for @kilivi-dev/payloadcms-localized-slugs
+# NPM Deployment Checklist for @kilivi/payloadcms-localized-slugs
 
 ## ✅ Completed
 
@@ -35,7 +35,7 @@
 
 ## 📦 Package Information
 
-**Name:** `@kilivi-dev/payloadcms-localized-slugs`  
+**Name:** `@kilivi/payloadcms-localized-slugs`  
 **Version:** `0.1.0`  
 **Type:** ESM Module  
 **License:** MIT
@@ -66,8 +66,8 @@ npm config set //registry.npmjs.org/:_authToken="your_npm_token"
 ### Step 2: Tag Release (from root)
 
 ```bash
-git tag @kilivi-dev/payloadcms-localized-slugs@0.1.0
-git push origin @kilivi-dev/payloadcms-localized-slugs@0.1.0
+git tag @kilivi/payloadcms-localized-slugs@0.1.0
+git push origin @kilivi/payloadcms-localized-slugs@0.1.0
 ```
 
 ### Step 3: Manual Publish (Optional)
@@ -110,7 +110,7 @@ Before publishing to npm:
 - [ ] Update `CHANGELOG.md` with new features/fixes
 - [ ] Test in consuming application:
   ```bash
-  npm install @kilivi-dev/payloadcms-localized-slugs@0.1.0
+  npm install @kilivi/payloadcms-localized-slugs@0.1.0
   ```
 
 ## 🎯 Quick Integration Test
@@ -118,7 +118,7 @@ Before publishing to npm:
 After publishing, test locally:
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -188,7 +188,7 @@ pnpm publish              # Publish to npm (from package dir)
 1. ✅ **Verify Build** - `pnpm build` ✓
 2. ⏭️ **Run Tests** - `pnpm test`
 3. ⏭️ **Setup npm Login** - `npm login`
-4. ⏭️ **Create Git Tag** - `git tag @kilivi-dev/payloadcms-localized-slugs@0.1.0`
+4. ⏭️ **Create Git Tag** - `git tag @kilivi/payloadcms-localized-slugs@0.1.0`
 5. ⏭️ **Push Tag** - GitHub Actions will auto-publish
 
 ---

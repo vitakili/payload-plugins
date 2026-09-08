@@ -3,17 +3,17 @@
 ## 📦 Package Structure
 
 ```
-@kilivi-dev/payloadcms-localized-slugs
+@kilivi/payloadcms-localized-slugs
 │
 ├── Server Entry Point: ./dist/index.js
-│   └── import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+│   └── import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 │       ├── Plugin configuration
 │       ├── Server hooks
 │       ├── Field definitions
 │       └── Server utilities
 │
 └── Client Entry Point: ./dist/client.js
-    └── import { ... } from '@kilivi-dev/payloadcms-localized-slugs/client'
+    └── import { ... } from '@kilivi/payloadcms-localized-slugs/client'
         ├── ClientSlugHandler (React component with "use client")
         ├── SlugProvider (React component with "use client")
         ├── useSlugContext (React hook with "use client")
@@ -30,7 +30,7 @@
 │  payload.config.ts                                              │
 │  ┌────────────────────────────────────────┐                    │
 │  │ import { localizedSlugsPlugin }        │                    │
-│  │   from '@kilivi-dev/payloadcms-localized-slugs'                 │
+│  │   from '@kilivi/payloadcms-localized-slugs'                 │
 │  │                                        │                    │
 │  │ plugins: [                             │                    │
 │  │   localizedSlugsPlugin({               │                    │
@@ -59,7 +59,7 @@
 │  ┌────────────────────────────────────────┐                    │
 │  │ 'use client'                           │                    │
 │  │ import { SlugProvider }                │                    │
-│  │   from '@kilivi-dev/payloadcms-localized-slugs/client'          │
+│  │   from '@kilivi/payloadcms-localized-slugs/client'          │
 │  │                                        │                    │
 │  │ <SlugProvider>                         │                    │
 │  │   {children}                           │                    │
@@ -70,7 +70,7 @@
 │  app/[locale]/posts/[slug]/page.tsx (Server Component)         │
 │  ┌────────────────────────────────────────┐                    │
 │  │ import { ClientSlugHandler }           │                    │
-│  │   from '@kilivi-dev/payloadcms-localized-slugs/client'          │
+│  │   from '@kilivi/payloadcms-localized-slugs/client'          │
 │  │                                        │                    │
 │  │ const post = await fetchFromPayload()  │                    │
 │  │                                        │                    │
@@ -84,7 +84,7 @@
 │  ┌────────────────────────────────────────┐                    │
 │  │ 'use client'                           │                    │
 │  │ import { useSlugContext }              │                    │
-│  │   from '@kilivi-dev/payloadcms-localized-slugs/client'          │
+│  │   from '@kilivi/payloadcms-localized-slugs/client'          │
 │  │                                        │                    │
 │  │ const { state } = useSlugContext()     │                    │
 │  │ const { localizedSlugs } = state       │                    │
@@ -101,22 +101,22 @@
 
 ```typescript
 // DON'T: Import client components from main entry
-import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs'
+import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs'
 // DON'T: Import plugin from client entry
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs/client'
 ```
 
 ### ✅ CORRECT
 
 ```typescript
 // Server-side (Payload config)
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 // Client-side (Next.js app)
 import {
   ClientSlugHandler,
   SlugProvider,
   useSlugContext,
-} from '@kilivi-dev/payloadcms-localized-slugs/client'
+} from '@kilivi/payloadcms-localized-slugs/client'
 ```
 
 ## 🧩 Component Relationships

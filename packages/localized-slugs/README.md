@@ -1,4 +1,4 @@
-# @kilivi-dev/payloadcms-localized-slugs
+# @kilivi/payloadcms-localized-slugs
 
 Localized slugs plugin for Payload CMS v3 with multi-locale support. Automatically copies and manages URL-friendly slugs for collections with internationalization (i18n) capabilities.
 
@@ -25,17 +25,17 @@ Localized slugs plugin for Payload CMS v3 with multi-locale support. Automatical
 ## Installation
 
 ```bash
-npm install @kilivi-dev/payloadcms-localized-slugs
+npm install @kilivi/payloadcms-localized-slugs
 # or
-pnpm add @kilivi-dev/payloadcms-localized-slugs
+pnpm add @kilivi/payloadcms-localized-slugs
 # or
-yarn add @kilivi-dev/payloadcms-localized-slugs
+yarn add @kilivi/payloadcms-localized-slugs
 ```
 
 ## Basic Usage
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -224,7 +224,7 @@ For hierarchical collections (e.g., pages with parents), the plugin generates fu
 To add custom locales beyond Czech and English:
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 localizedSlugsPlugin({
   locales: ['cs', 'en', 'sk'], // Add Slovak
@@ -330,7 +330,7 @@ export const Pages: CollectionConfig = {
 Creates a localized slug field configuration:
 
 ```typescript
-import { createLocalizedSlugField } from '@kilivi-dev/payloadcms-localized-slugs/fields'
+import { createLocalizedSlugField } from '@kilivi/payloadcms-localized-slugs/fields'
 
 const slugField = createLocalizedSlugField({
   locales: ['cs', 'en'],
@@ -343,7 +343,7 @@ const slugField = createLocalizedSlugField({
 Creates a hook for automatic slug generation:
 
 ```typescript
-import { createPopulateLocalizedSlugsHook } from '@kilivi-dev/payloadcms-localized-slugs/hooks'
+import { createPopulateLocalizedSlugsHook } from '@kilivi/payloadcms-localized-slugs/hooks'
 
 const beforeChangeHook = createPopulateLocalizedSlugsHook({
   slugField: 'slug',
@@ -357,7 +357,7 @@ const beforeChangeHook = createPopulateLocalizedSlugsHook({
 ### Blog with Localized Posts
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   collections: [
@@ -430,7 +430,7 @@ The plugin provides client components for use in your Next.js frontend applicati
 // app/layout.tsx
 'use client'
 
-import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client'
 
 export default function RootLayout({ children }) {
   return (
@@ -449,7 +449,7 @@ export default function RootLayout({ children }) {
 
 ```typescript
 // app/[locale]/posts/[slug]/page.tsx
-import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
 
 export default async function PostPage({ params }) {
   const post = await getPayloadData('posts', params.slug)
@@ -468,7 +468,7 @@ export default async function PostPage({ params }) {
 ```typescript
 'use client'
 
-import { useSlugContext } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client'
 import Link from 'next/link'
 
 export function LanguageSwitcher() {

@@ -7,7 +7,7 @@ The `localizedSlugsPlugin` now supports your exact desired configuration format.
 ### Example 1: Simple Configuration (Copy from existing fields)
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   // ... other config
@@ -283,7 +283,7 @@ Full TypeScript support is included. Types are automatically inferred:
 import type {
   LocalizedSlugsCollectionConfig,
   LocalizedSlugsPluginOptions,
-} from '@kilivi-dev/payloadcms-localized-slugs'
+} from '@kilivi/payloadcms-localized-slugs'
 
 const pluginConfig: LocalizedSlugsPluginOptions = {
   enabled: true,

@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Plugin `@kilivi-dev/payloadcms-localized-slugs` měl **kritický problém s nekonečnými smyčkami** v multitenant prostředích:
+Plugin `@kilivi/payloadcms-localized-slugs` měl **kritický problém s nekonečnými smyčkami** v multitenant prostředích:
 
 ```
 🌐 Populated localizedSlugs for pages: {}
@@ -187,7 +187,7 @@ localizedSlugsPlugin({ locales: ['en', 'cs'] })
 **Stav PO:**
 
 ```bash
-pnpm update @kilivi-dev/payloadcms-localized-slugs@latest
+pnpm update @kilivi/payloadcms-localized-slugs@latest
 ```
 
 **Konfigurace zůstává stejná!**

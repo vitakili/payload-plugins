@@ -1,15 +1,15 @@
 # Quick Start Guide
 
-Get up and running with `@kilivi-dev/payloadcms-localized-slugs` in minutes.
+Get up and running with `@kilivi/payloadcms-localized-slugs` in minutes.
 
 ## Installation
 
 ```bash
-npm install @kilivi-dev/payloadcms-localized-slugs
+npm install @kilivi/payloadcms-localized-slugs
 # or
-pnpm add @kilivi-dev/payloadcms-localized-slugs
+pnpm add @kilivi/payloadcms-localized-slugs
 # or
-yarn add @kilivi-dev/payloadcms-localized-slugs
+yarn add @kilivi/payloadcms-localized-slugs
 ```
 
 ## Basic Setup
@@ -18,7 +18,7 @@ yarn add @kilivi-dev/payloadcms-localized-slugs
 
 ```typescript
 // payload.config.ts
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -166,7 +166,7 @@ localizedSlugsPlugin({
 
 ```typescript
 // payload.config.ts
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -266,7 +266,7 @@ localizedSlugsPlugin({
 If you need fine-grained control:
 
 ```typescript
-import { createPopulateLocalizedSlugsHook } from '@kilivi-dev/payloadcms-localized-slugs/hooks'
+import { createPopulateLocalizedSlugsHook } from '@kilivi/payloadcms-localized-slugs/hooks'
 
 const collection: CollectionConfig = {
   slug: 'posts',
@@ -295,7 +295,7 @@ const collection: CollectionConfig = {
 Generate slugs programmatically:
 
 ```typescript
-import { generateSlugFromTitle } from '@kilivi-dev/payloadcms-localized-slugs/utils'
+import { generateSlugFromTitle } from '@kilivi/payloadcms-localized-slugs/utils'
 
 const slug = generateSlugFromTitle('My Amazing Post')
 console.log(slug) // "my-amazing-post"
