@@ -134,7 +134,7 @@ The hook now works correctly in **production** with real Payload CMS because:
 
 ## Version Info
 
-- **Package:** `@kilivi-dev/payloadcms-localized-slugs`
+- **Package:** `@kilivi/payloadcms-localized-slugs`
 - **Version:** `1.1.0`
 - **Status:** ✅ Production Ready
 - **Tests:** ✅ 38/38 Passing

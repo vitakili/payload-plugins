@@ -15,7 +15,7 @@ const nextConfig = {
   // Watch local file:-linked packages for HMR — without this webpack ignores node_modules
   transpilePackages: [
     '@kilivi-dev/payloadcms-theme-management',
-    '@kilivi-dev/payloadcms-localized-slugs',
+    '@kilivi/payloadcms-localized-slugs',
   ],
   images: {
     remotePatterns: [

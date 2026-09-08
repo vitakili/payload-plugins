@@ -7,21 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.7] - 2026-09-08
 
-### ⚠️ Package Renamed
+### Reverted
 
-- **npm scope changed from `@kilivi` to `@kilivi-dev`** - the package is now published as
-  `@kilivi-dev/payloadcms-localized-slugs` (npm ownership moved to the `kilivi-dev` account).
-  Update your `package.json` and imports:
-
-  ```diff
-  - pnpm add @kilivi/payloadcms-localized-slugs
-  + pnpm add @kilivi-dev/payloadcms-localized-slugs
-  ```
-
-  ```diff
-  - import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
-  + import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
-  ```
+- Reverted the brief `@kilivi-dev` npm scope rename - the package stays published as
+  `@kilivi/payloadcms-localized-slugs`.
 
 ## [1.1.6] - 2026-09-08
 
@@ -131,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 If upgrading from an earlier version:
 
-1. Update: `pnpm update @kilivi-dev/payloadcms-localized-slugs@latest`
+1. Update: `pnpm update @kilivi/payloadcms-localized-slugs@latest`
 2. Configuration stays the same
 3. Plugin still works the same way for end users
 4. If you have custom hooks, ensure they return documents instead of calling `req.payload.update()`
@@ -151,7 +140,7 @@ If upgrading from an earlier version:
 
 ### Added
 
-- Initial release of `@kilivi-dev/payloadcms-localized-slugs`
+- Initial release of `@kilivi/payloadcms-localized-slugs`
 - Multi-locale slug support (Czech, English, and extensible)
 - Automatic slug generation from title fields
 - Diacritic character mapping and normalization

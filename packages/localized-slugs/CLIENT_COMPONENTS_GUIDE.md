@@ -41,7 +41,7 @@ Following the pattern used by Payload CMS and other modern libraries, we use **s
 In your `payload.config.ts` or any server-side code:
 
 ```typescript
-import { localizedSlugsPlugin } from '@kilivi-dev/payloadcms-localized-slugs'
+import { localizedSlugsPlugin } from '@kilivi/payloadcms-localized-slugs'
 
 export default buildConfig({
   plugins: [
@@ -68,7 +68,7 @@ export default buildConfig({
 
 ```typescript
 // app/layout.tsx (Server Component)
-import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client/react' // ❌ ERROR
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react' // ❌ ERROR
 
 export default function RootLayout({ children }) {
   return (
@@ -89,7 +89,7 @@ export default function RootLayout({ children }) {
 // components/SlugProviderWrapper.tsx (Client Component)
 'use client'
 
-import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client/react'
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
 
 export function SlugProviderWrapper({ children }: { children: React.ReactNode }) {
   return <SlugProvider>{children}</SlugProvider>
@@ -119,7 +119,7 @@ export default function RootLayout({ children }) {
 // app/layout.tsx (Client Component)
 'use client'
 
-import { SlugProvider } from '@kilivi-dev/payloadcms-localized-slugs/client/react'
+import { SlugProvider } from '@kilivi/payloadcms-localized-slugs/client/react'
 
 export default function RootLayout({ children }) {
   return (
@@ -140,7 +140,7 @@ export default function RootLayout({ children }) {
 
 ```typescript
 // app/[locale]/posts/[slug]/page.tsx
-import { ClientSlugHandler } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { ClientSlugHandler } from '@kilivi/payloadcms-localized-slugs/client'
 import { getPayload } from 'payload'
 
 export default async function PostPage({ params }) {
@@ -170,7 +170,7 @@ export default async function PostPage({ params }) {
 ```typescript
 'use client'
 
-import { useSlugContext } from '@kilivi-dev/payloadcms-localized-slugs/client/react'
+import { useSlugContext } from '@kilivi/payloadcms-localized-slugs/client/react'
 import Link from 'next/link'
 
 export function LanguageSwitcher() {
@@ -194,7 +194,7 @@ export function LanguageSwitcher() {
 ```typescript
 'use client'
 
-import { generateSlugFromTitle, isValidSlug } from '@kilivi-dev/payloadcms-localized-slugs/client'
+import { generateSlugFromTitle, isValidSlug } from '@kilivi/payloadcms-localized-slugs/client'
 
 export function SlugInput({ title }) {
   const [slug, setSlug] = useState('')
