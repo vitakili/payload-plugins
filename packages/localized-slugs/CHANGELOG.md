@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-09-08
+
+### 🐛 Fixed
+
+- **Slug no longer stale after the first save** - `afterChange` re-fetched the current
+  locale's document via `findByID` without passing `req`, so the read could race the
+  still-open transaction of the very save that triggered the hook and come back with
+  the *previous* value. In practice this made `localizedSlugs` appear to populate
+  correctly only on document creation, then stop reflecting further slug edits.
+  The hook now reads the current locale directly from the already-saved `doc`
+  (always accurate, no extra round-trip) and passes `req` through to the remaining
+  `findByID`/`update` calls for other locales so they stay inside the same
+  transaction.
+
 ## [1.1.0] - 2025-11-07
 
 ### ✨ New Features & Configuration API
