@@ -31,7 +31,7 @@ export const Header: GlobalConfig = {
           cs: 'Vyberte token barvy pozadí pro hlavičku',
         },
         components: {
-          Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemeTokenSelectField',
+          Field: '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField',
         },
       },
     },

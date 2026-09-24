@@ -1,5 +1,56 @@
 # Changelog
 
+## [2.2.0] - 2026-09-24
+
+### 📦 Package name
+
+- **Published as `@kilivi/payloadcms-theme-management` again.** The `@kilivi-dev` scope (used for 1.x–2.1.x) is no longer updated. The API and stored data are unchanged. Swap the dependency, replace the import prefix and regenerate the import map (see *Migrating from `@kilivi-dev`* in the README).
+
+### ✨ Locks and undo
+
+- **"Keep my: Colours · Fonts · Style" locks** apply to every bulk action: theme preset, style preset and palette generator.
+  - The **colour lock** skips colour writes and disables *Generate palette*, with an explanation.
+  - The **font lock** pins the current preset font before a theme switch, so the font really does stay the same.
+  - The **style lock** skips effects, components, radius, motion and spacing.
+  - Locks last for the editing session only. Nothing new is stored.
+- **One-step undo.** After each bulk action an *Applied: … · Undo* bar appears. It lasts 10 s and pauses on hover or focus. Undo restores exactly the fields the action changed.
+
+### 🧭 Layout
+
+- **One live preview.** The effects preview now also renders the theme's fonts, base size and line height, so it replaces the separate colours and typography panel inside the tab.
+- **Sticky preview column.** When the settings group is at least 960 px wide (a container query), the preview gets its own sticky right-hand column spanning the whole tab. On narrower screens it follows the theme picker.
+- **New field order:** theme → live preview → style preset → radius and spacing → fine-tuning sections. *Colour mode* (44 token fields) is now collapsed by default.
+
+### ♿ Accessibility
+
+- The font picker, font select and token select can be operated with the keyboard. The two selects follow the WAI-ARIA select-only combobox pattern (arrow keys, Home/End, Enter, Escape, type-ahead).
+- Presets, style cards, device, mode and swatch toggles expose `aria-pressed`. The colour popover closes on Escape and returns focus.
+- Focus rings use Payload's `--accessibility-outline`. Every admin field respects `prefers-reduced-motion`.
+- Status colours use Payload's `--theme-success/warning/error-*` tokens, so they work in the dark admin.
+- The preview mock-ups are `inert`, so their sample buttons are no longer dead tab stops.
+
+### 🌍 Czech and English
+
+- Localised labels resolve to the admin language first (previously English was preferred).
+- Now fully translated:
+  - the import drawer
+  - both font guides
+  - the colour pickers and preview sample copy
+  - font-weight options and the theme validation message
+- Czech terminology is consistent (*motiv*, *styl*, *vzhled*) and uses the formal address throughout.
+
+### 🐛 Fixes
+
+- FontPicker buttons no longer submit the Payload form (they were missing `type="button"`).
+- Imported custom presets now appear in the theme picker, as the field description promised.
+- Contrast chips measure a colour against its paired token instead of plain white and black, so they no longer contradict the audit.
+- Failures are reported instead of passing silently:
+  - clipboard copy in the export
+  - Google Fonts loading (with a *Try again* button)
+  - logo image decoding
+- The palette generator seed follows the current primary colour after a preset is applied.
+- Section icons are inlined SVGs instead of files from the jsdelivr CDN, so they work under a strict CSP and offline.
+
 ## [2.1.0] - 2026-08-21
 
 ### 🎨 Cleaner Appearance Settings UI

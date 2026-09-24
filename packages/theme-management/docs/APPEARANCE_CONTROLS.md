@@ -194,7 +194,7 @@ import type {
   ThemeComponentStyles,
   ThemeHeroBackground,
   ThemeVisualEffects,
-} from '@kilivi-dev/payloadcms-theme-management'
+} from '@kilivi/payloadcms-theme-management'
 ```
 
 ### `ThemeVisualEffects`
@@ -282,7 +282,7 @@ import {
   resolveThemeConfiguration,
   getThemeHtmlAttributes,
   ServerThemeInjector,
-} from '@kilivi-dev/payloadcms-theme-management'
+} from '@kilivi/payloadcms-theme-management'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const themeConfiguration = await fetchThemeConfiguration({ collectionSlug: 'site-settings' })
@@ -313,7 +313,7 @@ to set these by hand anymore.
 
 ```typescript
 // lib/resolveAppearance.ts
-import type { SiteThemeConfiguration } from '@kilivi-dev/payloadcms-theme-management'
+import type { SiteThemeConfiguration } from '@kilivi/payloadcms-theme-management'
 
 export function resolveAppearanceAttributes(cfg: SiteThemeConfiguration | null) {
   const ve = cfg?.visualEffects

@@ -75,7 +75,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           cs: 'Vyberte motiv a barvy se předvyplní. Potom je můžete dál upravovat.',
         },
         components: {
-          Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField',
+          Field: '@kilivi/payloadcms-theme-management/fields/ThemePreviewField',
         },
         custom: {
           themePresets,
@@ -93,7 +93,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     type: 'ui',
     admin: {
       components: {
-        Field: '@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField',
+        Field: '@kilivi/payloadcms-theme-management/fields/AppearancePreviewField',
       },
     },
   })
@@ -124,7 +124,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         defaultValue: '',
         admin: {
           components: {
-            Field: '@kilivi-dev/payloadcms-theme-management/fields/StylePresetField',
+            Field: '@kilivi/payloadcms-theme-management/fields/StylePresetField',
           },
         },
       },
@@ -263,7 +263,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           type: 'ui',
           admin: {
             components: {
-              Field: '@kilivi-dev/payloadcms-theme-management/fields/AccessibilityAuditField',
+              Field: '@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField',
             },
           },
         },
@@ -272,7 +272,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           type: 'ui',
           admin: {
             components: {
-              Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemeExportField',
+              Field: '@kilivi/payloadcms-theme-management/fields/ThemeExportField',
             },
           },
         },
@@ -315,7 +315,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 admin: {
                   width: '50%',
                   components: {
-                    Field: '@kilivi-dev/payloadcms-theme-management/fields/FontSelectField',
+                    Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                   },
                 },
                 dbName: 'body_font',
@@ -332,7 +332,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 admin: {
                   width: '50%',
                   components: {
-                    Field: '@kilivi-dev/payloadcms-theme-management/fields/FontSelectField',
+                    Field: '@kilivi/payloadcms-theme-management/fields/FontSelectField',
                   },
                 },
                 dbName: 'heading_font',
@@ -450,7 +450,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
             cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světlý a tmavý režim.',
           },
           components: {
-            Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemePresetImportField',
+            Field: '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField',
           },
         },
       },

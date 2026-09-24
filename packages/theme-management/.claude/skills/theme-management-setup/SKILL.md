@@ -1,11 +1,11 @@
 ---
 name: theme-management-setup
-description: Install, register and wire up the @kilivi-dev/payloadcms-theme-management plugin in a Payload CMS v3 + Next.js App Router project — collection tab vs standalone collection, live preview, cache revalidation, and rendering the resolved theme on the front-end.
+description: Install, register and wire up the @kilivi/payloadcms-theme-management plugin in a Payload CMS v3 + Next.js App Router project — collection tab vs standalone collection, live preview, cache revalidation, and rendering the resolved theme on the front-end.
 ---
 
 # Theme Management — setup & wiring
 
-Use this skill when adding the `@kilivi-dev/payloadcms-theme-management` plugin to a
+Use this skill when adding the `@kilivi/payloadcms-theme-management` plugin to a
 Payload v3 project, or when debugging why a configured theme is not showing on the
 front-end.
 
@@ -14,7 +14,7 @@ front-end.
 In `payload.config.ts`:
 
 ```ts
-import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 
 export default buildConfig({
   plugins: [
@@ -59,9 +59,9 @@ After changing field components, regenerate the import map:
 In the tenant/root layout (server component):
 
 ```tsx
-import { ServerThemeInjector } from '@kilivi-dev/payloadcms-theme-management/server'
-import { resolveThemeConfiguration, ThemeProvider } from '@kilivi-dev/payloadcms-theme-management'
-import { getThemeHtmlAttributes } from '@kilivi-dev/payloadcms-theme-management'
+import { ServerThemeInjector } from '@kilivi/payloadcms-theme-management/server'
+import { resolveThemeConfiguration, ThemeProvider } from '@kilivi/payloadcms-theme-management'
+import { getThemeHtmlAttributes } from '@kilivi/payloadcms-theme-management'
 
 const settings = await fetchSiteSettings() // your own fetch
 const themeConfig = resolveThemeConfiguration(settings?.themeConfiguration)
@@ -87,7 +87,7 @@ To fetch the stored config from a client/edge context use `fetchThemeConfigurati
 
 ## 3. Cache revalidation (Next.js `unstable_cache`)
 
-From `@kilivi-dev/payloadcms-theme-management/server`:
+From `@kilivi/payloadcms-theme-management/server`:
 - `createCachedThemeFetcher`, `revalidateThemeCache`, `getThemeCacheTag`.
 
 The plugin can also inject a Payload endpoint (default `/api/theme/revalidate`,

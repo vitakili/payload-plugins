@@ -1,6 +1,6 @@
 ---
 name: theme-color-fields
-description: Add theme-aware colour and appearance controls to any Payload collection, block or global using the out-of-the-box helpers from @kilivi-dev/payloadcms-theme-management (createColorGroup, createColorField), and resolve the stored values to CSS on the front-end with resolveColorValue.
+description: Add theme-aware colour and appearance controls to any Payload collection, block or global using the out-of-the-box helpers from @kilivi/payloadcms-theme-management (createColorGroup, createColorField), and resolve the stored values to CSS on the front-end with resolveColorValue.
 ---
 
 # Theme-aware colour fields (out of the box)
@@ -17,7 +17,7 @@ import {
   createColorField,
   resolveColorValue,
   type ColorGroupValue,
-} from '@kilivi-dev/payloadcms-theme-management/fields/colorFieldHelpers'
+} from '@kilivi/payloadcms-theme-management/fields/colorFieldHelpers'
 ```
 
 ## `createColorGroup(name, options?)`

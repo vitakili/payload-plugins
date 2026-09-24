@@ -27,7 +27,7 @@ Let a site owner give their site its own appearance (color palette, light/dark m
 ## Operating Context
 
 - Runs inside Payload CMS v3 admin (Next.js), as a tab injected into an existing collection, a standalone collection, or a standalone global.
-- Main deployment: the owner's own multi-tenant SaaS, where each tenant has isolated appearance settings. The plugin is also published on npm as `@kilivi-dev/payloadcms-theme-management`.
+- Main deployment: the owner's own multi-tenant SaaS, where each tenant has isolated appearance settings. The plugin is also published on npm as `@kilivi/payloadcms-theme-management`.
 - Works with Payload Live Preview, cache revalidation (`/api/theme/revalidate`) and SSR injection (`ServerThemeInjector`).
 
 ## Capabilities and Constraints

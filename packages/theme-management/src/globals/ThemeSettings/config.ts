@@ -50,7 +50,7 @@ export const ThemeSettings: GlobalConfig = {
                   cs: 'Aktuální rodina písem pro váš web',
                 },
                 components: {
-                  Field: '@kilivi-dev/payloadcms-theme-management/globals/ThemeSettings/FontPicker',
+                  Field: '@kilivi/payloadcms-theme-management/globals/ThemeSettings/FontPicker',
                 },
               },
             },
@@ -92,7 +92,7 @@ export const ThemeSettings: GlobalConfig = {
               admin: {
                 components: {
                   Field:
-                    '@kilivi-dev/payloadcms-theme-management/globals/ThemeSettings/fields/TypographyInfoField',
+                    '@kilivi/payloadcms-theme-management/globals/ThemeSettings/fields/TypographyInfoField',
                 },
               },
             },
@@ -107,7 +107,7 @@ export const ThemeSettings: GlobalConfig = {
               admin: {
                 components: {
                   Field:
-                    '@kilivi-dev/payloadcms-theme-management/globals/ThemeSettings/fields/FontLoadingGuideField',
+                    '@kilivi/payloadcms-theme-management/globals/ThemeSettings/fields/FontLoadingGuideField',
                 },
               },
             },

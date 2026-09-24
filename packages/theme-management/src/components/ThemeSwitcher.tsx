@@ -57,7 +57,7 @@ const applyPreset = (preset: SwitchablePreset): void => {
  *
  * @example
  * ```tsx
- * import { ThemeSwitcher } from '@kilivi-dev/payloadcms-theme-management/components/ThemeSwitcher'
+ * import { ThemeSwitcher } from '@kilivi/payloadcms-theme-management/components/ThemeSwitcher'
  * <ThemeSwitcher presets={[oceanPreset, forestPreset]} />
  * ```
  */

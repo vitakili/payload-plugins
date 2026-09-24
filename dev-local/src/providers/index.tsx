@@ -1,4 +1,4 @@
-import { ResolvedThemeConfiguration, ThemeProvider } from '@kilivi-dev/payloadcms-theme-management'
+import { ResolvedThemeConfiguration, ThemeProvider } from '@kilivi/payloadcms-theme-management'
 import { EcommerceProvider } from '@payloadcms/plugin-ecommerce/client/react'
 import { stripeAdapterClient } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import React from 'react'

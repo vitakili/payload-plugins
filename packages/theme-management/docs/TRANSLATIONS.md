@@ -26,7 +26,7 @@ Each entry is deep-merged over the built-in translations, so you only provide th
 you want to change. Missing keys fall back to English.
 
 ```ts
-import { themeManagementPlugin } from '@kilivi-dev/payloadcms-theme-management'
+import { themeManagementPlugin } from '@kilivi/payloadcms-theme-management'
 // Bring real language packs only if you want the admin to offer a brand-new UI language
 import { de } from '@payloadcms/translations/languages/de'
 
@@ -57,7 +57,7 @@ provided hooks — they resolve the active Payload admin language automatically:
 import {
   useThemeTranslations,
   useThemeLanguage,
-} from '@kilivi-dev/payloadcms-theme-management/hooks/useThemeTranslations'
+} from '@kilivi/payloadcms-theme-management/hooks/useThemeTranslations'
 
 function MyField() {
   const t = useThemeTranslations() // full translation object for the active language

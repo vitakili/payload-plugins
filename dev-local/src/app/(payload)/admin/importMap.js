@@ -22,15 +22,15 @@ import { VariantOptionsSelector as VariantOptionsSelector_b91672ccd6e8b071c11142
 import { PriceCell as PriceCell_e27bf7b8cc50640dcdd584767b8eac3c } from '@payloadcms/plugin-ecommerce/client'
 import { PriceInput as PriceInput_b91672ccd6e8b071c11142ab941fedfb } from '@payloadcms/plugin-ecommerce/rsc'
 import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { default as default_d543118e46625061a216069b884e5ec8 } from '@kilivi-dev/payloadcms-theme-management/fields/ThemeTokenSelectField'
-import { default as default_beada05bdc4b6bf0cf0a946a4c8e0541 } from '@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField'
-import { default as default_eaf59c237dd34c1e4182da1be6af05e0 } from '@kilivi-dev/payloadcms-theme-management/fields/StylePresetField'
-import { default as default_0a61509edff7cf9ed56cbd4cc843d31a } from '@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField'
-import { default as default_04aef3ecf733e651acc57317ace7f05a } from '@kilivi-dev/payloadcms-theme-management/fields/ThemeColorPickerField'
-import { default as default_c825d2285d989eceefe6396de133087d } from '@kilivi-dev/payloadcms-theme-management/fields/AccessibilityAuditField'
-import { default as default_653c84494cd4f80cfb6904ae5b067e55 } from '@kilivi-dev/payloadcms-theme-management/fields/ThemeExportField'
-import { default as default_713cc68d3d89567cb76d24c0fc49150c } from '@kilivi-dev/payloadcms-theme-management/fields/FontSelectField'
-import { default as default_e38ffb8b72d31bfe68afb2c02966ed66 } from '@kilivi-dev/payloadcms-theme-management/fields/ThemePresetImportField'
+import { default as default_58bce6d963f55b41129662191194379a } from '@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField'
+import { default as default_8f2883114fa2e4186f7d5253bf815ddc } from '@kilivi/payloadcms-theme-management/fields/ThemePreviewField'
+import { default as default_ec977e983c757d6185686bf30205fce9 } from '@kilivi/payloadcms-theme-management/fields/AppearancePreviewField'
+import { default as default_e2abde10c4de2c0fa041710fd8f00c3b } from '@kilivi/payloadcms-theme-management/fields/StylePresetField'
+import { default as default_48001663b65131ccddf4637eb5f6fccf } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
+import { default as default_d816f393e71233eda8cf280a991b486b } from '@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField'
+import { default as default_4a31d3b5968252752c28cf837f7ce198 } from '@kilivi/payloadcms-theme-management/fields/ThemeExportField'
+import { default as default_72023a29db4abb7a4753cdfae25e3ec4 } from '@kilivi/payloadcms-theme-management/fields/FontSelectField'
+import { default as default_c0e58144b6360d2782757f2b62063fc5 } from '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField'
 import { BeforeDashboard as BeforeDashboard_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
 import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
 
@@ -59,15 +59,15 @@ export const importMap = {
   "@payloadcms/plugin-ecommerce/client#PriceCell": PriceCell_e27bf7b8cc50640dcdd584767b8eac3c,
   "@payloadcms/plugin-ecommerce/rsc#PriceInput": PriceInput_b91672ccd6e8b071c11142ab941fedfb,
   "@payloadcms/richtext-lexical/client#HorizontalRuleFeatureClient": HorizontalRuleFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "@kilivi-dev/payloadcms-theme-management/fields/ThemeTokenSelectField#default": default_d543118e46625061a216069b884e5ec8,
-  "@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField#default": default_beada05bdc4b6bf0cf0a946a4c8e0541,
-  "@kilivi-dev/payloadcms-theme-management/fields/StylePresetField#default": default_eaf59c237dd34c1e4182da1be6af05e0,
-  "@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField#default": default_0a61509edff7cf9ed56cbd4cc843d31a,
-  "@kilivi-dev/payloadcms-theme-management/fields/ThemeColorPickerField#default": default_04aef3ecf733e651acc57317ace7f05a,
-  "@kilivi-dev/payloadcms-theme-management/fields/AccessibilityAuditField#default": default_c825d2285d989eceefe6396de133087d,
-  "@kilivi-dev/payloadcms-theme-management/fields/ThemeExportField#default": default_653c84494cd4f80cfb6904ae5b067e55,
-  "@kilivi-dev/payloadcms-theme-management/fields/FontSelectField#default": default_713cc68d3d89567cb76d24c0fc49150c,
-  "@kilivi-dev/payloadcms-theme-management/fields/ThemePresetImportField#default": default_e38ffb8b72d31bfe68afb2c02966ed66,
+  "@kilivi/payloadcms-theme-management/fields/ThemeTokenSelectField#default": default_58bce6d963f55b41129662191194379a,
+  "@kilivi/payloadcms-theme-management/fields/ThemePreviewField#default": default_8f2883114fa2e4186f7d5253bf815ddc,
+  "@kilivi/payloadcms-theme-management/fields/AppearancePreviewField#default": default_ec977e983c757d6185686bf30205fce9,
+  "@kilivi/payloadcms-theme-management/fields/StylePresetField#default": default_e2abde10c4de2c0fa041710fd8f00c3b,
+  "@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField#default": default_48001663b65131ccddf4637eb5f6fccf,
+  "@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField#default": default_d816f393e71233eda8cf280a991b486b,
+  "@kilivi/payloadcms-theme-management/fields/ThemeExportField#default": default_4a31d3b5968252752c28cf837f7ce198,
+  "@kilivi/payloadcms-theme-management/fields/FontSelectField#default": default_72023a29db4abb7a4753cdfae25e3ec4,
+  "@kilivi/payloadcms-theme-management/fields/ThemePresetImportField#default": default_c0e58144b6360d2782757f2b62063fc5,
   "@/components/BeforeDashboard#BeforeDashboard": BeforeDashboard_1a7510af427896d367a49dbf838d2de6,
   "@/components/BeforeLogin#BeforeLogin": BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e
 }

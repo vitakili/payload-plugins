@@ -44,7 +44,7 @@ type StartViewTransition = (callback: () => void) => { ready: Promise<void> }
  *
  * @example
  * ```tsx
- * import { ColorModeToggle } from '@kilivi-dev/payloadcms-theme-management/components/ColorModeToggle'
+ * import { ColorModeToggle } from '@kilivi/payloadcms-theme-management/components/ColorModeToggle'
  * <ColorModeToggle />
  * ```
  */

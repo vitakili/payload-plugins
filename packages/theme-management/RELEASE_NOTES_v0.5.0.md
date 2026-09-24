@@ -72,13 +72,13 @@ None - The `defaultThemePresets` export is still available for backward compatib
 No migration needed. If you want to use all themes (including TweakCN), import `allThemePresets`:
 
 ```typescript
-import { allThemePresets } from '@kilivi-dev/payloadcms-theme-management'
+import { allThemePresets } from '@kilivi/payloadcms-theme-management'
 ```
 
 For backward compatibility, `defaultThemePresets` still works:
 
 ```typescript
-import { defaultThemePresets } from '@kilivi-dev/payloadcms-theme-management'
+import { defaultThemePresets } from '@kilivi/payloadcms-theme-management'
 ```
 
 ## Available Themes (60+)
@@ -143,7 +143,7 @@ To use this release in `payload-builder`:
 
    ```bash
    cd payload-builder
-   pnpm add @kilivi-dev/payloadcms-theme-management@0.5.0
+   pnpm add @kilivi/payloadcms-theme-management@0.5.0
    ```
 
 2. **Verify Theme Selector**:

@@ -1,6 +1,6 @@
 ---
 name: theme-customization-tools
-description: Use the admin-side and programmatic theming tools in @kilivi-dev/payloadcms-theme-management — generate a full light/dark palette from one brand colour or a logo, run a WCAG accessibility audit of the palette with one-click fixes, and export the theme as W3C design tokens (JSON) or Tailwind v4 @theme / v3 config.
+description: Use the admin-side and programmatic theming tools in @kilivi/payloadcms-theme-management — generate a full light/dark palette from one brand colour or a logo, run a WCAG accessibility audit of the palette with one-click fixes, and export the theme as W3C design tokens (JSON) or Tailwind v4 @theme / v3 config.
 ---
 
 # Theme customization & export tools
@@ -19,7 +19,7 @@ Programmatic:
 import {
   generatePaletteFromColor,
   extractDominantColors,
-} from '@kilivi-dev/payloadcms-theme-management/utils/generatePalette'
+} from '@kilivi/payloadcms-theme-management/utils/generatePalette'
 
 const { lightMode, darkMode } = generatePaletteFromColor('#1d4ed8')
 // extractDominantColors(imgEl, 6) → hex[] ranked by saturation-weighted frequency
@@ -41,7 +41,7 @@ import {
   getContrastRatio,
   getWcagLevel,
   suggestAccessibleColor,
-} from '@kilivi-dev/payloadcms-theme-management/utils/contrast'
+} from '@kilivi/payloadcms-theme-management/utils/contrast'
 
 auditThemePalette(lightMode) // ContrastPairResult[] with ratio, level, suggestion
 getContrastRatio('#fff', '#1d4ed8') // 1–21 or null
@@ -61,7 +61,7 @@ import {
   generateDesignTokensJson,    // pretty JSON string
   generateTailwindV4Theme,     // "@theme inline { --color-primary: var(--primary); … }"
   generateTailwindV3Theme,     // theme.extend config string
-} from '@kilivi-dev/payloadcms-theme-management/utils/exportTokens'
+} from '@kilivi/payloadcms-theme-management/utils/exportTokens'
 ```
 
 The Tailwind output maps utilities (`bg-primary`, `text-foreground`, …) to the

@@ -201,7 +201,7 @@ All 8 new presets use the **OKLCH** colour format (`oklch(L C H)`) which is nati
 If you need legacy HEX fallbacks, use the existing conversion utilities:
 
 ```typescript
-import { generateThemeColorsCss, hexToHsl } from '@kilivi-dev/payloadcms-theme-management'
+import { generateThemeColorsCss, hexToHsl } from '@kilivi/payloadcms-theme-management'
 ```
 
 ---

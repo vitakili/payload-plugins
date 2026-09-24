@@ -11,7 +11,7 @@ import type { Field, GroupField } from 'payload'
 
 type LocalizedLabel = string | { [locale: string]: string }
 
-const FIELD_PREFIX = '@kilivi-dev/payloadcms-theme-management/fields'
+const FIELD_PREFIX = '@kilivi/payloadcms-theme-management/fields'
 
 export type ColorGroupOptions = {
   /** Field label (bilingual object or plain string). */
@@ -45,7 +45,7 @@ const text = (en: string, cs: string) => ({ en, cs })
  *
  * @example
  * ```ts
- * import { createColorGroup } from '@kilivi-dev/payloadcms-theme-management/fields/colorFieldHelpers'
+ * import { createColorGroup } from '@kilivi/payloadcms-theme-management/fields/colorFieldHelpers'
  *
  * fields: [
  *   createColorGroup('sectionBackground', { label: { en: 'Background', cs: 'Pozadí' } }),

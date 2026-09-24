@@ -1,6 +1,6 @@
 ---
 name: theme-visitor-components
-description: Add front-end (visitor-facing) theme controls from @kilivi-dev/payloadcms-theme-management — the ColorModeToggle (light/dark/auto with a View Transitions ripple animation) and the ThemeSwitcher (runtime theme-preset switching). Use when a site needs a dark-mode button or a theme picker for end users.
+description: Add front-end (visitor-facing) theme controls from @kilivi/payloadcms-theme-management — the ColorModeToggle (light/dark/auto with a View Transitions ripple animation) and the ThemeSwitcher (runtime theme-preset switching). Use when a site needs a dark-mode button or a theme picker for end users.
 ---
 
 # Theme visitor components
@@ -17,7 +17,7 @@ hasn't requested reduced motion, the change animates as a circular ripple from
 the click point.
 
 ```tsx
-import { ColorModeToggle } from '@kilivi-dev/payloadcms-theme-management/components/ColorModeToggle'
+import { ColorModeToggle } from '@kilivi/payloadcms-theme-management/components/ColorModeToggle'
 
 <ColorModeToggle />
 // options:
@@ -41,13 +41,13 @@ preset's colour CSS and updating `data-theme`. Persists the choice to
 localStorage and restores it on the next visit.
 
 ```tsx
-import { ThemeSwitcher } from '@kilivi-dev/payloadcms-theme-management/components/ThemeSwitcher'
+import { ThemeSwitcher } from '@kilivi/payloadcms-theme-management/components/ThemeSwitcher'
 
 // All bundled presets:
 <ThemeSwitcher />
 
 // A curated subset:
-import { allThemePresets } from '@kilivi-dev/payloadcms-theme-management'
+import { allThemePresets } from '@kilivi/payloadcms-theme-management'
 const offered = allThemePresets.filter((p) => ['cool', 'ocean', 'forest'].includes(p.name))
 <ThemeSwitcher presets={offered} persist onChange={(name) => console.log(name)} />
 ```

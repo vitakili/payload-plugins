@@ -14,7 +14,7 @@ const nextConfig = {
   },
   // Watch local file:-linked packages for HMR — without this webpack ignores node_modules
   transpilePackages: [
-    '@kilivi-dev/payloadcms-theme-management',
+    '@kilivi/payloadcms-theme-management',
     '@kilivi/payloadcms-localized-slugs',
   ],
   images: {
@@ -44,7 +44,7 @@ const nextConfig = {
     // `<pkg>/components/...` instead of `<pkg>/dist/components/...` and fail.
     // Instead the plugins are consumed exactly like a published package via the
     // `file:` dependency — after changing plugin source run:
-    //   pnpm --filter @kilivi-dev/payloadcms-theme-management build && (cd dev-local && pnpm ii)
+    //   pnpm --filter @kilivi/payloadcms-theme-management build && (cd dev-local && pnpm ii)
 
     return webpackConfig
   },

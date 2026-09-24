@@ -1,6 +1,6 @@
 ---
 name: theme-live-preview
-description: Wire up and debug live theme preview for @kilivi-dev/payloadcms-theme-management — the native Payload Live Preview iframe (with mobile/tablet/desktop breakpoints), the in-admin device + light/dark preview panels, and the ThemeLivePreviewSync client component that applies theme CSS live without a full save.
+description: Wire up and debug live theme preview for @kilivi/payloadcms-theme-management — the native Payload Live Preview iframe (with mobile/tablet/desktop breakpoints), the in-admin device + light/dark preview panels, and the ThemeLivePreviewSync client component that applies theme CSS live without a full save.
 ---
 
 # Theme live preview
@@ -39,7 +39,7 @@ listener so theme edits apply **without a full save/refresh**:
 ```tsx
 'use client'
 import { RefreshRouteOnSave } from '@payloadcms/live-preview-react'
-import { ThemeLivePreviewSync } from '@kilivi-dev/payloadcms-theme-management/components/ThemeLivePreviewSync'
+import { ThemeLivePreviewSync } from '@kilivi/payloadcms-theme-management/components/ThemeLivePreviewSync'
 
 // inside a component that only renders when in the preview iframe:
 <>
