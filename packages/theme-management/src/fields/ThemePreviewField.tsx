@@ -5,7 +5,7 @@ import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import * as _PayloadUI from '@payloadcms/ui'
 import { ChevronDown, ChevronRight, Moon, Palette, Sun, type LucideIcon } from 'lucide-react'
 import type { SelectFieldClientProps } from 'payload'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type {
   ResolvedTypographyPreview,
   TypographySelection,
@@ -17,6 +17,10 @@ import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTransla
 import PaletteGeneratorField from './PaletteGeneratorField.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { darkModeDefaults, lightModeDefaults } from './colorModeFields.js'
+import { parseThemePresetInput } from '../utils/customThemePresets.js'
+import { resolveLocalizedText } from '../utils/localizedText.js'
+import { AppearanceLocks, AppearanceUndoBar } from '../components/AppearanceSessionControls.js'
+import { createBulkWriter, getAppearanceSession } from '../hooks/useAppearanceSession.js'
 
 // useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
 // the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules.
@@ -104,6 +108,8 @@ function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly
 
   return (
     <div
+      // A picture of the site: its sample buttons must not become dead tab stops.
+      ref={(el) => el?.setAttribute('inert', '')}
       style={{
         display: 'grid',
         gap: '16px',
@@ -202,7 +208,7 @@ function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly
             color: mutedForeground,
           }}
         >
-          Muted Card
+          {t.ui.mutedSample}
         </div>
         <div
           style={{
@@ -214,7 +220,7 @@ function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly
             color: accentForeground,
           }}
         >
-          Accent Tag
+          {t.ui.accentSample}
         </div>
       </div>
 
@@ -236,7 +242,7 @@ function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly
             lineHeight: 1.2,
           }}
         >
-          Nadpis / Heading preview
+          {t.ui.headingSample}
         </div>
         <p
           style={{
@@ -248,21 +254,30 @@ function ModePreview({ icon: Icon, title, colors, typography, radius }: Readonly
             opacity: 0.85,
           }}
         >
-          Sphinx of black quartz, judge my vow. Příliš žluťoučký kůň úpěl ďábelské ódy.
+          {t.ui.bodySample}
         </p>
         <div
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '10px',
-            fontSize: '11px',
-            color: 'rgba(15, 23, 42, 0.7)',
+            fontSize: '12px',
+            // Follow the previewed palette so the meta line stays readable in dark mode.
+            color: mutedForeground,
           }}
         >
-          <span>Body: {typography.bodyLabel}</span>
-          <span>Heading: {typography.headingLabel}</span>
-          <span>Base size: {baseFontSize}</span>
-          <span>Line height: {lineHeight}</span>
+          <span>
+            {t.ui.bodyFontLabel}: {typography.bodyLabel}
+          </span>
+          <span>
+            {t.ui.headingFontLabel}: {typography.headingLabel}
+          </span>
+          <span>
+            {t.ui.baseSizeLabel}: {baseFontSize}
+          </span>
+          <span>
+            {t.ui.lineHeightLabel}: {lineHeight}
+          </span>
         </div>
       </div>
     </div>
@@ -286,10 +301,24 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   // otherwise fallback to `allThemePresets`.
   // Prefer presets passed via `admin.custom.themePresets` (set by the field factory / plugin).
   // Fall back to legacy `admin.themePresets` for backwards compatibility, then to `allThemePresets`.
-  const baseThemePresets =
+  const configuredThemePresets =
     (field?.admin?.custom as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
     (field?.admin as unknown as { themePresets?: ThemePreset[] })?.themePresets ??
     allThemePresets
+  // Presets imported through the "Custom Theme Presets" JSON field live next to
+  // this field. Merge them in (overriding built-ins by name) so they show up in
+  // the picker as soon as they are imported.
+  const customPresetsPath = [...path.split('.').slice(0, -1), 'customThemePresets'].join('.')
+  const customPresetsValue = useFormFields(
+    ([formState]: any) => formState?.[customPresetsPath]?.value as unknown,
+  )
+  const baseThemePresets = useMemo(() => {
+    const custom = parseThemePresetInput(customPresetsValue)
+    if (custom.length === 0) return configuredThemePresets
+    const byName = new Map(configuredThemePresets.map((preset) => [preset.name, preset]))
+    custom.forEach((preset) => byName.set(preset.name, preset))
+    return [...byName.values()]
+  }, [configuredThemePresets, customPresetsValue])
   const runtimeThemePresets = useMemo(() => {
     return (baseThemePresets as ThemePreset[]).reduce<Record<string, ThemePresetDefinition>>(
       (acc, preset) => {
@@ -316,35 +345,53 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   // preview panel — not the long preset list — dominates the layout.
   const [presetsOpen, setPresetsOpen] = useState(false)
 
+  const { setModified } = useForm()
+
+  /**
+   * Write a theme preset into the form, honouring the session locks:
+   * colours (Colours lock), visual effects (Style lock). Theme fonts apply
+   * implicitly through the "Use theme preset" font option, so with the Fonts lock
+   * on we pin the current preset font as a custom value before switching.
+   */
   const applyPreset = useCallback(
-    (presetName: string) => {
+    (presetName: string, writer: ReturnType<typeof createBulkWriter>) => {
       const preset = runtimeThemePresets[presetName]
       if (!preset) {
         return
       }
+      const { locks } = getAppearanceSession()
 
-      colorKeys.forEach((key) => {
-        const lightValue = preset.lightMode[key]
-        const darkValue = preset.darkMode[key]
+      if (!locks.colors) {
+        colorKeys.forEach((key) => {
+          const lightValue = preset.lightMode[key]
+          const darkValue = preset.darkMode[key]
+          if (lightValue) writer.write(`themeConfiguration.lightMode.${key}`, lightValue)
+          if (darkValue) writer.write(`themeConfiguration.darkMode.${key}`, darkValue)
+        })
+      }
 
-        if (lightValue) {
-          dispatchFields({
-            type: 'UPDATE',
-            path: `themeConfiguration.lightMode.${key}`,
-            value: lightValue,
-          })
+      if (locks.fonts && selectedTheme) {
+        const typographyValue = (key: string) =>
+          formFields?.[`themeConfiguration.typography.${key}`]?.value as string | undefined
+        const current = resolveTypographyPreview(
+          {
+            bodyFont: typographyValue('bodyFont'),
+            headingFont: typographyValue('headingFont'),
+          },
+          selectedTheme,
+        )
+        const pin = (key: 'bodyFont' | 'headingFont', family: string) => {
+          const value = typographyValue(key)
+          if (!value || value === 'preset') {
+            writer.write(`themeConfiguration.typography.${key}`, 'custom')
+            writer.write(`themeConfiguration.typography.${key}Custom`, family)
+          }
         }
+        pin('bodyFont', current.bodyFont)
+        pin('headingFont', current.headingFont)
+      }
 
-        if (darkValue) {
-          dispatchFields({
-            type: 'UPDATE',
-            path: `themeConfiguration.darkMode.${key}`,
-            value: darkValue,
-          })
-        }
-      })
-
-      if (preset.visualEffects) {
+      if (!locks.style && preset.visualEffects) {
         const vfKeys = [
           'effectStyle',
           'shadowIntensity',
@@ -355,31 +402,28 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
         ] as const
         vfKeys.forEach((key) => {
           const value = preset.visualEffects?.[key]
-          if (value !== undefined) {
-            dispatchFields({
-              type: 'UPDATE',
-              path: `themeConfiguration.visualEffects.${key}`,
-              value,
-            })
-          }
+          if (value !== undefined) writer.write(`themeConfiguration.visualEffects.${key}`, value)
         })
       }
     },
-    [dispatchFields],
+    [runtimeThemePresets, formFields, selectedTheme],
   )
 
   const handleThemeSelect = useCallback(
     (value: string) => {
-      setValue(value)
-
       if (!value) {
+        setValue(value)
         return
       }
 
       hasAppliedInitialPresetRef.current = true
-      applyPreset(value)
+      const writer = createBulkWriter(formFields, dispatchFields)
+      writer.write(path, value)
+      applyPreset(value, writer)
+      setModified(true)
+      writer.commit('theme', runtimeThemePresets[value]?.label ?? value)
     },
-    [applyPreset, setValue],
+    [applyPreset, setValue, formFields, dispatchFields, path, setModified, runtimeThemePresets],
   )
 
   useEffect(() => {
@@ -429,7 +473,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
       return
     }
 
-    applyPreset(selectedTheme)
+    // First-time fill of empty colour fields: not an editor action, so no undo entry.
+    applyPreset(selectedTheme, createBulkWriter(formFields, dispatchFields))
     hasAppliedInitialPresetRef.current = true
   }, [selectedTheme, formFields, applyPreset])
 
@@ -507,6 +552,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
 
   // Translate labels at runtime based on the active Payload admin language
   const t = useThemeTranslations()
+  const fieldId = `tm-theme-${useId().replace(/:/g, '')}`
   // Explicitly type keys as `keyof ColorModeColors` to satisfy TypeScript when indexing `lightMode`/`darkMode`
   const highlightSwatches: { key: keyof ColorModeColors; label: string }[] = [
     { key: 'primary', label: t.colors.primary },
@@ -528,12 +574,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   const resolveLocalized = (
     value: string | Record<string, string> | null | undefined,
     fallback = '',
-  ): string => {
-    if (typeof value === 'string') return value
-    if (!value) return fallback
-    const base = adminLanguage.split('-')[0]
-    return value[adminLanguage] ?? value[base] ?? value.en ?? Object.values(value)[0] ?? fallback
-  }
+  ): string => resolveLocalizedText(value, adminLanguage, fallback)
 
   const fieldLabel = resolveLocalized(
     field.label as string | Record<string, string> | undefined,
@@ -553,7 +594,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           marginBottom: '10px',
         }}
       >
-        <label
+        <div
+          id={`${fieldId}-label`}
           style={{
             fontSize: '13px',
             fontWeight: 600,
@@ -561,12 +603,14 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           }}
         >
           {fieldLabel}
-        </label>
+        </div>
         {showPreviewPanel && (
           <button
             type="button"
             onClick={() => setPreviewOpen((v) => !v)}
             className="theme-preview-toggle"
+            aria-expanded={previewOpen}
+            aria-controls={`${fieldId}-preview`}
           >
             {previewOpen ? (
               <ChevronDown size={12} aria-hidden />
@@ -587,6 +631,8 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           {/* Palette generator lives in the same column as the preset picker:
               editors either generate a palette from a brand colour / logo, or
               pick a ready-made preset right below it. */}
+          <AppearanceLocks />
+          <AppearanceUndoBar sources={['theme', 'palette']} />
           <PaletteGeneratorField />
 
           {/* Collapsible preset picker — collapsed by default so the live preview
@@ -596,7 +642,10 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             className={`theme-preset-summary${presetsOpen ? ' is-open' : ''}`}
             onClick={() => setPresetsOpen((v) => !v)}
             aria-expanded={presetsOpen}
-            aria-label={t.ui.choosePreset}
+            aria-controls={`${fieldId}-presets`}
+            aria-label={
+              activePreset ? `${t.ui.choosePreset}: ${activePreset.label}` : t.ui.choosePreset
+            }
           >
             {presetsOpen ? (
               <ChevronDown size={14} aria-hidden />
@@ -606,9 +655,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
             <span className="theme-preset-summary__info">
               <span className="theme-label">{activePreset?.label ?? t.ui.choosePreset}</span>
               <span className="theme-name">
-                {presetsOpen
-                  ? `${presetCount} ${t.ui.presetCount}`
-                  : (selectedTheme ?? t.ui.themePresets)}
+                {`${presetCount} ${t.ui.presetCount}`}
               </span>
             </span>
             <span className="theme-swatches" aria-hidden="true">
@@ -623,7 +670,12 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
           </button>
 
           {presetsOpen && (
-            <div className="theme-preset-list">
+            <div
+              className="theme-preset-list"
+              id={`${fieldId}-presets`}
+              role="group"
+              aria-labelledby={`${fieldId}-label`}
+            >
               {Object.entries(runtimeThemePresets).map(([key, preset]) => {
                 const isSelected = key === selectedTheme
                 const swatches = highlightSwatches
@@ -634,12 +686,12 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
                   <button
                     key={key}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => handleThemeSelect(key)}
                     className={`theme-preset-button ${isSelected ? 'selected' : ''}`}
                   >
                     <div className="theme-info">
                       <span className="theme-label">{preset.label}</span>
-                      <span className="theme-name">{key}</span>
                     </div>
                     <div className="theme-swatches" aria-hidden="true">
                       {swatches.map((color, index) => (
@@ -670,7 +722,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
         </div>
 
         {showPreviewPanel && previewOpen && (
-          <div className="theme-preview-panel">
+          <div className="theme-preview-panel" id={`${fieldId}-preview`}>
             <div
               style={{
                 width: '100%',

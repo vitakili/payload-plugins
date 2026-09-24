@@ -1,6 +1,7 @@
 'use client'
 
 import { useField } from '@payloadcms/ui'
+import { Star } from 'lucide-react'
 import type { TextFieldClientProps } from 'payload'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type {
@@ -59,6 +60,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
   // State
   const [fonts, setFonts] = useState<GoogleFont[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState(false)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<FontCategory>('all')
   const [subset, setSubset] = useState<LanguageSubset>('all')
@@ -100,6 +102,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
       if (loading) return
 
       setLoading(true)
+      setLoadError(false)
 
       try {
         const currentOffset = reset ? 0 : offset
@@ -112,6 +115,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
         })
 
         const response = await fetch(`/api/google-fonts?${params}`)
+        if (!response.ok) throw new Error(`Font request failed with ${response.status}`)
         const data = await response.json()
 
         if (reset) {
@@ -125,6 +129,8 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
         setHasMore(currentOffset + data.fonts.length < data.total)
       } catch (error) {
         console.error('Error fetching fonts:', error)
+        setLoadError(true)
+        setHasMore(false)
       } finally {
         setLoading(false)
       }
@@ -228,10 +234,12 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
       {/* Preview Panel */}
       <div className="font-picker__preview-panel">
         {/* Preview Tabs */}
-        <div className="font-picker__preview-tabs">
+        <div className="font-picker__preview-tabs" role="group" aria-label={t.previewModes}>
           {(['typography', 'blog', 'landing', 'ui'] as PreviewTab[]).map((tab) => (
             <button
               key={tab}
+              type="button"
+              aria-pressed={previewTab === tab}
               className={`font-picker__preview-tab ${previewTab === tab ? 'font-picker__preview-tab--active' : ''}`}
               onClick={() => setPreviewTab(tab)}
             >
@@ -255,6 +263,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
             type="text"
             className="font-picker__search"
             placeholder={t.search}
+            aria-label={t.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -263,6 +272,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
           <div className="font-picker__filters">
             <select
               className="font-picker__select"
+              aria-label={t.category}
               value={category}
               onChange={(e) => setCategory(e.target.value as FontCategory)}
             >
@@ -276,6 +286,7 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
 
             <select
               className="font-picker__select"
+              aria-label={t.subset}
               value={subset}
               onChange={(e) => setSubset(e.target.value as LanguageSubset)}
             >
@@ -295,24 +306,30 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
           </div>
 
           {/* View Mode Toggle */}
-          <div className="font-picker__view-toggle">
+          <div className="font-picker__view-toggle" role="group" aria-label={t.viewMode}>
             <button
+              type="button"
+              aria-pressed={viewMode === 'row'}
+              aria-label={t.viewModes.row}
               className={`font-picker__view-button ${viewMode === 'row' ? 'font-picker__view-button--active' : ''}`}
               onClick={() => setViewMode('row')}
               title={t.viewModes.row}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <rect x="2" y="4" width="16" height="2" />
                 <rect x="2" y="9" width="16" height="2" />
                 <rect x="2" y="14" width="16" height="2" />
               </svg>
             </button>
             <button
+              type="button"
+              aria-pressed={viewMode === 'grid'}
+              aria-label={t.viewModes.grid}
               className={`font-picker__view-button ${viewMode === 'grid' ? 'font-picker__view-button--active' : ''}`}
               onClick={() => setViewMode('grid')}
               title={t.viewModes.grid}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <rect x="2" y="2" width="7" height="7" />
                 <rect x="11" y="2" width="7" height="7" />
                 <rect x="2" y="11" width="7" height="7" />
@@ -323,44 +340,69 @@ const FontPickerComponent: React.FC<FontPickerProps> = ({ value, onChange, langu
         </div>
 
         {/* Font List */}
-        <div className={`font-picker__list font-picker__list--${viewMode}`}>
-          {fonts.map((font) => (
-            <div
-              key={font.family}
-              className={`font-picker__item ${
-                selectedFont?.family === font.family ? 'font-picker__item--selected' : ''
-              }`}
-              onClick={() => handleFontSelect(font)}
-              onMouseEnter={() => handleFontHover(font)}
-            >
-              <div className="font-picker__item-header">
-                <span className="font-picker__item-name">{font.family}</span>
+        <div
+          className={`font-picker__list font-picker__list--${viewMode}`}
+          role="list"
+          aria-label={t.fontList}
+          aria-busy={loading}
+        >
+          {fonts.map((font) => {
+            const isSelected = selectedFont?.family === font.family
+            const isFavorite = favorites.includes(font.family)
+            return (
+              <div
+                key={font.family}
+                role="listitem"
+                className={`font-picker__item ${isSelected ? 'font-picker__item--selected' : ''}`}
+              >
                 <button
-                  className={`font-picker__favorite ${
-                    favorites.includes(font.family) ? 'font-picker__favorite--active' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleFavorite(font.family)
-                  }}
-                  title={
-                    favorites.includes(font.family) ? 'Remove from favorites' : 'Add to favorites'
-                  }
+                  type="button"
+                  className="font-picker__item-select"
+                  aria-pressed={isSelected}
+                  onClick={() => handleFontSelect(font)}
+                  onMouseEnter={() => handleFontHover(font)}
+                  onFocus={() => handleFontHover(font)}
                 >
-                  ★
+                  <span className="font-picker__item-name">{font.family}</span>
+                  <span className="font-picker__item-preview">
+                    <FontPreview font={font} variant="row" text={t.typography.body} />
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className={`font-picker__favorite ${isFavorite ? 'font-picker__favorite--active' : ''}`}
+                  aria-pressed={isFavorite}
+                  aria-label={`${isFavorite ? t.removeFavorite : t.addFavorite}: ${font.family}`}
+                  title={isFavorite ? t.removeFavorite : t.addFavorite}
+                  onClick={() => toggleFavorite(font.family)}
+                >
+                  <Star size={16} aria-hidden="true" fill={isFavorite ? 'currentColor' : 'none'} />
                 </button>
               </div>
-              <div className="font-picker__item-preview">
-                <FontPreview font={font} variant="row" text={t.typography.body} />
-              </div>
-            </div>
-          ))}
+            )
+          })}
 
           {/* Loading indicator */}
-          {loading && <div className="font-picker__loading">{t.loading}</div>}
+          {loading && (
+            <div className="font-picker__loading" role="status">
+              {t.loading}
+            </div>
+          )}
+
+          {/* Load error */}
+          {!loading && loadError && (
+            <div className="font-picker__error" role="alert">
+              <p>{t.loadError}</p>
+              <button type="button" className="font-picker__retry" onClick={() => fetchFonts(true)}>
+                {t.retry}
+              </button>
+            </div>
+          )}
 
           {/* No fonts found */}
-          {!loading && fonts.length === 0 && <div className="font-picker__empty">{t.noFonts}</div>}
+          {!loading && !loadError && fonts.length === 0 && (
+            <div className="font-picker__empty">{t.noFonts}</div>
+          )}
 
           {/* Infinite scroll trigger */}
           {hasMore && <div ref={loadMoreRef} style={{ height: '20px' }} />}

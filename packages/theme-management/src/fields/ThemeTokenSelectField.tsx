@@ -2,7 +2,8 @@
 
 import { useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Check, ChevronDown } from 'lucide-react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { allThemePresets, fetchThemeConfiguration } from '../index.js'
 import type { SiteThemeConfiguration } from '../payload-types.js'
 import type { ThemePreset } from '../presets.js'
@@ -21,7 +22,7 @@ interface ThemeColorOption {
 const FALLBACK_TOKENS: ThemeColorOption[] = [
   {
     value: 'background',
-    label: { en: 'Theme background', cs: 'Pozadí tématu' },
+    label: { en: 'Theme background', cs: 'Pozadí motivu' },
     color: 'var(--background)',
   },
   { value: 'card', label: { en: 'Card background', cs: 'Pozadí karty' }, color: 'var(--card)' },
@@ -77,7 +78,7 @@ function buildOptionsFromConfiguration(
       }
 
       const labelMap: Record<string, { en: string; cs: string }> = {
-        background: { en: 'Theme background', cs: 'Pozadí tématu' },
+        background: { en: 'Theme background', cs: 'Pozadí motivu' },
         card: { en: 'Card background', cs: 'Pozadí karty' },
         muted: { en: 'Muted surface', cs: 'Tlumený povrch' },
         accent: { en: 'Accent surface', cs: 'Akcentní povrch' },
@@ -289,28 +290,109 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     }
   }
 
-  const selectedOption = options.find((opt) => opt.value === selectedValue)
+  const selectedIndex = options.findIndex((opt) => opt.value === selectedValue)
+  const selectedOption = selectedIndex >= 0 ? options[selectedIndex] : undefined
   const selectedColor = selectedOption ? resolveCssColor(selectedOption.color) : ''
   const selectedLabel = selectedOption ? getOptionLabel(selectedOption) : ''
   const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const baseId = useId()
+  const labelId = `${baseId}-label`
+  const listboxId = `${baseId}-listbox`
+  const optionId = (index: number) => `${baseId}-option-${index}`
+  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const listboxRef = useRef<HTMLDivElement>(null)
+
+  const openList = (index = selectedIndex >= 0 ? selectedIndex : 0) => {
+    setActiveIndex(index)
+    setIsOpen(true)
+  }
+
+  const closeList = useCallback((restoreFocus: boolean) => {
+    setIsOpen(false)
+    if (restoreFocus) triggerRef.current?.focus()
+  }, [])
+
+  const chooseOption = (index: number) => {
+    const option = options[index]
+    if (!option) return
+    handleSelect(option.value)
+    closeList(true)
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    listboxRef.current?.focus()
+    const handlePointerOutside = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) closeList(false)
+    }
+    document.addEventListener('pointerdown', handlePointerOutside)
+    return () => document.removeEventListener('pointerdown', handlePointerOutside)
+  }, [isOpen, closeList])
+
+  useEffect(() => {
+    if (!isOpen || activeIndex < 0) return
+    listboxRef.current
+      ?.querySelector<HTMLElement>(`#${CSS.escape(optionId(activeIndex))}`)
+      ?.scrollIntoView({ block: 'nearest' })
+  }, [isOpen, activeIndex])
+
+  const handleTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+      event.preventDefault()
+      openList()
+    }
+  }
+
+  const handleListboxKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const last = options.length - 1
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault()
+        setActiveIndex((i) => Math.min(last, i + 1))
+        break
+      case 'ArrowUp':
+        event.preventDefault()
+        setActiveIndex((i) => Math.max(0, i - 1))
+        break
+      case 'Home':
+        event.preventDefault()
+        setActiveIndex(0)
+        break
+      case 'End':
+        event.preventDefault()
+        setActiveIndex(last)
+        break
+      case 'Enter':
+      case ' ':
+        event.preventDefault()
+        chooseOption(activeIndex)
+        break
+      case 'Escape':
+        event.preventDefault()
+        event.stopPropagation()
+        closeList(true)
+        break
+      case 'Tab':
+        closeList(false)
+        break
+    }
+  }
 
   return (
     <div className="field-type theme-token-select">
       {label && (
-        <label
-          className="field-label"
-          htmlFor={path}
-          style={{ display: 'block', marginBottom: '8px' }}
-        >
+        <div className="field-label" id={labelId} style={{ display: 'block', marginBottom: '8px' }}>
           {label}
           {field.required && <span className="required">*</span>}
-        </label>
+        </div>
       )}
 
       {description && (
         <div
           className="field-description"
-          style={{ marginBottom: '12px', fontSize: '13px', color: 'var(--theme-elevation-500)' }}
+          style={{ marginBottom: '12px', fontSize: '13px', color: 'var(--theme-elevation-600)' }}
         >
           {description}
         </div>
@@ -334,53 +416,61 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
             border: '2px solid var(--theme-elevation-200)',
             backgroundColor: selectedColor,
             flexShrink: 0,
-            transition: 'all 0.2s ease',
             boxShadow: selectedColor
               ? '0 2px 8px rgba(0, 0, 0, 0.1)'
               : 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
           }}
         />
 
-        {/* Custom Select Combobox */}
-        <div style={{ flex: 1, position: 'relative' }}>
+        {/* Select-only combobox (WAI-ARIA): button trigger + keyboard listbox */}
+        <div ref={containerRef} style={{ flex: 1, minWidth: 0, position: 'relative' }}>
           <button
+            ref={triggerRef}
             id={path}
             type="button"
             role="combobox"
+            aria-haspopup="listbox"
             aria-expanded={isOpen}
-            onClick={() => setIsOpen(!isOpen)}
+            aria-controls={isOpen ? listboxId : undefined}
+            aria-labelledby={label ? `${labelId} ${baseId}-value` : undefined}
+            onClick={() => (isOpen ? closeList(false) : openList())}
+            onKeyDown={handleTriggerKeyDown}
             style={{
               width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
               padding: '10px 12px',
               borderRadius: '8px',
               border: '1px solid var(--theme-elevation-200)',
-              backgroundColor: 'var(--theme-elevation-0)',
+              backgroundColor: 'var(--theme-input-bg, var(--theme-elevation-0))',
               color: 'var(--theme-elevation-900)',
               fontSize: '14px',
               fontWeight: 500,
               cursor: 'pointer',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
               textAlign: 'left',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M${isOpen ? '5 8l-5-4 2-1.5L5 4l3-1.5 2 1.5L5 8z' : '1 4l5 4 5-4'}'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 10px center',
-              paddingRight: '32px',
-            }}
-            onFocus={(event) => {
-              event.currentTarget.style.borderColor = 'var(--theme-primary-500)'
-              event.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
-            }}
-            onBlur={(event) => {
-              event.currentTarget.style.borderColor = 'var(--theme-elevation-200)'
-              event.currentTarget.style.boxShadow = 'none'
             }}
           >
-            {selectedLabel}
+            <span id={`${baseId}-value`} style={{ minWidth: 0 }}>
+              {selectedLabel}
+            </span>
+            <ChevronDown
+              size={14}
+              aria-hidden
+              style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : undefined }}
+            />
           </button>
 
-          {/* Dropdown Menu */}
           {isOpen && (
             <div
+              ref={listboxRef}
+              id={listboxId}
+              role="listbox"
+              tabIndex={-1}
+              aria-labelledby={label ? labelId : undefined}
+              aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
+              onKeyDown={handleListboxKeyDown}
               style={{
                 position: 'absolute',
                 top: '100%',
@@ -396,44 +486,34 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
                 overflowY: 'auto',
               }}
             >
-              {options.map((option) => {
+              {options.map((option, index) => {
                 const isSelected = option.value === selectedValue
+                const isActive = index === activeIndex
                 const optionColor = resolveCssColor(option.color)
                 return (
-                  <button
+                  <div
                     key={option.value}
-                    type="button"
-                    onClick={() => {
-                      handleSelect(option.value)
-                      setIsOpen(false)
-                    }}
+                    id={optionId(index)}
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => chooseOption(index)}
+                    onPointerMove={() => setActiveIndex(index)}
                     style={{
-                      width: '100%',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '10px',
                       padding: '10px 12px',
-                      border: 'none',
-                      backgroundColor: isSelected ? 'var(--theme-primary-50)' : 'transparent',
+                      backgroundColor: isActive
+                        ? 'var(--theme-elevation-100)'
+                        : isSelected
+                          ? 'var(--theme-elevation-50)'
+                          : 'transparent',
+                      outline: isActive ? '2px solid var(--theme-elevation-800)' : undefined,
+                      outlineOffset: '-2px',
                       color: 'var(--theme-elevation-900)',
                       fontSize: '14px',
                       fontWeight: isSelected ? 600 : 500,
                       cursor: 'pointer',
-                      transition: 'background-color 0.15s ease',
-                      textAlign: 'left',
-                      borderLeft: isSelected
-                        ? '3px solid var(--theme-primary-500)'
-                        : '3px solid transparent',
-                    }}
-                    onMouseEnter={(event) => {
-                      if (!isSelected) {
-                        event.currentTarget.style.backgroundColor = 'var(--theme-elevation-50)'
-                      }
-                    }}
-                    onMouseLeave={(event) => {
-                      if (!isSelected) {
-                        event.currentTarget.style.backgroundColor = 'transparent'
-                      }
                     }}
                   >
                     <span
@@ -442,13 +522,14 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
                         width: '24px',
                         height: '24px',
                         borderRadius: '6px',
-                        border: '1px solid rgba(15, 23, 42, 0.1)',
+                        border: '1px solid var(--theme-elevation-150)',
                         backgroundColor: optionColor,
                         flexShrink: 0,
                       }}
                     />
-                    <span>{getOptionLabel(option)}</span>
-                  </button>
+                    <span style={{ flex: 1 }}>{getOptionLabel(option)}</span>
+                    {isSelected && <Check size={14} aria-hidden />}
+                  </div>
                 )
               })}
             </div>
@@ -456,22 +537,6 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
         </div>
       </div>
 
-      {/* Click outside to close */}
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 999,
-          }}
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Optional: Show selected label and color info */}
       {selectedLabel && (
         <div
           style={{
@@ -483,12 +548,9 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
             color: 'var(--theme-elevation-700)',
           }}
         >
-          <span style={{ fontWeight: 600 }}>
-            {t.ui.selectedColor}
-          </span>{' '}
-          {selectedLabel}
+          <span style={{ fontWeight: 600 }}>{t.ui.selectedColor}</span> {selectedLabel}
           {selectedColor && selectedColor !== '' && (
-            <span style={{ marginLeft: '8px', fontFamily: 'monospace', opacity: 0.7 }}>
+            <span style={{ marginLeft: '8px', fontFamily: 'monospace', color: 'var(--theme-elevation-600)' }}>
               ({selectedColor})
             </span>
           )}
@@ -497,3 +559,4 @@ export default function ThemeTokenSelectField(props: SelectFieldClientProps) {
     </div>
   )
 }
+

@@ -31,7 +31,7 @@ export interface FontPreviewProps {
  * to prevent Payload CMS admin styles from affecting the preview.
  */
 export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, onLoad }) => {
-  const shadowHostRef = useRef<HTMLDivElement>(null)
+  const shadowHostRef = useRef<HTMLSpanElement>(null)
   const shadowRootRef = useRef<ShadowRoot | null>(null)
   const fontLoadedRef = useRef(false)
   const adminLang = useThemeLanguage()
@@ -270,5 +270,8 @@ export const FontPreview: React.FC<FontPreviewProps> = ({ font, variant, text, o
     }
   }, [font, variant, text, onLoad, adminLang])
 
-  return <div ref={shadowHostRef} style={{ width: '100%', minHeight: '20px' }} />
+  // A span host keeps the preview valid inside interactive parents such as <button>.
+  return (
+    <span ref={shadowHostRef} style={{ display: 'block', width: '100%', minHeight: '20px' }} />
+  )
 }

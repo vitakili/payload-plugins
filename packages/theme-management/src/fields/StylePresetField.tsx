@@ -1,8 +1,15 @@
 'use client'
 
-import { useField, useForm } from '@payloadcms/ui'
+import { useField, useForm, useFormFields } from '@payloadcms/ui'
 import type { TextFieldClientProps } from 'payload'
 import { useCallback, useMemo } from 'react'
+import { X } from 'lucide-react'
+import { AppearanceUndoBar } from '../components/AppearanceSessionControls.js'
+import {
+  createBulkWriter,
+  getAppearanceSession,
+  useAppearanceSession,
+} from '../hooks/useAppearanceSession.js'
 import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { allStylePresets, stylePresetCategories } from '../style-presets.js'
 import type { StylePreset } from '../style-presets.js'
@@ -116,11 +123,10 @@ function getContainerBg(preset: StylePreset): string {
   return EFFECT_PREVIEW[effect]?.containerBg ?? '#f1f5f9'
 }
 
-// Category accent colors
-const CATEGORY_ACCENT: Record<string, string> = {
-  classic: '#64748b',
-  effect: '#6366f1',
-}
+// Selection uses Payload's own contrast token so it reads in both admin themes.
+const SELECTED_ACCENT = 'var(--theme-elevation-800)'
+// The thumbnail is always drawn on a light surface, so its sample button keeps a fixed dark fill.
+const THUMB_BUTTON = '#334155'
 
 export default function StylePresetField(props: TextFieldClientProps) {
   const { path } = props
@@ -129,64 +135,57 @@ export default function StylePresetField(props: TextFieldClientProps) {
   const lang = useThemeLanguage() as 'en' | 'cs'
   const t = useThemeTranslations()
 
+  const { setModified } = useForm()
+  const formFields = useFormFields(([state]) => state) as Record<string, { value?: unknown } | undefined>
+  const { locks } = useAppearanceSession()
+  const fullyLocked = locks.style && locks.fonts
+
+  /**
+   * Write a style preset, honouring the session locks: typography is skipped with
+   * the Fonts lock, and effects / components / radius / motion / spacing with the
+   * Style lock. Colours are never touched by a style preset.
+   */
   const applyStylePreset = useCallback(
-    (preset: StylePreset) => {
+    (preset: StylePreset, writer: ReturnType<typeof createBulkWriter>) => {
       const basePath = path.substring(0, path.lastIndexOf('.'))
+      const { locks: current } = getAppearanceSession()
 
-      if (preset.borderRadius !== undefined)
-        dispatchFields({
-          type: 'UPDATE',
-          path: `${basePath}.borderRadius`,
-          value: preset.borderRadius,
-        })
+      if (!current.style) {
+        if (preset.borderRadius !== undefined) writer.write(`${basePath}.borderRadius`, preset.borderRadius)
+        if (preset.animationLevel !== undefined)
+          writer.write(`${basePath}.animationLevel`, preset.animationLevel)
+        if (preset.spacing !== undefined) writer.write(`${basePath}.spacing`, preset.spacing)
 
-      if (preset.animationLevel !== undefined)
-        dispatchFields({
-          type: 'UPDATE',
-          path: `${basePath}.animationLevel`,
-          value: preset.animationLevel,
-        })
-
-      if (preset.spacing !== undefined)
-        dispatchFields({
-          type: 'UPDATE',
-          path: `${basePath}.spacing`,
-          value: preset.spacing,
-        })
-
-      if (preset.visualEffects) {
         VF_KEYS.forEach((key) => {
           const value = preset.visualEffects?.[key]
-          if (value !== undefined)
-            dispatchFields({ type: 'UPDATE', path: `${basePath}.visualEffects.${key}`, value })
+          if (value !== undefined) writer.write(`${basePath}.visualEffects.${key}`, value)
         })
-      }
-
-      if (preset.componentStyles) {
         CS_KEYS.forEach((key) => {
           const value = preset.componentStyles?.[key]
-          if (value !== undefined)
-            dispatchFields({ type: 'UPDATE', path: `${basePath}.componentStyles.${key}`, value })
+          if (value !== undefined) writer.write(`${basePath}.componentStyles.${key}`, value)
         })
       }
 
-      if (preset.typography) {
+      if (!current.fonts) {
         TYPO_KEYS.forEach((key) => {
           const value = preset.typography?.[key]
-          if (value !== undefined)
-            dispatchFields({ type: 'UPDATE', path: `${basePath}.typography.${key}`, value })
+          if (value !== undefined) writer.write(`${basePath}.typography.${key}`, value)
         })
       }
     },
-    [dispatchFields, path],
+    [path],
   )
 
   const handleSelect = useCallback(
-    (preset: StylePreset) => {
-      setValue(preset.name)
-      applyStylePreset(preset)
+    (preset: StylePreset, label: string) => {
+      if (getAppearanceSession().locks.style && getAppearanceSession().locks.fonts) return
+      const writer = createBulkWriter(formFields, dispatchFields)
+      writer.write(path, preset.name)
+      applyStylePreset(preset, writer)
+      setModified(true)
+      writer.commit('style', label)
     },
-    [setValue, applyStylePreset],
+    [formFields, dispatchFields, path, applyStylePreset, setModified],
   )
 
   const groupedPresets = useMemo(
@@ -205,15 +204,18 @@ export default function StylePresetField(props: TextFieldClientProps) {
         style={{
           margin: '0 0 16px',
           fontSize: '12px',
-          color: 'var(--theme-elevation-500, #64748b)',
+          color: 'var(--theme-elevation-600)',
           lineHeight: 1.6,
         }}
       >
         {t.stylePreset.description}
       </p>
 
+      {fullyLocked ? <p className="tm-locked-note">{t.appearance.styleLocked}</p> : null}
+      <AppearanceUndoBar sources={['style']} />
+
       {groupedPresets.map((category) => {
-        const accent = CATEGORY_ACCENT[category.name] ?? '#64748b'
+        const accent = SELECTED_ACCENT
         const catLabel =
           typeof category.label === 'object'
             ? (category.label[lang] ?? category.label.en)
@@ -222,37 +224,21 @@ export default function StylePresetField(props: TextFieldClientProps) {
           <div key={category.name} style={{ marginBottom: '20px' }}>
             {/* Category header */}
             <div
+              id={`${path}-${category.name}-heading`}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
                 marginBottom: '10px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--theme-elevation-800)',
               }}
             >
-              <div
-                style={{
-                  width: '3px',
-                  height: '16px',
-                  borderRadius: '2px',
-                  background: accent,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: accent,
-                }}
-              >
-                {catLabel}
-              </span>
+              {catLabel}
             </div>
 
             {/* Preset grid */}
             <div
+              role="group"
+              aria-labelledby={`${path}-${category.name}-heading`}
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
@@ -276,29 +262,30 @@ export default function StylePresetField(props: TextFieldClientProps) {
                   <button
                     key={preset.name}
                     type="button"
-                    onClick={() => handleSelect(preset)}
+                    aria-pressed={isSelected}
+                    aria-disabled={fullyLocked || undefined}
+                    onClick={() => handleSelect(preset, labelText)}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '0',
                       padding: '0',
                       borderRadius: '10px',
-                      border: isSelected ? `2px solid ${accent}` : '2px solid transparent',
-                      outline: isSelected ? `3px solid ${accent}22` : 'none',
-                      outlineOffset: '2px',
-                      background: 'var(--theme-elevation-50, #f8fafc)',
-                      cursor: 'pointer',
+                      border: isSelected ? `2px solid ${accent}` : '2px solid var(--theme-elevation-150)',
+                      background: 'var(--theme-elevation-50)',
+                      cursor: fullyLocked ? 'not-allowed' : 'pointer',
+                      opacity: fullyLocked && !isSelected ? 0.6 : 1,
                       textAlign: 'left',
                       overflow: 'hidden',
-                      transition:
-                        'border-color 140ms ease, outline 140ms ease, box-shadow 140ms ease',
+                      transition: 'border-color 140ms ease-out, box-shadow 140ms ease-out',
                       boxShadow: isSelected
-                        ? `0 0 0 1px ${accent}33, 0 4px 12px rgba(0,0,0,0.08)`
+                        ? '0 4px 12px rgba(0,0,0,0.12)'
                         : '0 1px 3px rgba(0,0,0,0.06)',
                     }}
                   >
-                    {/* Visual preview swatch */}
+                    {/* Visual preview swatch: a fixed light miniature, hidden from assistive tech */}
                     <div
+                      aria-hidden="true"
                       style={{
                         height: '52px',
                         background: containerBg,
@@ -363,7 +350,7 @@ export default function StylePresetField(props: TextFieldClientProps) {
                           background:
                             preset.componentStyles?.buttonVariant === 'brutal'
                               ? 'transparent'
-                              : accent,
+                              : THUMB_BUTTON,
                           border:
                             preset.componentStyles?.buttonVariant === 'brutal'
                               ? `2px solid #0f172a`
@@ -402,7 +389,7 @@ export default function StylePresetField(props: TextFieldClientProps) {
                           <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
                             <path
                               d="M1.5 4.5L3.5 6.5L7.5 2.5"
-                              stroke="white"
+                              stroke="var(--theme-elevation-0)"
                               strokeWidth="1.5"
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -440,8 +427,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
                             style={{
                               fontFamily: preset.typography.headingFont ?? 'inherit',
                               fontWeight: preset.typography.headingWeight ?? '700',
-                              fontSize: '11px',
-                              color: isSelected ? accent : 'var(--theme-elevation-700, #334155)',
+                              fontSize: '12px',
+                              color: 'var(--theme-elevation-800)',
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
@@ -460,8 +447,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
                             <span
                               style={{
                                 fontFamily: preset.typography.bodyFont ?? 'inherit',
-                                fontSize: '10px',
-                                color: 'var(--theme-elevation-500, #64748b)',
+                                fontSize: '11px',
+                                color: 'var(--theme-elevation-600)',
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -480,8 +467,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
                             <span
                               style={{
                                 marginLeft: 'auto',
-                                fontSize: '9px',
-                                color: 'var(--theme-elevation-400, #94a3b8)',
+                                fontSize: '11px',
+                                color: 'var(--theme-elevation-600)',
                                 flexShrink: 0,
                               }}
                             >
@@ -493,8 +480,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
                       {descText && (
                         <div
                           style={{
-                            fontSize: '10px',
-                            color: 'var(--theme-elevation-500, #64748b)',
+                            fontSize: '12px',
+                            color: 'var(--theme-elevation-600)',
                             lineHeight: 1.4,
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
@@ -522,17 +509,21 @@ export default function StylePresetField(props: TextFieldClientProps) {
           style={{
             alignSelf: 'flex-start',
             marginTop: '4px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            minHeight: '28px',
             padding: '5px 12px',
-            fontSize: '11px',
+            fontSize: '12px',
             borderRadius: '6px',
-            border: '1px solid var(--theme-elevation-200, #e2e8f0)',
+            border: '1px solid var(--theme-elevation-200)',
             background: 'transparent',
-            color: 'var(--theme-elevation-500, #64748b)',
+            color: 'var(--theme-elevation-700)',
             cursor: 'pointer',
-            transition: 'background 120ms ease',
           }}
         >
-          {`✕ ${t.ui.clearSelection}`}
+          <X size={14} aria-hidden />
+          {t.ui.clearSelection}
         </button>
       )}
     </div>

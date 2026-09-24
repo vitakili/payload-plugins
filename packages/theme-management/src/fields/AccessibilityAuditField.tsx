@@ -15,11 +15,18 @@ import { auditThemePalette, type AuditColors, type ContrastPairResult } from '..
 
 type Mode = 'lightMode' | 'darkMode'
 
+// Payload's semantic status tokens flip with the admin theme, unlike fixed hex pastels.
+const STATUS = {
+  success: { bg: 'var(--theme-success-100)', fg: 'var(--theme-success-800)' },
+  warning: { bg: 'var(--theme-warning-100)', fg: 'var(--theme-warning-800)' },
+  error: { bg: 'var(--theme-error-100)', fg: 'var(--theme-error-800)' },
+}
+
 const LEVEL_TONE: Record<string, { bg: string; fg: string }> = {
-  AAA: { bg: '#dcfce7', fg: '#166534' },
-  AA: { bg: '#dcfce7', fg: '#166534' },
-  'AA Large': { bg: '#fef9c3', fg: '#854d0e' },
-  fail: { bg: '#fee2e2', fg: '#991b1b' },
+  AAA: STATUS.success,
+  AA: STATUS.success,
+  'AA Large': STATUS.warning,
+  fail: STATUS.error,
 }
 
 export default function AccessibilityAuditField() {
@@ -30,6 +37,12 @@ export default function AccessibilityAuditField() {
   const { dispatchFields, setModified } = useForm()
   const tr = useThemeTranslations()
   const t = tr.accessibility
+
+  const levelLabel = (level: string): string => {
+    if (level === 'AA Large') return tr.colorPicker.levelAALarge
+    if (level === 'fail') return tr.colorPicker.levelLow
+    return level
+  }
 
   const readMode = (mode: Mode): AuditColors => {
     const colors: AuditColors = {}
@@ -90,33 +103,33 @@ export default function AccessibilityAuditField() {
   const renderSection = (title: string, mode: Mode, audit: ContrastPairResult[]) => {
     const failing = audit.filter((r) => !r.passes).length
     return (
-      <div style={{ flex: '1 1 260px', minWidth: '260px' }}>
+      <section aria-label={title} style={{ flex: '1 1 260px', minWidth: 0 }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 600,
-            color: 'var(--theme-elevation-700)',
+            color: 'var(--theme-elevation-800)',
             marginBottom: '8px',
           }}
         >
           {failing === 0 ? (
-            <ShieldCheck size={14} color="#166534" aria-hidden />
+            <ShieldCheck size={14} color={STATUS.success.fg} aria-hidden />
           ) : (
-            <AlertTriangle size={14} color="#991b1b" aria-hidden />
+            <AlertTriangle size={14} color={STATUS.error.fg} aria-hidden />
           )}
           {title}
-          <span style={{ fontWeight: 500, color: 'var(--theme-elevation-500)' }}>
+          <span style={{ fontWeight: 500, color: 'var(--theme-elevation-600)' }}>
             ({audit.length - failing}/{audit.length})
           </span>
         </div>
 
         {audit.length === 0 ? (
-          <div style={{ fontSize: '11px', color: 'var(--theme-elevation-400)' }}>{t.noData}</div>
+          <div style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>{t.noData}</div>
         ) : failing === 0 ? (
-          <div style={{ fontSize: '11px', color: '#166534' }}>{t.allGood}</div>
+          <div style={{ fontSize: '12px', color: STATUS.success.fg }}>{t.allGood}</div>
         ) : null}
 
         <div style={{ display: 'grid', gap: '6px' }}>
@@ -129,7 +142,7 @@ export default function AccessibilityAuditField() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  fontSize: '11px',
+                  fontSize: '12px',
                   padding: '4px 6px',
                   borderRadius: '8px',
                   border: '1px solid var(--theme-elevation-150)',
@@ -171,19 +184,22 @@ export default function AccessibilityAuditField() {
                     fontWeight: 600,
                   }}
                 >
-                  {r.passes ? <Check size={11} aria-hidden /> : null}
-                  {r.level}
+                  {r.passes ? <Check size={12} aria-hidden /> : null}
+                  {levelLabel(r.level)}
                 </span>
                 {!r.passes && r.suggestion ? (
                   <button
                     type="button"
                     onClick={() => applyFix(mode, r)}
                     title={`${t.fix} → ${r.suggestion}`}
+                    aria-label={`${t.fix}: ${pairLabel(r)} (${title}) → ${r.suggestion}`}
+                    className="theme-audit__fix"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '3px',
-                      padding: '2px 7px',
+                      gap: '4px',
+                      minHeight: '26px',
+                      padding: '2px 9px',
                       borderRadius: '6px',
                       border: 'none',
                       cursor: 'pointer',
@@ -192,7 +208,7 @@ export default function AccessibilityAuditField() {
                       fontWeight: 600,
                     }}
                   >
-                    <Wand2 size={11} aria-hidden />
+                    <Wand2 size={12} aria-hidden />
                     {t.fix}
                   </button>
                 ) : null}
@@ -200,7 +216,7 @@ export default function AccessibilityAuditField() {
             )
           })}
         </div>
-      </div>
+      </section>
     )
   }
 
@@ -219,7 +235,7 @@ export default function AccessibilityAuditField() {
         <ShieldCheck size={14} aria-hidden />
         {t.title}
       </div>
-      <div style={{ fontSize: '11px', color: 'var(--theme-elevation-500)', marginBottom: '12px' }}>
+      <div style={{ fontSize: '12px', color: 'var(--theme-elevation-600)', marginBottom: '12px' }}>
         {t.subtitle}
       </div>
 

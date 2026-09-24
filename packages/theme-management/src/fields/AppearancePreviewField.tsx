@@ -10,6 +10,7 @@ import {
   type DevicePreviewId,
 } from '../constants/devicePreviews.js'
 import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
+import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 
 const DEVICE_ICONS: Record<DevicePreviewId, LucideIcon> = {
@@ -256,12 +257,30 @@ export default function AppearancePreviewField() {
     { value?: unknown } | undefined
   >
   const lang = useThemeLanguage() as 'en' | 'cs'
-  const t = useThemeTranslations().appearancePreview
+  const translations = useThemeTranslations()
+  const t = translations.appearancePreview
+  const site = translations.preview
   const [mode, setMode] = useState<Mode>('light')
   const [device, setDevice] = useState<DevicePreviewId>(DEFAULT_DEVICE_PREVIEW_ID)
   const uid = useId().replace(/[:]/g, '')
 
   const activeDevice = getDevicePreview(device)
+
+  // Fonts follow the Typography section (or the theme preset when set to "Use theme preset"),
+  // so this single preview shows colours, type and component styles together.
+  const typographyValue = (key: string) =>
+    formFields?.[`themeConfiguration.typography.${key}`]?.value as string | undefined
+  const typography = resolveTypographyPreview(
+    {
+      bodyFont: typographyValue('bodyFont'),
+      headingFont: typographyValue('headingFont'),
+      bodyFontCustom: typographyValue('bodyFontCustom'),
+      headingFontCustom: typographyValue('headingFontCustom'),
+      baseFontSize: typographyValue('baseFontSize'),
+      lineHeight: typographyValue('lineHeight'),
+    },
+    formFields?.['themeConfiguration.theme']?.value as string | undefined,
+  )
 
   const str = (key: string, fallback: string): string => {
     const v = formFields?.[`themeConfiguration.${key}`]?.value
@@ -366,18 +385,20 @@ export default function AppearancePreviewField() {
       ? `.${uid} .tm-prev-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 ${palette.foreground}}`
       : ''
   }`
+  // Movement-based hover effects only run for users who haven't asked for reduced motion.
+  const previewCSS = `@media (prefers-reduced-motion: no-preference){${hoverCSS}${btnHoverCSS}}`
 
+  const chipLabels = t.chips
   const chips: Array<[string, string]> = [
-    ['effect', choices.effectStyle],
-    ['shadow', choices.shadowIntensity],
-    ['card', choices.cardStyle],
-    ['hover', choices.cardHoverEffect],
-    ['button', `${choices.buttonVariant}/${choices.buttonSize}`],
-    ['navbar', choices.navbarStyle],
-    ['footer', choices.footerStyle],
-    ['link', choices.linkStyle],
-    ['image', choices.imageStyle],
-    ['radius', choices.borderRadius],
+    [chipLabels.effect, choices.effectStyle],
+    [chipLabels.shadow, choices.shadowIntensity],
+    [chipLabels.card, choices.cardStyle],
+    [chipLabels.hover, choices.cardHoverEffect],
+    [chipLabels.button, `${choices.buttonVariant} / ${choices.buttonSize}`],
+    [chipLabels.navbar, choices.navbarStyle],
+    [chipLabels.footer, choices.footerStyle],
+    [chipLabels.link, choices.linkStyle],
+    [chipLabels.radius, choices.borderRadius],
   ]
 
   const footerStyleCss: React.CSSProperties =
@@ -397,8 +418,11 @@ export default function AppearancePreviewField() {
             : { background: palette.muted, color: palette.mutedForeground, borderTop: `1px solid ${palette.border}` }
 
   return (
-    <div className={uid} style={{ marginBottom: '20px' }}>
-      <style dangerouslySetInnerHTML={{ __html: hoverCSS + btnHoverCSS }} />
+    // The slot spans the whole right column of the Appearance tab on wide admins;
+    // its inner panel is sticky so the preview stays in view while editing.
+    <div className={`tm-live-preview-slot ${uid}`}>
+      <div className="tm-live-preview">
+      <style dangerouslySetInnerHTML={{ __html: previewCSS }} />
 
       <div
         style={{
@@ -424,7 +448,7 @@ export default function AppearancePreviewField() {
             <Sparkles size={14} aria-hidden />
             {t.title}
           </div>
-          <div style={{ fontSize: '11px', color: 'var(--theme-elevation-500)' }}>{t.subtitle}</div>
+          <div style={{ fontSize: '12px', color: 'var(--theme-elevation-600)' }}>{t.subtitle}</div>
         </div>
         <div style={{ display: 'inline-flex', gap: '8px', flexWrap: 'wrap' }}>
           {/* Device / viewport switcher */}
@@ -439,14 +463,16 @@ export default function AppearancePreviewField() {
                 <button
                   key={d.id}
                   type="button"
+                  aria-pressed={device === d.id}
                   onClick={() => setDevice(d.id)}
                   title={`${lang === 'cs' ? d.labelCs : d.label} — ${d.width}×${d.height}`}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '5px',
+                    minHeight: '28px',
                     padding: '5px 10px',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: 'none',
@@ -461,20 +487,26 @@ export default function AppearancePreviewField() {
             })}
           </div>
           {/* Light / dark switcher */}
-          <div style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--theme-elevation-200)' }}>
+          <div
+            role="group"
+            aria-label={`${t.light} / ${t.dark}`}
+            style={{ display: 'inline-flex', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--theme-elevation-200)' }}
+          >
             {(['light', 'dark'] as Mode[]).map((m) => {
               const Icon = m === 'light' ? Sun : Moon
               return (
                 <button
                   key={m}
                   type="button"
+                  aria-pressed={mode === m}
                   onClick={() => setMode(m)}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '5px',
+                    minHeight: '28px',
                     padding: '5px 12px',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: 'none',
@@ -499,11 +531,12 @@ export default function AppearancePreviewField() {
           background: 'var(--theme-elevation-50)',
           borderRadius: '14px',
           padding: device === 'desktop' ? '0' : '16px',
-          transition: 'padding 0.25s ease',
         }}
       >
-      {/* Browser-like frame */}
+      {/* Browser-like frame. It is a picture of the site, so it is inert: its
+          sample buttons and links must not become dead tab stops. */}
       <div
+        ref={(el) => el?.setAttribute('inert', '')}
         style={{
           width: '100%',
           maxWidth: device === 'desktop' ? '100%' : `${activeDevice.width}px`,
@@ -513,22 +546,34 @@ export default function AppearancePreviewField() {
           boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
           background: palette.background,
           color: palette.foreground,
-          transition: 'max-width 0.25s ease',
+          fontFamily: typography.bodyFont,
+          lineHeight: typography.lineHeight,
         }}
       >
         <nav style={nav}>
-          <span style={{ fontWeight: 700, fontSize: '13px' }}>Acme</span>
+          <span style={{ fontWeight: 700, fontSize: '13px' }}>{site.siteTitle}</span>
           <span style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.85 }}>
-            <span>Home</span>
-            <span>About</span>
-            <span style={{ ...linkStyle(choices, palette) }}>Services</span>
+            <span>{site.nav.home}</span>
+            <span>{site.nav.about}</span>
+            <span style={{ ...linkStyle(choices, palette) }}>{site.nav.services}</span>
           </span>
         </nav>
 
         <div style={{ padding: '20px', display: 'grid', gap: '14px' }}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 700, lineHeight: 1.2 }}>{t.heading}</div>
-            <p style={{ margin: '6px 0 0', fontSize: '13px', lineHeight: 1.6, color: palette.mutedForeground }}>
+            <div
+              style={{ fontFamily: typography.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1.2 }}
+            >
+              {t.heading}
+            </div>
+            <p
+              style={{
+                margin: '6px 0 0',
+                fontSize: `calc(${typography.baseFontSize} * 0.8125)`,
+                lineHeight: typography.lineHeight,
+                color: palette.mutedForeground,
+              }}
+            >
               {t.body}
               <a style={linkStyle(choices, palette)}>{t.link}</a>.
             </p>
@@ -555,7 +600,6 @@ export default function AppearancePreviewField() {
               </button>
               <span
                 aria-hidden
-                title="brand gradient"
                 style={{
                   marginLeft: 'auto',
                   width: '54px',
@@ -570,7 +614,7 @@ export default function AppearancePreviewField() {
         </div>
 
         <div style={{ padding: '12px 16px', fontSize: '11px', ...footerStyleCss }}>
-          © {new Date().getFullYear()} Acme — {t.footer}
+          © {new Date().getFullYear()} {site.siteTitle} — {t.footer}
         </div>
       </div>
       </div>
@@ -581,17 +625,18 @@ export default function AppearancePreviewField() {
           <span
             key={k}
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               padding: '2px 7px',
               borderRadius: '999px',
               background: 'var(--theme-elevation-50)',
               border: '1px solid var(--theme-elevation-150)',
-              color: 'var(--theme-elevation-600)',
+              color: 'var(--theme-elevation-700)',
             }}
           >
-            <span style={{ opacity: 0.6 }}>{k}:</span> <strong style={{ fontWeight: 600 }}>{v}</strong>
+            <span style={{ color: 'var(--theme-elevation-600)' }}>{k}:</span> <strong style={{ fontWeight: 600 }}>{v}</strong>
           </span>
         ))}
+      </div>
       </div>
     </div>
   )

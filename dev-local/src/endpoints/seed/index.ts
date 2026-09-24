@@ -5,6 +5,7 @@ import { contactPageData } from './contact-page'
 import { productHatData } from './product-hat'
 import { productTshirtData, productTshirtVariant } from './product-tshirt'
 import { homePageData } from './home'
+import { seedThemeShowcase } from './theme-showcase'
 import { imageHatData } from './image-hat'
 import { imageTshirtBlackData } from './image-tshirt-black'
 import { imageTshirtWhiteData } from './image-tshirt-white'
@@ -572,6 +573,9 @@ export const seed = async ({
       } as any,
     }),
   ])
+
+  payload.logger.info(`— Turning the home page into the theme showcase...`)
+  await seedThemeShowcase(payload)
 
   payload.logger.info('Seeded database successfully!')
 }

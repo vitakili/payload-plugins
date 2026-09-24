@@ -6,6 +6,7 @@ import {
   LINE_HEIGHT_OPTIONS,
 } from '../constants/themeFonts.js'
 import type { ThemePreset } from '../index.js'
+import { getTranslations } from '../translations.js'
 import { darkModeField, lightModeField } from './colorModeFields.js'
 
 interface ThemeConfigurationFieldOptions {
@@ -60,18 +61,18 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       defaultValue: defaultTheme,
       label: {
         en: 'Theme Selection',
-        cs: 'Výběr tématu',
+        cs: 'Výběr motivu',
       },
-      validate: (value: unknown) => {
+      validate: (value: unknown, options?: { req?: { i18n?: { language?: string } } }) => {
         if (typeof value === 'string' && value.trim().length > 0) {
           return true
         }
-        return 'Select a theme'
+        return getTranslations(options?.req?.i18n?.language ?? 'en').ui.selectThemeError
       },
       admin: {
         description: {
-          en: 'Select a theme to auto-populate color values. You can customize colors after selection.',
-          cs: 'Vyberte téma pro automatické předvyplnění barev. Po výběru můžete barvy upravit.',
+          en: 'Pick a theme to fill in the colours. You can fine-tune them afterwards.',
+          cs: 'Vyberte motiv a barvy se předvyplní. Potom je můžete dál upravovat.',
         },
         components: {
           Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemePreviewField',
@@ -84,12 +85,25 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     },
   ]
 
+  // Live preview: colours, fonts and component styles in one place. On wide admins
+  // it occupies a sticky right-hand column spanning the whole tab (see
+  // ThemePreviewField.css, `.tm-appearance`); on narrow ones it follows the theme picker.
+  fields.push({
+    name: 'appearancePreview',
+    type: 'ui',
+    admin: {
+      components: {
+        Field: '@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField',
+      },
+    },
+  })
+
   // Style Preset - visual style selection independent of colors
   fields.push({
     type: 'collapsible',
     label: {
       en: 'Style Preset',
-      cs: 'Styl předlohy',
+      cs: 'Styl vzhledu',
     },
     admin: {
       initCollapsed: true,
@@ -105,7 +119,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         type: 'text',
         label: {
           en: 'Active Style Preset',
-          cs: 'Aktivní styl předlohy',
+          cs: 'Aktivní styl vzhledu',
         },
         defaultValue: '',
         admin: {
@@ -115,18 +129,6 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         },
       },
     ],
-  })
-
-  // Live appearance preview — always visible, reflects Visual Effects +
-  // Component Styles + colour choices in real time as the editor changes them.
-  fields.push({
-    name: 'appearancePreview',
-    type: 'ui',
-    admin: {
-      components: {
-        Field: '@kilivi-dev/payloadcms-theme-management/fields/AppearancePreviewField',
-      },
-    },
   })
 
   // Border Radius Configuration - Always visible
@@ -191,10 +193,11 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         cs: 'Nastavení barevného režimu',
       },
       admin: {
-        initCollapsed: false,
+        // Fine-tuning: collapsed by default so presets and the preview lead the tab.
+        initCollapsed: true,
         description: {
-          en: 'Configure light and dark mode colors. Changes here override theme selection.',
-          cs: 'Nakonfigurujte barvy světlého a tmavého režimu. Změny zde přepíší výběr tématu.',
+          en: 'Individual light and dark mode colours. Edits here take precedence over the theme.',
+          cs: 'Jednotlivé barvy světlého a tmavého režimu. Úpravy zde mají přednost před motivem.',
         },
       },
       fields: [
@@ -444,7 +447,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         admin: {
           description: {
             en: 'Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.',
-            cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světly/tmavý režim.',
+            cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světlý a tmavý režim.',
           },
           components: {
             Field: '@kilivi-dev/payloadcms-theme-management/fields/ThemePresetImportField',
@@ -1041,9 +1044,10 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         name: 'themeConfiguration',
         type: 'group',
         admin: {
+          className: 'tm-appearance',
           description: {
-            en: 'Configure website appearance and styling',
-            cs: 'Nakonfigurujte vzhled a stylování webu',
+            en: 'Appearance and style of the whole website',
+            cs: 'Vzhled a styl celého webu',
           },
         },
         fields,

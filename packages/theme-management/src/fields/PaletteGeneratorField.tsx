@@ -2,8 +2,13 @@
 
 import { useForm, useFormFields } from '@payloadcms/ui'
 import { ImageUp, Sparkles, Wand2 } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
+import {
+  createBulkWriter,
+  getAppearanceSession,
+  useAppearanceSession,
+} from '../hooks/useAppearanceSession.js'
 import { useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import {
   extractDominantColors,
@@ -33,38 +38,61 @@ export default function PaletteGeneratorField() {
   const [seed, setSeed] = useState<string>(currentPrimary)
   const [swatches, setSwatches] = useState<string[]>([])
   const [open, setOpen] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const seedTouchedRef = useRef(false)
+
+  // Follow the form's primary colour (e.g. after a preset is applied) until the
+  // editor picks a seed of their own.
+  useEffect(() => {
+    if (!seedTouchedRef.current) setSeed(currentPrimary)
+  }, [currentPrimary])
+
+  const chooseSeed = useCallback((color: string) => {
+    seedTouchedRef.current = true
+    setSeed(color)
+  }, [])
+
+  const { locks } = useAppearanceSession()
+  const appearanceT = useThemeTranslations().appearance
+  const colorsLocked = locks.colors
+  const lockNoteId = useId()
 
   const applyPalette = useCallback(() => {
+    if (getAppearanceSession().locks.colors) return
     const palette = generatePaletteFromColor(seed)
+    const writer = createBulkWriter(formFields, dispatchFields)
     ;(['lightMode', 'darkMode'] as const).forEach((mode) => {
       const colors = palette[mode]
       ;(Object.keys(colors) as Array<keyof GeneratedColorMode>).forEach((key) => {
-        dispatchFields({
-          type: 'UPDATE',
-          path: `themeConfiguration.${mode}.${key}`,
-          value: colors[key],
-        })
+        writer.write(`themeConfiguration.${mode}.${key}`, colors[key])
       })
     })
     // `dispatchFields` alone does not flip the form's dirty flag, so Payload
     // would keep the Save button disabled after generating a palette.
     setModified(true)
-  }, [seed, dispatchFields, setModified])
+    writer.commit('palette', `${appearanceT.generatedPalette} ${seed}`)
+  }, [seed, formFields, dispatchFields, setModified, appearanceT.generatedPalette])
 
   const handleFile = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
+    setImageError(false)
     const url = URL.createObjectURL(file)
     const img = new Image()
     img.onload = () => {
       const colors = extractDominantColors(img, 6)
       setSwatches(colors)
-      if (colors[0]) setSeed(colors[0])
+      if (colors[0]) chooseSeed(colors[0])
       URL.revokeObjectURL(url)
     }
-    img.onerror = () => URL.revokeObjectURL(url)
+    img.onerror = () => {
+      setImageError(true)
+      URL.revokeObjectURL(url)
+    }
     img.src = url
-  }, [])
+    // Allow re-selecting the same file after an error.
+    event.target.value = ''
+  }, [chooseSeed])
 
   return (
     <div
@@ -88,7 +116,7 @@ export default function PaletteGeneratorField() {
         <Sparkles size={14} aria-hidden />
         {t.title}
       </div>
-      <div style={{ fontSize: '11px', color: 'var(--theme-elevation-500)', marginBottom: '12px' }}>
+      <div style={{ fontSize: '12px', color: 'var(--theme-elevation-600)', marginBottom: '12px' }}>
         {t.subtitle}
       </div>
 
@@ -98,7 +126,8 @@ export default function PaletteGeneratorField() {
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            aria-label="Toggle colour picker"
+            aria-label={`${t.seedLabel}: ${seed}`}
+            aria-expanded={open}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -125,10 +154,10 @@ export default function PaletteGeneratorField() {
           </button>
           {open ? (
             <div style={{ display: 'grid', gap: '8px' }}>
-              <HexColorPicker color={seed} onChange={setSeed} />
+              <HexColorPicker color={seed} onChange={chooseSeed} />
               <HexColorInput
                 color={seed}
-                onChange={setSeed}
+                onChange={chooseSeed}
                 prefixed
                 style={{
                   width: '160px',
@@ -148,6 +177,8 @@ export default function PaletteGeneratorField() {
           <button
             type="button"
             onClick={applyPalette}
+            disabled={colorsLocked}
+            aria-describedby={colorsLocked ? lockNoteId : undefined}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -155,9 +186,10 @@ export default function PaletteGeneratorField() {
               padding: '8px 14px',
               borderRadius: '8px',
               border: 'none',
-              cursor: 'pointer',
+              cursor: colorsLocked ? 'not-allowed' : 'pointer',
               background: 'var(--theme-elevation-800)',
               color: 'var(--theme-elevation-0)',
+              opacity: colorsLocked ? 0.5 : 1,
               fontWeight: 600,
               fontSize: '12px',
             }}
@@ -192,16 +224,25 @@ export default function PaletteGeneratorField() {
             onChange={handleFile}
             style={{ display: 'none' }}
           />
-          <div style={{ fontSize: '10px', color: 'var(--theme-elevation-400)', maxWidth: '180px' }}>
-            {t.hint}
+          <div
+            id={lockNoteId}
+            style={{ fontSize: '12px', color: 'var(--theme-elevation-600)', maxWidth: '200px' }}
+          >
+            {colorsLocked ? appearanceT.colorsLocked : t.hint}
           </div>
         </div>
       </div>
 
+      {imageError ? (
+        <div role="alert" style={{ marginTop: '12px', fontSize: '12px', color: 'var(--theme-error-600)' }}>
+          {t.imageError}
+        </div>
+      ) : null}
+
       {/* Extracted swatches */}
       {swatches.length > 0 ? (
         <div style={{ marginTop: '12px' }}>
-          <div style={{ fontSize: '11px', color: 'var(--theme-elevation-600)', marginBottom: '6px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--theme-elevation-600)', marginBottom: '6px' }}>
             {t.pick}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -209,9 +250,10 @@ export default function PaletteGeneratorField() {
               <button
                 key={color}
                 type="button"
-                onClick={() => setSeed(color)}
+                onClick={() => chooseSeed(color)}
                 title={color}
-                aria-label={`Use ${color}`}
+                aria-label={`${t.useColor} ${color}`}
+                aria-pressed={color === seed}
                 style={{
                   width: '30px',
                   height: '30px',

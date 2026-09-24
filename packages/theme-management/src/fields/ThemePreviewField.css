@@ -189,7 +189,7 @@
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-/* ─── Section header icons (lucide SVG via mask-image) ──────────────────────
+/* ─── Section header icons (inlined lucide SVG via mask-image; no CDN, CSP-safe) ──────────────────────
    Payload v3 collapsible structure: .collapsible.{className} > .collapsible__toggle-wrap
    The toggle-wrap is already display:flex so ::before inserts as first flex item.
    ─────────────────────────────────────────────────────────────────────────── */
@@ -213,26 +213,259 @@
 }
 
 .tm-section-typography .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/type.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%224%207%204%204%2020%204%2020%207%22%3E%3C%2Fpolyline%3E%3Cline%20x1%3D%229%22%20x2%3D%2215%22%20y1%3D%2220%22%20y2%3D%2220%22%3E%3C%2Fline%3E%3Cline%20x1%3D%2212%22%20x2%3D%2212%22%20y1%3D%224%22%20y2%3D%2220%22%3E%3C%2Fline%3E%3C%2Fsvg%3E");
 }
 
 .tm-section-effects .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/sparkles.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9.937%2015.5A2%202%200%200%200%208.5%2014.063l-6.135-1.582a.5.5%200%200%201%200-.962L8.5%209.936A2%202%200%200%200%209.937%208.5l1.582-6.135a.5.5%200%200%201%20.963%200L14.063%208.5A2%202%200%200%200%2015.5%209.937l6.135%201.581a.5.5%200%200%201%200%20.964L15.5%2014.063a2%202%200%200%200-1.437%201.437l-1.582%206.135a.5.5%200%200%201-.963%200z%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M20%203v4%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M22%205h-4%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M4%2017v2%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M5%2018H3%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
 }
 
 .tm-section-style-preset .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/wand-sparkles.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m21.64%203.64-1.28-1.28a1.21%201.21%200%200%200-1.72%200L2.36%2018.64a1.21%201.21%200%200%200%200%201.72l1.28%201.28a1.2%201.2%200%200%200%201.72%200L21.64%205.36a1.2%201.2%200%200%200%200-1.72%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22m14%207%203%203%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M5%206v4%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M19%2014v4%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M10%202v2%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M7%208H3%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M21%2016h-4%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M11%203H9%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
 }
 
 .tm-section-custom-presets .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/puzzle.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M15.39%204.39a1%201%200%200%200%201.68-.474%202.5%202.5%200%201%201%203.014%203.015%201%201%200%200%200-.474%201.68l1.683%201.682a2.414%202.414%200%200%201%200%203.414L19.61%2015.39a1%201%200%200%201-1.68-.474%202.5%202.5%200%201%200-3.014%203.015%201%201%200%200%201%20.474%201.68l-1.683%201.682a2.414%202.414%200%200%201-3.414%200L8.61%2019.61a1%201%200%200%200-1.68.474%202.5%202.5%200%201%201-3.014-3.015%201%201%200%200%200%20.474-1.68l-1.683-1.682a2.414%202.414%200%200%201%200-3.414L4.39%208.61a1%201%200%200%201%201.68.474%202.5%202.5%200%201%200%203.014-3.015%201%201%200%200%201-.474-1.68l1.683-1.682a2.414%202.414%200%200%201%203.414%200z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
 }
 
 .tm-section-components .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/layers.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.83%202.18a2%202%200%200%200-1.66%200L2.6%206.08a1%201%200%200%200%200%201.83l8.58%203.91a2%202%200%200%200%201.66%200l8.58-3.9a1%201%200%200%200%200-1.83z%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M2%2012a1%201%200%200%200%20.58.91l8.6%203.91a2%202%200%200%200%201.65%200l8.58-3.9A1%201%200%200%200%2022%2012%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M2%2017a1%201%200%200%200%20.58.91l8.6%203.91a2%202%200%200%200%201.65%200l8.58-3.9A1%201%200%200%200%2022%2017%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
 }
 
 .tm-section-advanced .collapsible__toggle-wrap::before {
-  mask-image: url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/settings-2.svg');
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%207h-9%22%3E%3C%2Fpath%3E%3Cpath%20d%3D%22M14%2017H5%22%3E%3C%2Fpath%3E%3Ccircle%20cx%3D%2217%22%20cy%3D%2217%22%20r%3D%223%22%3E%3C%2Fcircle%3E%3Ccircle%20cx%3D%227%22%20cy%3D%227%22%20r%3D%223%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E");
 }
 
+
+/* ─── Keyboard focus ─────────────────────────────────────────────────────────
+   Custom controls follow Payload's own focus ring so they match native fields. */
+.theme-preset-summary:focus-visible,
+.theme-preset-button:focus-visible,
+.theme-preview-toggle:focus-visible,
+.font-select-trigger:focus-visible,
+.theme-token-select button:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: var(--accessibility-outline-offset, 2px);
+}
+
+.font-select-listbox:focus-visible,
+.theme-token-select [role='listbox']:focus-visible {
+  outline: none; /* the active option carries the visible focus indicator */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-preset-summary,
+  .theme-preset-button,
+  .theme-preview-toggle {
+    transition: none;
+  }
+}
+
+/* ─── Appearance session: locks + one-step undo ─────────────────────────────── */
+.tm-appearance-locks {
+  display: grid;
+  gap: 6px;
+}
+
+.tm-appearance-locks__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tm-appearance-locks__label {
+  margin-inline-end: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-elevation-800);
+}
+
+.tm-appearance-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-elevation-200);
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-700);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+}
+
+.tm-appearance-lock:hover {
+  border-color: var(--theme-elevation-400);
+  color: var(--theme-elevation-900);
+}
+
+.tm-appearance-lock.is-locked {
+  border-color: var(--theme-elevation-800);
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+}
+
+.tm-appearance-locks__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--theme-elevation-600);
+}
+
+.tm-appearance-undo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--theme-elevation-200);
+  background: var(--theme-elevation-100);
+  color: var(--theme-elevation-900);
+  font-size: 13px;
+  animation: tm-undo-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tm-appearance-undo__text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tm-appearance-undo__action,
+.tm-appearance-undo__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  border-radius: 8px;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tm-appearance-undo__action {
+  padding: 4px 12px;
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+  font-weight: 600;
+}
+
+.tm-appearance-undo__dismiss {
+  width: 30px;
+  background: transparent;
+  color: var(--theme-elevation-600);
+}
+
+.tm-appearance-undo__dismiss:hover {
+  background: var(--theme-elevation-150);
+  color: var(--theme-elevation-900);
+}
+
+.tm-appearance-lock:focus-visible,
+.tm-appearance-undo__action:focus-visible,
+.tm-appearance-undo__dismiss:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: var(--accessibility-outline-offset, 2px);
+}
+
+.tm-locked-note {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--theme-elevation-700);
+}
+
+.tm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes tm-undo-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-appearance-undo {
+    animation: none;
+  }
+
+  .tm-appearance-lock {
+    transition: none;
+  }
+}
+
+/* ─── Appearance tab layout: controls left, one sticky live preview right ─────
+   The `themeConfiguration` group (className `tm-appearance`) becomes a two-column
+   grid once its own container is wide enough. Payload renders each field as a
+   direct child of `.render-fields`, so the preview slot can span every row of the
+   right column and its inner panel stays pinned while the editor scrolls through
+   presets, colours, typography and component settings on the left.
+   ───────────────────────────────────────────────────────────────────────── */
+.tm-appearance > .group-field__wrap {
+  container-type: inline-size;
+  container-name: tm-appearance;
+}
+
+.tm-live-preview-slot {
+  min-width: 0;
+  margin-bottom: 20px;
+}
+
+@container tm-appearance (min-width: 960px) {
+  .tm-appearance > .group-field__wrap > .render-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 42%);
+    column-gap: 28px;
+    align-items: start;
+  }
+
+  .tm-appearance > .group-field__wrap > .render-fields > * {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .tm-appearance > .group-field__wrap > .render-fields > .tm-live-preview-slot {
+    grid-column: 2;
+    grid-row: 1 / span 60;
+    align-self: stretch;
+    margin-bottom: 0;
+  }
+
+  .tm-live-preview {
+    position: sticky;
+    top: calc(var(--app-header-height, 56px) + var(--doc-controls-height, 64px) + 12px);
+    max-height: calc(100vh - var(--app-header-height, 56px) - var(--doc-controls-height, 64px) - 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Inside the Appearance tab the merged live preview (right after the theme picker)
+   covers colours and type, so the picker drops its own inline preview. */
+.tm-appearance .theme-preview-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.tm-appearance .theme-preview-panel,
+.tm-appearance .theme-preview-toggle {
+  display: none;
+}

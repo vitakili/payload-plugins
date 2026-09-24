@@ -1,5 +1,17 @@
 import type { GlobalConfig } from 'payload'
 
+const fontWeightOptions = [
+  { value: '100', label: { en: '100 – Thin', cs: '100 – Vlasové' } },
+  { value: '200', label: { en: '200 – Extra light', cs: '200 – Extra tenké' } },
+  { value: '300', label: { en: '300 – Light', cs: '300 – Tenké' } },
+  { value: '400', label: { en: '400 – Regular', cs: '400 – Normální' } },
+  { value: '500', label: { en: '500 – Medium', cs: '500 – Střední' } },
+  { value: '600', label: { en: '600 – Semi bold', cs: '600 – Polotučné' } },
+  { value: '700', label: { en: '700 – Bold', cs: '700 – Tučné' } },
+  { value: '800', label: { en: '800 – Extra bold', cs: '800 – Extra tučné' } },
+  { value: '900', label: { en: '900 – Black', cs: '900 – Černé' } },
+]
+
 /**
  * ThemeSettings Global Configuration
  *
@@ -9,7 +21,7 @@ import type { GlobalConfig } from 'payload'
  */
 export const ThemeSettings: GlobalConfig = {
   slug: 'themeSettings',
-  label: { en: 'Theme Settings', cs: 'Nastavení témat' },
+  label: { en: 'Theme Settings', cs: 'Nastavení motivu' },
   admin: {
     group: { en: 'Settings', cs: 'Nastavení' },
   },
@@ -61,36 +73,16 @@ export const ThemeSettings: GlobalConfig = {
                 {
                   name: 'fontWeightHeading',
                   type: 'select',
-                  label: 'Heading Font Weight',
+                  label: { en: 'Heading font weight', cs: 'Tloušťka písma nadpisů' },
                   defaultValue: '700',
-                  options: [
-                    { label: '100 - Thin', value: '100' },
-                    { label: '200 - Extra Light', value: '200' },
-                    { label: '300 - Light', value: '300' },
-                    { label: '400 - Regular', value: '400' },
-                    { label: '500 - Medium', value: '500' },
-                    { label: '600 - Semi Bold', value: '600' },
-                    { label: '700 - Bold', value: '700' },
-                    { label: '800 - Extra Bold', value: '800' },
-                    { label: '900 - Black', value: '900' },
-                  ],
+                  options: fontWeightOptions,
                 },
                 {
                   name: 'fontWeightBody',
                   type: 'select',
-                  label: 'Body Font Weight',
+                  label: { en: 'Body font weight', cs: 'Tloušťka písma textu' },
                   defaultValue: '400',
-                  options: [
-                    { label: '100 - Thin', value: '100' },
-                    { label: '200 - Extra Light', value: '200' },
-                    { label: '300 - Light', value: '300' },
-                    { label: '400 - Regular', value: '400' },
-                    { label: '500 - Medium', value: '500' },
-                    { label: '600 - Semi Bold', value: '600' },
-                    { label: '700 - Bold', value: '700' },
-                    { label: '800 - Extra Bold', value: '800' },
-                    { label: '900 - Black', value: '900' },
-                  ],
+                  options: fontWeightOptions,
                 },
               ],
             },

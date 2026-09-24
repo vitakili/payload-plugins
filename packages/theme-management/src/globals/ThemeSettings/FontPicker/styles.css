@@ -32,7 +32,7 @@
   font-weight: 500;
   color: var(--theme-elevation-600);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
 }
 
 .font-picker__preview-tab:hover {
@@ -54,7 +54,8 @@
 
 /* Selection Panel (Right) */
 .font-picker__selection-panel {
-  width: 400px;
+  flex: 0 0 clamp(280px, 40%, 400px);
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--theme-elevation-0);
@@ -77,10 +78,10 @@
   color: var(--theme-elevation-900);
 }
 
-.font-picker__search:focus {
-  outline: none;
+.font-picker__search:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: 1px;
   border-color: var(--theme-elevation-500);
-  box-shadow: 0 0 0 3px var(--theme-elevation-100);
 }
 
 .font-picker__search::placeholder {
@@ -104,10 +105,10 @@
   cursor: pointer;
 }
 
-.font-picker__select:focus {
-  outline: none;
+.font-picker__select:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: 1px;
   border-color: var(--theme-elevation-500);
-  box-shadow: 0 0 0 3px var(--theme-elevation-100);
 }
 
 .font-picker__view-toggle {
@@ -123,7 +124,7 @@
   border-radius: 6px;
   color: var(--theme-elevation-600);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
 }
 
 .font-picker__view-button:hover {
@@ -157,26 +158,34 @@
   gap: 8px;
 }
 
-.font-picker__list--grid .font-picker__item {
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 12px;
-}
-
-.font-picker__list--grid .font-picker__item-preview {
-  width: 100%;
-  margin-top: 8px;
-}
-
 .font-picker__item {
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
+  position: relative;
   border: 1px solid var(--theme-elevation-200);
   border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out;
   background: var(--theme-elevation-0);
+}
+
+.font-picker__item-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  /* Leave room for the favourite toggle in the top-right corner. */
+  padding: 12px 44px 12px 12px;
+  border: none;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.font-picker__item-select:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: 2px;
 }
 
 .font-picker__item:hover {
@@ -191,13 +200,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.font-picker__item-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
 .font-picker__item-name {
   font-size: 14px;
   font-weight: 600;
@@ -205,29 +207,40 @@
 }
 
 .font-picker__favorite {
-  padding: 4px 8px;
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   background: none;
   border: none;
-  font-size: 18px;
-  color: var(--theme-elevation-400);
+  border-radius: 6px;
+  color: var(--theme-elevation-500);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.15s ease-out, background-color 0.15s ease-out;
 }
 
 .font-picker__favorite:hover {
-  color: var(--theme-elevation-600);
-  transform: scale(1.1);
+  color: var(--theme-elevation-800);
+  background: var(--theme-elevation-100);
 }
 
-.font-picker__favorite--active {
-  color: #fbbf24;
+.font-picker__favorite:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: 0;
 }
 
+.font-picker__favorite--active,
 .font-picker__favorite--active:hover {
-  color: #f59e0b;
+  color: var(--theme-warning-500, #d97706);
 }
 
 .font-picker__item-preview {
+  display: block;
+  width: 100%;
   font-size: 14px;
   color: var(--theme-elevation-700);
   overflow: hidden;
@@ -240,6 +253,38 @@
   text-align: center;
   color: var(--theme-elevation-500);
   font-size: 14px;
+}
+
+.font-picker__error {
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--theme-error-500, var(--theme-elevation-800));
+  font-size: 14px;
+}
+
+.font-picker__error p {
+  margin: 0 0 12px;
+}
+
+.font-picker__retry {
+  padding: 8px 14px;
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 6px;
+  background: var(--theme-elevation-0);
+  color: var(--theme-elevation-900);
+  font: inherit;
+  cursor: pointer;
+}
+
+.font-picker__retry:hover {
+  background: var(--theme-elevation-100);
+}
+
+.font-picker__retry:focus-visible,
+.font-picker__preview-tab:focus-visible,
+.font-picker__view-button:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-text));
+  outline-offset: 2px;
 }
 
 .font-picker__empty {
@@ -333,5 +378,17 @@
 
 /* Apply animation to font items */
 .font-picker__list .font-picker__item {
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .font-picker__list .font-picker__item {
+    animation: none;
+  }
+
+  .font-picker *,
+  .font-picker *::before,
+  .font-picker *::after {
+    transition-duration: 0.01ms !important;
+  }
 }

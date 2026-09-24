@@ -43,6 +43,7 @@ export default function ThemeExportField() {
   >
   const t = useThemeTranslations().themeExport
   const [copied, setCopied] = useState(false)
+  const [copyFailed, setCopyFailed] = useState(false)
 
   const buildConfig = useCallback(() => {
     const read = (path: string) => {
@@ -82,10 +83,12 @@ export default function ThemeExportField() {
     const css = generateTailwindV4Theme(buildConfig())
     try {
       await navigator.clipboard.writeText(css)
+      setCopyFailed(false)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
-      /* clipboard may be unavailable */
+      // Clipboard access can be blocked (permissions, insecure context); say so.
+      setCopyFailed(true)
     }
   }, [buildConfig])
 
@@ -161,6 +164,9 @@ export default function ThemeExportField() {
           <Download size={14} aria-hidden />
           {t.tailwindV3}
         </button>
+      </div>
+      <div role="status" style={{ marginTop: '8px', fontSize: '12px', color: 'var(--theme-error-600)' }}>
+        {copyFailed ? t.copyFailed : null}
       </div>
     </div>
   )

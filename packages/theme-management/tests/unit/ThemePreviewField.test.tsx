@@ -1,11 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { SelectFieldClientProps } from 'payload'
 import React from 'react'
 import ThemePreviewField from '../../src/fields/ThemePreviewField.js'
+import { resetAppearanceSession } from '../../src/hooks/useAppearanceSession.js'
 
 const mockSetValue = jest.fn()
 const mockDispatchFields = jest.fn()
+const mockSetModified = jest.fn()
 
 jest.mock('@payloadcms/ui', () => ({
   useField: jest.fn(() => ({
@@ -14,6 +16,7 @@ jest.mock('@payloadcms/ui', () => ({
   })),
   useForm: jest.fn(() => ({
     dispatchFields: mockDispatchFields,
+    setModified: mockSetModified,
   })),
   useFormFields: jest.fn((selector) => selector([{}])),
   useLivePreviewContext: jest.fn(() => ({
@@ -167,6 +170,8 @@ describe('ThemePreviewField', () => {
   beforeEach(() => {
     mockSetValue.mockClear()
     mockDispatchFields.mockClear()
+    mockSetModified.mockClear()
+    resetAppearanceSession()
   })
 
   const baseProps = {
@@ -232,8 +237,10 @@ const openPresetList = async () => {
     render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
     await openPresetList()
 
-    const coolButton = screen.getByRole('button', { name: /Cool & Professional/i })
-    const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
+    // The collapsed summary button also names the active preset, so scope to the list.
+    const presetList = screen.getByRole('group', { name: /theme configuration/i })
+    const coolButton = within(presetList).getByRole('button', { name: /Cool & Professional/i })
+    const neonButton = within(presetList).getByRole('button', { name: /Neon Cyberpunk/i })
 
     expect(coolButton).toBeInTheDocument()
     expect(neonButton).toBeInTheDocument()
@@ -282,7 +289,50 @@ const openPresetList = async () => {
     const neonButton = screen.getByRole('button', { name: /Neon Cyberpunk/i })
     await user.click(neonButton)
 
-    expect(mockSetValue).toHaveBeenCalledWith('neon')
-    expect(mockDispatchFields).toHaveBeenCalled()
+    expect(mockDispatchFields).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'UPDATE', path: baseProps.path, value: 'neon' }),
+    )
+    expect(mockDispatchFields).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'themeConfiguration.lightMode.primary' }),
+    )
+    expect(mockSetModified).toHaveBeenCalledWith(true)
+  })
+
+  it('leaves colours untouched when the Colours lock is on', async () => {
+    render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
+    const user = await openPresetList()
+
+    await user.click(screen.getByRole('button', { name: 'Colours' }))
+    expect(screen.getByRole('button', { name: 'Colours' })).toHaveAttribute('aria-pressed', 'true')
+
+    // Ignore the one-time fill of the empty mocked form that happens on mount.
+    mockDispatchFields.mockClear()
+    const presetList = screen.getByRole('group', { name: /theme configuration/i })
+    await user.click(within(presetList).getByRole('button', { name: /Neon Cyberpunk/i }))
+
+    const colourWrites = mockDispatchFields.mock.calls.filter(([action]) =>
+      String(action.path).includes('Mode.'),
+    )
+    expect(colourWrites).toHaveLength(0)
+    expect(mockDispatchFields).toHaveBeenCalledWith(
+      expect.objectContaining({ path: baseProps.path, value: 'neon' }),
+    )
+  })
+
+  it('offers a one-step undo that restores the previous values', async () => {
+    render(<ThemePreviewField {...(baseProps as SelectFieldClientProps)} />)
+    const user = await openPresetList()
+
+    const presetList = screen.getByRole('group', { name: /theme configuration/i })
+    await user.click(within(presetList).getByRole('button', { name: /Neon Cyberpunk/i }))
+    mockDispatchFields.mockClear()
+
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
+
+    // The theme field goes back to its previous value ('cool' from the mocked useField).
+    expect(mockDispatchFields).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'UPDATE', path: baseProps.path }),
+    )
+    expect(screen.queryByRole('button', { name: 'Undo' })).not.toBeInTheDocument()
   })
 })

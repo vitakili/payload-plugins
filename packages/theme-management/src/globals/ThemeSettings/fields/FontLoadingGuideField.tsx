@@ -1,80 +1,74 @@
 'use client'
 
+import { Globe, Package } from 'lucide-react'
 import type { UIFieldClientProps } from 'payload'
 import React from 'react'
+import { useThemeTranslations } from '../../../hooks/useThemeTranslations.js'
+
+const PRE_IMPORTED_FONTS = [
+  'Inter',
+  'Nunito',
+  'Montserrat',
+  'Manrope',
+  'Mulish',
+  'Barlow',
+  'Raleway',
+  'Playfair Display',
+]
+
+const calloutStyle: React.CSSProperties = {
+  background: 'var(--theme-elevation-50)',
+  border: '1px solid var(--theme-elevation-150)',
+  borderRadius: '8px',
+  padding: '16px',
+  marginBottom: '24px',
+}
+
+const calloutHeadingStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  margin: '0 0 8px 0',
+  fontSize: '16px',
+  fontWeight: 600,
+}
 
 const FontLoadingGuideField: React.FC<UIFieldClientProps> = () => {
-  return (
-    <div style={{ padding: '24px' }}>
-      <h2 style={{ marginTop: 0, fontSize: '20px', fontWeight: 700 }}>Font Loading Strategy</h2>
+  const t = useThemeTranslations().fontGuide
 
-      <div
-        style={{
-          background: '#eff6ff',
-          border: '1px solid #bfdbfe',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '24px',
-        }}
-      >
-        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
-          📦 Pre-imported Fonts (Optimized)
+  return (
+    <div style={{ padding: '24px', color: 'var(--theme-text)' }}>
+      <h2 style={{ marginTop: 0, fontSize: '20px', fontWeight: 700 }}>{t.strategyTitle}</h2>
+
+      <div style={calloutStyle}>
+        <h3 style={calloutHeadingStyle}>
+          <Package size={16} color="var(--theme-success-600)" aria-hidden />
+          {t.preImportedTitle}
         </h3>
         <p style={{ margin: '0 0 12px 0', fontSize: '14px', lineHeight: '1.6' }}>
-          These 8 popular fonts are pre-optimized via next/font/google for zero runtime loading:
+          {t.preImportedCopy}
         </p>
         <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px' }}>
-          <li>Inter</li>
-          <li>Nunito</li>
-          <li>Montserrat</li>
-          <li>Manrope</li>
-          <li>Mulish</li>
-          <li>Barlow</li>
-          <li>Raleway</li>
-          <li>Playfair Display</li>
+          {PRE_IMPORTED_FONTS.map((font) => (
+            <li key={font}>{font}</li>
+          ))}
         </ul>
       </div>
 
-      <div
-        style={{
-          background: '#fef3c7',
-          border: '1px solid #fde68a',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '24px',
-        }}
-      >
-        <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '14px',
-                height: '14px',
-                maskImage:
-                  "url('https://cdn.jsdelivr.net/npm/lucide-static@0.507.0/icons/globe.svg')",
-                maskRepeat: 'no-repeat',
-                maskSize: 'contain',
-                backgroundColor: 'currentColor',
-                flexShrink: 0,
-              }}
-            />
-            Dynamic Fonts (Google Fonts CSS)
-          </span>
+      <div style={calloutStyle}>
+        <h3 style={calloutHeadingStyle}>
+          <Globe size={16} color="var(--theme-warning-600)" aria-hidden />
+          {t.dynamicTitle}
         </h3>
-        <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6' }}>
-          Other fonts are loaded dynamically via Google Fonts CSS link. This provides access to
-          1400+ fonts but requires runtime loading.
-        </p>
+        <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6' }}>{t.dynamicCopy}</p>
       </div>
 
-      <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
-        Implementation Example
-      </h3>
+      <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>{t.exampleTitle}</h3>
       <pre
         style={{
-          background: '#1f2937',
-          color: '#f9fafb',
+          // Inverted elevation tokens: the code block contrasts with the page in both admin themes.
+          background: 'var(--theme-elevation-900)',
+          color: 'var(--theme-elevation-50)',
           padding: '16px',
           borderRadius: '8px',
           fontSize: '13px',

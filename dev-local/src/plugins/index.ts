@@ -100,6 +100,7 @@ export const plugins: Plugin[] = [
       injectRoute: true,
       routePath: '/theme/preview',
       pageCollection: 'pages',
+      // `pnpm seed:theme` fills this page with theme showcase blocks.
       pageSlug: 'home',
       fallbackToFirstPage: true,
       breakpoints: [

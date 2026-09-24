@@ -10,6 +10,12 @@ export interface Translations {
   allLanguages: string
   loading: string
   noFonts: string
+  loadError: string
+  retry: string
+  addFavorite: string
+  removeFavorite: string
+  fontList: string
+  previewModes: string
   loadMore: string
   selectFont: string
   previewTabs: {
@@ -80,7 +86,13 @@ export const translations: Record<Language, Translations> = {
     allCategories: 'All Categories',
     allLanguages: 'All Languages',
     loading: 'Loading fonts...',
-    noFonts: 'No fonts found',
+    noFonts: 'No fonts match these filters',
+    loadError: 'Fonts could not be loaded. Check the connection and try again.',
+    retry: 'Try again',
+    addFavorite: 'Add to favorites',
+    removeFavorite: 'Remove from favorites',
+    fontList: 'Fonts',
+    previewModes: 'Preview mode',
     loadMore: 'Load more',
     selectFont: 'Select Font',
     previewTabs: {
@@ -150,7 +162,13 @@ export const translations: Record<Language, Translations> = {
     allCategories: 'Všechny kategorie',
     allLanguages: 'Všechny jazyky',
     loading: 'Načítání fontů...',
-    noFonts: 'Žádné fonty nenalezeny',
+    noFonts: 'Filtrům neodpovídá žádný font',
+    loadError: 'Fonty se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.',
+    retry: 'Zkusit znovu',
+    addFavorite: 'Přidat do oblíbených',
+    removeFavorite: 'Odebrat z oblíbených',
+    fontList: 'Fonty',
+    previewModes: 'Režim náhledu',
     loadMore: 'Načíst další',
     selectFont: 'Vybrat font',
     previewTabs: {
