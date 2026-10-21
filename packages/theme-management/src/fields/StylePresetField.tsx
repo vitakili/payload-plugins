@@ -10,8 +10,14 @@ import {
   getAppearanceSession,
   useAppearanceSession,
 } from '../hooks/useAppearanceSession.js'
+import { getFontCatalogEntry } from '../constants/themeFonts.js'
+import { useThemeFonts } from '../hooks/useThemeFonts.js'
 import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
-import { allStylePresets, stylePresetCategories } from '../style-presets.js'
+import {
+  allStylePresets,
+  normalizeStylePresetValue,
+  stylePresetCategories,
+} from '../style-presets.js'
 import type { StylePreset } from '../style-presets.js'
 
 const VF_KEYS = [
@@ -23,7 +29,16 @@ const VF_KEYS = [
   'glassOpacity',
 ] as const
 
-const CS_KEYS = ['buttonVariant', 'cardStyle', 'cardHoverEffect', 'navbarStyle'] as const
+const CS_KEYS = [
+  'buttonVariant',
+  'buttonSize',
+  'cardStyle',
+  'cardHoverEffect',
+  'navbarStyle',
+  'footerStyle',
+  'imageStyle',
+  'linkStyle',
+] as const
 
 const TYPO_KEYS = [
   'bodyFont',
@@ -123,6 +138,15 @@ function getContainerBg(preset: StylePreset): string {
   return EFFECT_PREVIEW[effect]?.containerBg ?? '#f1f5f9'
 }
 
+const ALL_PRESET_FONTS = allStylePresets.flatMap((preset) => [
+  preset.typography?.bodyFont,
+  preset.typography?.headingFont,
+])
+
+const fontStack = (value?: string) => getFontCatalogEntry(value)?.fontFamily ?? 'inherit'
+const fontName = (value?: string) =>
+  value === 'helvetica' ? 'Helvetica' : value === 'system-ui' ? 'System' : (value ?? '')
+
 // Selection uses Payload's own contrast token so it reads in both admin themes.
 const SELECTED_ACCENT = 'var(--theme-elevation-800)'
 // The thumbnail is always drawn on a light surface, so its sample button keeps a fixed dark fill.
@@ -139,6 +163,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
   const formFields = useFormFields(([state]) => state) as Record<string, { value?: unknown } | undefined>
   const { locks } = useAppearanceSession()
   const fullyLocked = locks.style && locks.fonts
+  // The cards show each style's real fonts.
+  useThemeFonts(ALL_PRESET_FONTS)
 
   /**
    * Write a style preset, honouring the session locks: typography is skipped with
@@ -154,7 +180,8 @@ export default function StylePresetField(props: TextFieldClientProps) {
         if (preset.borderRadius !== undefined) writer.write(`${basePath}.borderRadius`, preset.borderRadius)
         if (preset.animationLevel !== undefined)
           writer.write(`${basePath}.animationLevel`, preset.animationLevel)
-        if (preset.spacing !== undefined) writer.write(`${basePath}.spacing`, preset.spacing)
+        if (preset.spacing !== undefined)
+          writer.write(`${basePath}.spacing`, normalizeStylePresetValue('spacing', preset.spacing))
 
         VF_KEYS.forEach((key) => {
           const value = preset.visualEffects?.[key]
@@ -169,7 +196,11 @@ export default function StylePresetField(props: TextFieldClientProps) {
       if (!current.fonts) {
         TYPO_KEYS.forEach((key) => {
           const value = preset.typography?.[key]
-          if (value !== undefined) writer.write(`${basePath}.typography.${key}`, value)
+          if (value !== undefined)
+            writer.write(
+              `${basePath}.typography.${key}`,
+              normalizeStylePresetValue(`typography.${key}`, value),
+            )
         })
       }
     },
@@ -412,69 +443,46 @@ export default function StylePresetField(props: TextFieldClientProps) {
                       >
                         {labelText}
                       </div>
-                      {/* Font sample row */}
+                      {/* Font sample: the heading face set as the style would set it, plus font names */}
                       {preset.typography && (
                         <div
                           style={{
                             display: 'flex',
-                            gap: '6px',
+                            gap: '8px',
                             alignItems: 'baseline',
-                            marginBottom: '3px',
-                            overflow: 'hidden',
+                            marginBottom: '4px',
+                            minWidth: 0,
                           }}
                         >
                           <span
+                            aria-hidden="true"
                             style={{
-                              fontFamily: preset.typography.headingFont ?? 'inherit',
+                              fontFamily: fontStack(preset.typography.headingFont),
                               fontWeight: preset.typography.headingWeight ?? '700',
-                              fontSize: '12px',
+                              textTransform:
+                                preset.typography.letterSpacing === 'wider' ? 'uppercase' : 'none',
+                              fontSize: '20px',
+                              lineHeight: 1,
                               color: 'var(--theme-elevation-800)',
+                              flexShrink: 0,
+                            }}
+                          >
+                            Aa
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '12px',
+                              color: 'var(--theme-elevation-600)',
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
-                              maxWidth: '70px',
-                              flexShrink: 0,
+                              minWidth: 0,
                             }}
-                            title={preset.typography.headingFont}
                           >
-                            {(preset.typography.headingFont ?? '')
-                              .split(',')[0]
-                              ?.split(' ')
-                              .slice(0, 2)
-                              .join(' ') || 'Heading'}
+                            {preset.typography.bodyFont === preset.typography.headingFont
+                              ? fontName(preset.typography.headingFont)
+                              : `${fontName(preset.typography.headingFont)} · ${fontName(preset.typography.bodyFont)}`}
                           </span>
-                          {preset.typography.bodyFont !== preset.typography.headingFont && (
-                            <span
-                              style={{
-                                fontFamily: preset.typography.bodyFont ?? 'inherit',
-                                fontSize: '11px',
-                                color: 'var(--theme-elevation-600)',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                maxWidth: '70px',
-                              }}
-                              title={preset.typography.bodyFont}
-                            >
-                              {(preset.typography.bodyFont ?? '')
-                                .split(',')[0]
-                                ?.split(' ')
-                                .slice(0, 2)
-                                .join(' ') || 'Body'}
-                            </span>
-                          )}
-                          {preset.spacing && (
-                            <span
-                              style={{
-                                marginLeft: 'auto',
-                                fontSize: '11px',
-                                color: 'var(--theme-elevation-600)',
-                                flexShrink: 0,
-                              }}
-                            >
-                              {preset.spacing}
-                            </span>
-                          )}
                         </div>
                       )}
                       {descText && (

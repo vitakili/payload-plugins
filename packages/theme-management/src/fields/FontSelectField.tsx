@@ -1,9 +1,17 @@
 'use client'
 
+import './FontSelectField.css'
 import { useField } from '@payloadcms/ui'
+import { mergeFieldStyles } from '@payloadcms/ui/shared'
 import { Check, ChevronDown } from 'lucide-react'
 import type { SelectFieldClientComponent } from 'payload'
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import React, { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  FONT_CATEGORY_LABELS,
+  getFontCatalogEntry,
+  type FontCategory,
+} from '../constants/themeFonts.js'
+import { useThemeFonts } from '../hooks/useThemeFonts.js'
 import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { resolveLocalizedText } from '../utils/localizedText.js'
 
@@ -13,10 +21,8 @@ interface FontOption {
   label: string | LocalizedLabel
   value: string
   fontFamily?: string
-  category?: 'sans-serif' | 'serif' | 'monospace' | 'display'
+  category?: FontCategory
 }
-
-const NON_GOOGLE_VALUES = ['preset', 'custom', 'system-ui']
 
 function previewFamily(option: FontOption): string {
   if (option.fontFamily) return option.fontFamily
@@ -29,8 +35,9 @@ function previewFamily(option: FontOption): string {
 /**
  * Font select with live font previews. Implements the WAI-ARIA "select-only
  * combobox" pattern: a button trigger plus a listbox navigated with the arrow
- * keys, Home/End, Enter/Space and Escape. Preview fonts load for whichever option
- * is active, so keyboard users get the same previews as mouse users.
+ * keys, Home/End, Enter/Space and Escape. Options are grouped by font category.
+ * Preview fonts come from the plugin's self-hosted font endpoint: the selected
+ * face always, every face while the list is open.
  */
 const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
   const { value, setValue } = useField<string>({ path })
@@ -44,9 +51,14 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const listboxRef = useRef<HTMLDivElement>(null)
-  const loadedFonts = useRef<Set<string>>(new Set())
 
-  const options = (field.options as FontOption[]) || []
+  // Payload strips custom option props on the way to the client, so the face and
+  // category come from the font catalog by value.
+  const options = ((field.options as FontOption[]) || []).map((option) => {
+    const entry = getFontCatalogEntry(option.value)
+    return entry ? { ...option, fontFamily: entry.fontFamily, category: entry.category } : option
+  })
+  const [alignEnd, setAlignEnd] = useState(false)
   const selectedIndex = options.findIndex((opt) => opt.value === value)
   const selectedOption = selectedIndex >= 0 ? options[selectedIndex] : undefined
 
@@ -54,23 +66,16 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
   const label = resolveLocalizedText(field.label, lang, 'Font')
   const optionId = (index: number) => `${baseId}-option-${index}`
 
-  const ensureFontLoaded = useCallback((fontValue: string | undefined) => {
-    if (!fontValue || NON_GOOGLE_VALUES.includes(fontValue)) return
-    if (loadedFonts.current.has(fontValue) || typeof document === 'undefined') return
-    loadedFonts.current.add(fontValue)
-
-    const linkId = `font-${fontValue.replace(/\s+/g, '-')}`
-    if (document.getElementById(linkId)) return
-
-    const link = document.createElement('link')
-    link.id = linkId
-    link.rel = 'stylesheet'
-    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontValue)}:wght@400;700&display=swap`
-    document.head.appendChild(link)
-  }, [])
+  useThemeFonts(isOpen ? options.map((option) => option.value) : [value])
 
   const open = useCallback(
     (index = selectedIndex >= 0 ? selectedIndex : 0) => {
+      // Open towards the side with room, so the list never spills past the form column.
+      const trigger = triggerRef.current?.getBoundingClientRect()
+      const column = containerRef.current
+        ?.closest('.render-fields, .group-field__wrap')
+        ?.getBoundingClientRect()
+      setAlignEnd(Boolean(trigger && column && trigger.left + 300 > column.right))
       setActiveIndex(index)
       setIsOpen(true)
     },
@@ -89,10 +94,9 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
     close(true)
   }
 
-  // Load the preview font for the active option and keep it scrolled into view.
+  // Keep the active option scrolled into view.
   useEffect(() => {
     if (!isOpen || activeIndex < 0) return
-    ensureFontLoaded(options[activeIndex]?.value)
     listboxRef.current
       ?.querySelector<HTMLElement>(`#${CSS.escape(optionId(activeIndex))}`)
       ?.scrollIntoView({ block: 'nearest' })
@@ -163,29 +167,23 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
     }
   }
 
+  const isSpecial = (option: FontOption) => option.value === 'preset' || option.value === 'custom'
+
   return (
     <div
       ref={containerRef}
-      className="font-select-container"
-      style={{ position: 'relative', marginBottom: '12px', maxWidth: '360px' }}
+      // Payload rows size each field through --field-width on the field root.
+      className="field-type tm-font-select"
+      style={mergeFieldStyles(field) as React.CSSProperties}
     >
-      <div
-        id={labelId}
-        style={{
-          display: 'block',
-          marginBottom: '6px',
-          fontSize: '13px',
-          fontWeight: 600,
-          color: 'var(--theme-elevation-800)',
-        }}
-      >
+      <div id={labelId} className="field-label tm-font-select__label">
         {label}
       </div>
 
       <button
         ref={triggerRef}
         type="button"
-        className="font-select-trigger"
+        className="tm-font-select__trigger"
         role="combobox"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -193,30 +191,21 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
         aria-labelledby={`${labelId} ${baseId}-value`}
         onClick={() => (isOpen ? close(false) : open())}
         onKeyDown={handleTriggerKeyDown}
-        style={{
-          width: '100%',
-          padding: '10px 14px',
-          borderRadius: '6px',
-          border: '1px solid var(--theme-elevation-200)',
-          backgroundColor: 'var(--theme-input-bg)',
-          color: 'var(--theme-elevation-800)',
-          textAlign: 'left',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '14px',
-          fontFamily: selectedOption?.fontFamily || 'inherit',
-        }}
       >
-        <span id={`${baseId}-value`} style={{ flex: 1, minWidth: 0 }}>
+        <span
+          id={`${baseId}-value`}
+          className="tm-font-select__value"
+          style={{
+            fontFamily:
+              selectedOption && !isSpecial(selectedOption) ? previewFamily(selectedOption) : undefined,
+          }}
+        >
           {selectedOption ? getOptionLabel(selectedOption) : t.ui.selectFontPlaceholder}
         </span>
         <ChevronDown
-          size={14}
+          size={16}
           aria-hidden
-          style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : undefined }}
+          className={`tm-font-select__chevron${isOpen ? ' is-open' : ''}`}
         />
       </button>
 
@@ -229,81 +218,54 @@ const FontSelectField: SelectFieldClientComponent = ({ field, path }) => {
           aria-labelledby={labelId}
           aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
           onKeyDown={handleListboxKeyDown}
-          className="font-select-listbox"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            marginTop: '4px',
-            maxHeight: '280px',
-            overflowY: 'auto',
-            backgroundColor: 'var(--theme-elevation-0)',
-            border: '1px solid var(--theme-elevation-200)',
-            borderRadius: '8px',
-            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
-            zIndex: 1000,
-          }}
+          className={`tm-font-select__listbox${alignEnd ? ' is-align-end' : ''}`}
         >
           {options.map((option, index) => {
             const isSelected = option.value === value
             const isActive = index === activeIndex
+            const startsGroup =
+              option.category !== undefined && option.category !== options[index - 1]?.category
+            const special = isSpecial(option)
+            const family = special ? undefined : previewFamily(option)
 
             return (
-              <div
-                key={option.value}
-                id={optionId(index)}
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => handleSelect(index)}
-                onPointerMove={() => setActiveIndex(index)}
-                style={{
-                  padding: '12px 14px',
-                  backgroundColor: isActive
-                    ? 'var(--theme-elevation-100)'
-                    : isSelected
-                      ? 'var(--theme-elevation-50)'
-                      : 'transparent',
-                  // The active option gets an outline so keyboard focus never relies on a subtle fill alone.
-                  outline: isActive ? '2px solid var(--theme-elevation-800)' : undefined,
-                  outlineOffset: '-2px',
-                  color: 'var(--theme-elevation-800)',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontFamily: previewFamily(option),
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px',
-                }}
-              >
-                <span
-                  style={{
-                    fontWeight: isSelected ? 600 : 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
+              <React.Fragment key={option.value}>
+                {startsGroup && option.category ? (
+                  <div role="presentation" className="tm-font-select__group">
+                    {resolveLocalizedText(FONT_CATEGORY_LABELS[option.category], lang, '')}
+                  </div>
+                ) : null}
+                <div
+                  id={optionId(index)}
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => handleSelect(index)}
+                  onPointerMove={() => setActiveIndex(index)}
+                  className={`tm-font-select__option${isActive ? ' is-active' : ''}${
+                    isSelected ? ' is-selected' : ''
+                  }`}
                 >
-                  {isSelected && <Check size={14} color="var(--theme-elevation-600)" aria-hidden />}
-                  {getOptionLabel(option)}
-                </span>
-                <span
-                  aria-hidden
-                  style={{
-                    fontSize: '16px',
-                    color: 'var(--theme-elevation-600)',
-                    fontStyle:
-                      option.value === 'preset' || option.value === 'custom' ? 'italic' : 'normal',
-                    fontFamily: option.fontFamily || undefined,
-                  }}
-                >
-                  {option.value === 'preset'
-                    ? t.ui.usePreset
-                    : option.value === 'custom'
-                      ? t.ui.specifyCustom
-                      : t.ui.sampleSentence}
-                </span>
-              </div>
+                  <span className="tm-font-select__check" aria-hidden>
+                    {isSelected ? <Check size={14} /> : null}
+                  </span>
+                  <span className="tm-font-select__text">
+                    <span className="tm-font-select__name" style={{ fontFamily: family }}>
+                      {getOptionLabel(option)}
+                    </span>
+                    <span
+                      aria-hidden
+                      className={`tm-font-select__sample${special ? ' is-hint' : ''}`}
+                      style={{ fontFamily: family }}
+                    >
+                      {option.value === 'preset'
+                        ? t.ui.usePreset
+                        : option.value === 'custom'
+                          ? t.ui.specifyCustom
+                          : t.ui.sampleSentence}
+                    </span>
+                  </span>
+                </div>
+              </React.Fragment>
             )
           })}
         </div>

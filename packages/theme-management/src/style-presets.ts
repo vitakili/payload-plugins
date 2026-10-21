@@ -1,23 +1,26 @@
 /**
- * Style presets — define visual style (effects, component defaults, layout)
- * WITHOUT touching color palettes.
+ * Style presets — define the visual style (type, rhythm, effects, component
+ * styles) WITHOUT touching colour palettes.
  *
- * A user can combine any color preset (ThemePreset) with any style preset (StylePreset).
+ * A user can combine any colour preset (ThemePreset) with any style preset
+ * (StylePreset). Every value here must be a valid option of the matching admin
+ * field (see `themeConfigurationField.ts` and `constants/themeFonts.ts`),
+ * otherwise the document cannot be saved — `tests/unit/stylePresets.test.ts`
+ * guards this.
  */
 
 export interface StylePresetTypography {
-  /** Body / paragraph font family (CSS font-family value or Google Fonts name) */
+  /** Body font: a FONT_CATALOG value (e.g. 'Inter', 'Lora'). */
   bodyFont?: string
-  /** Heading font family */
+  /** Heading font: a FONT_CATALOG value. */
   headingFont?: string
-  /** Base font size token: 'small' | 'medium' | 'large' */
-  baseFontSize?: 'small' | 'medium' | 'large'
-  /** Line-height token: 'compact' | 'normal' | 'relaxed' */
-  lineHeight?: 'compact' | 'normal' | 'relaxed'
-  /** Letter-spacing character: 'tight' | 'normal' | 'wide' | 'wider' */
+  /** Base font size in px, stored without unit. Legacy 'small' | 'medium' | 'large' are mapped. */
+  baseFontSize?: '14' | '15' | '16' | '17' | '18' | '20' | 'small' | 'medium' | 'large'
+  /** Legacy 'compact' | 'normal' | 'relaxed' are mapped. */
+  lineHeight?: '1.4' | '1.5' | '1.6' | '1.7' | '1.8' | 'compact' | 'normal' | 'relaxed'
+  /** Heading tracking. 'wider' also sets headings in capitals. */
   letterSpacing?: 'tight' | 'normal' | 'wide' | 'wider'
-  /** Heading weight: normal CSS font-weight string */
-  headingWeight?: '300' | '400' | '500' | '600' | '700' | '800' | '900'
+  headingWeight?: '300' | '400' | '500' | '600' | '700' | '800'
 }
 
 export interface StylePreset {
@@ -27,8 +30,8 @@ export interface StylePreset {
   category: 'classic' | 'effect'
   borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'xl'
   animationLevel?: 'none' | 'reduced' | 'medium' | 'high'
-  /** Spacing scale: 'compact' = tighter padding/gap, 'medium' = default, 'spacious' = generous whitespace */
-  spacing?: 'compact' | 'medium' | 'spacious'
+  /** Spacing scale: 'compact' = tighter, 'medium' = default, 'comfortable' = generous whitespace ('spacious' is a legacy alias). */
+  spacing?: 'compact' | 'medium' | 'comfortable' | 'spacious'
   typography?: StylePresetTypography
   visualEffects?: {
     effectStyle?: 'flat' | 'elevated' | 'glass' | 'neumorphic' | 'clay'
@@ -40,116 +43,222 @@ export interface StylePreset {
   }
   componentStyles?: {
     buttonVariant?: 'filled' | 'outlined' | 'ghost' | 'gradient' | 'pill' | 'brutal'
+    buttonSize?: 'small' | 'medium' | 'large' | 'xl'
     cardStyle?: 'elevated' | 'flat' | 'bordered' | 'glass' | 'neumorphic' | 'gradient-border'
     cardHoverEffect?: 'none' | 'lift' | 'scale' | 'shadow' | 'glow' | 'tilt'
     navbarStyle?: 'solid' | 'transparent' | 'blur' | 'floating' | 'minimal'
+    footerStyle?: 'standard' | 'minimal' | 'dark' | 'gradient-top' | 'full-color'
+    imageStyle?: 'default' | 'rounded' | 'circle' | 'vignette' | 'grayscale' | 'duotone' | 'polaroid'
+    linkStyle?: 'underline' | 'underline-hover' | 'none' | 'highlight' | 'animated'
   }
+}
+
+const LEGACY_STYLE_VALUES: Record<string, Record<string, string>> = {
+  spacing: { spacious: 'comfortable' },
+  'typography.baseFontSize': { small: '15', medium: '16', large: '18' },
+  'typography.lineHeight': { compact: '1.4', normal: '1.6', relaxed: '1.8' },
+  'typography.bodyFont': { 'Source Sans Pro': 'Source Sans 3', 'Helvetica Neue': 'helvetica' },
+  'typography.headingFont': { 'Source Sans Pro': 'Source Sans 3', 'Helvetica Neue': 'helvetica' },
+}
+
+/** Maps values from older StylePreset definitions onto the current field options. */
+export function normalizeStylePresetValue(path: string, value: unknown): unknown {
+  return typeof value === 'string' ? (LEGACY_STYLE_VALUES[path]?.[value] ?? value) : value
 }
 
 export const allStylePresets: StylePreset[] = [
   // ─── Classic styles ───────────────────────────────────────────────────────
   {
-    name: 'brutalism',
-    label: { en: 'Brutalism', cs: 'Brutalismus' },
-    description: {
-      en: 'Raw, anti-aesthetic design. Thick borders, harsh shadows, zero roundness.',
-      cs: 'Surový, anti-estetický design. Silné okraje, tvrdé stíny, žádné zaoblení.',
-    },
-    category: 'classic',
-    borderRadius: 'none',
-    animationLevel: 'none',
-    spacing: 'spacious',
-    typography: {
-      bodyFont: 'Space Mono',
-      headingFont: 'Space Mono',
-      baseFontSize: 'medium',
-      lineHeight: 'compact',
-      letterSpacing: 'normal',
-      headingWeight: '700',
-    },
-    visualEffects: {
-      effectStyle: 'elevated',
-      shadowIntensity: 'dramatic',
-      borderStyle: 'solid',
-      borderWidth: '3px',
-    },
-    componentStyles: {
-      buttonVariant: 'brutal',
-      cardStyle: 'bordered',
-      cardHoverEffect: 'shadow',
-      navbarStyle: 'solid',
-    },
-  },
-  {
     name: 'swiss',
     label: { en: 'Swiss / Clean', cs: 'Švýcarský / čistý' },
     description: {
-      en: 'Typographic clarity. No radius, outlined elements, strict grid, zero decoration.',
-      cs: 'Typografická jasnost. Žádné zaoblení, obrysové prvky, přísný grid, nulová dekorace.',
+      en: 'Typographic clarity. Square corners, outlined buttons, strict grid, no decoration.',
+      cs: 'Typografická jasnost. Ostré rohy, obrysová tlačítka, přísná mřížka, žádná dekorace.',
     },
     category: 'classic',
     borderRadius: 'none',
     animationLevel: 'reduced',
-    spacing: 'spacious',
+    spacing: 'comfortable',
     typography: {
-      bodyFont: 'Helvetica Neue, Arial, sans-serif',
-      headingFont: 'Helvetica Neue, Arial, sans-serif',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
+      bodyFont: 'helvetica',
+      headingFont: 'helvetica',
+      baseFontSize: '16',
+      lineHeight: '1.5',
       letterSpacing: 'tight',
       headingWeight: '700',
     },
     visualEffects: {
       effectStyle: 'flat',
       shadowIntensity: 'none',
+      backdropBlur: 'none',
       borderStyle: 'solid',
       borderWidth: '1px',
     },
     componentStyles: {
       buttonVariant: 'outlined',
+      buttonSize: 'medium',
       cardStyle: 'flat',
       cardHoverEffect: 'none',
       navbarStyle: 'minimal',
+      footerStyle: 'minimal',
+      imageStyle: 'default',
+      linkStyle: 'underline',
     },
   },
   {
-    name: 'flat-design',
-    label: { en: 'Flat Design', cs: 'Plochý design' },
+    name: 'editorial',
+    label: { en: 'Editorial / Magazine', cs: 'Redakční / časopis' },
     description: {
-      en: 'No shadows, no depth. Clean colours, simple icons, purely functional UI.',
-      cs: 'Bez stínů, bez hloubky. Čisté barvy, jednoduché ikony, čistě funkční UI.',
+      en: 'Serif headings, generous line spacing, ink-on-paper feel. Typography is the hero.',
+      cs: 'Patkové nadpisy, velké řádkování, pocit tisku na papíře. Hlavní roli hraje typografie.',
+    },
+    category: 'classic',
+    borderRadius: 'none',
+    animationLevel: 'reduced',
+    spacing: 'comfortable',
+    typography: {
+      bodyFont: 'Lora',
+      headingFont: 'Playfair Display',
+      baseFontSize: '18',
+      lineHeight: '1.8',
+      letterSpacing: 'tight',
+      headingWeight: '700',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'solid',
+      borderWidth: '1px',
+    },
+    componentStyles: {
+      buttonVariant: 'outlined',
+      buttonSize: 'medium',
+      cardStyle: 'flat',
+      cardHoverEffect: 'none',
+      navbarStyle: 'minimal',
+      footerStyle: 'minimal',
+      imageStyle: 'default',
+      linkStyle: 'underline',
+    },
+  },
+  {
+    name: 'luxury',
+    label: { en: 'Luxury / Boutique', cs: 'Luxusní / butik' },
+    description: {
+      en: 'High-contrast display serif, light airy text, wide tracking and black-and-white imagery.',
+      cs: 'Kontrastní výrazné patkové písmo, lehký vzdušný text, široké prostrkání a černobílé fotky.',
+    },
+    category: 'classic',
+    borderRadius: 'none',
+    animationLevel: 'reduced',
+    spacing: 'comfortable',
+    typography: {
+      bodyFont: 'Manrope',
+      headingFont: 'DM Serif Display',
+      baseFontSize: '16',
+      lineHeight: '1.8',
+      letterSpacing: 'wide',
+      headingWeight: '400',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'solid',
+      borderWidth: '1px',
+    },
+    componentStyles: {
+      buttonVariant: 'outlined',
+      buttonSize: 'large',
+      cardStyle: 'flat',
+      cardHoverEffect: 'none',
+      navbarStyle: 'transparent',
+      footerStyle: 'dark',
+      imageStyle: 'grayscale',
+      linkStyle: 'animated',
+    },
+  },
+  {
+    name: 'art-deco',
+    label: { en: 'Art Deco', cs: 'Art deco' },
+    description: {
+      en: 'Capitalised serif headings, double rules and a strong vertical rhythm.',
+      cs: 'Patkové nadpisy verzálkami, dvojité linky a silný vertikální rytmus.',
+    },
+    category: 'classic',
+    borderRadius: 'none',
+    animationLevel: 'reduced',
+    spacing: 'comfortable',
+    typography: {
+      bodyFont: 'Libre Baskerville',
+      headingFont: 'Cormorant Garamond',
+      baseFontSize: '17',
+      lineHeight: '1.7',
+      letterSpacing: 'wider',
+      headingWeight: '600',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'double',
+      borderWidth: '4px',
+    },
+    componentStyles: {
+      buttonVariant: 'outlined',
+      buttonSize: 'large',
+      cardStyle: 'flat',
+      cardHoverEffect: 'none',
+      navbarStyle: 'solid',
+      footerStyle: 'dark',
+      imageStyle: 'vignette',
+      linkStyle: 'underline',
+    },
+  },
+  {
+    name: 'corporate',
+    label: { en: 'Corporate / Professional', cs: 'Firemní / profesionální' },
+    description: {
+      en: 'Trustworthy and calm. Clean sans-serif, soft shadows, solid buttons.',
+      cs: 'Důvěryhodný a klidný. Čisté bezpatkové písmo, jemné stíny, plná tlačítka.',
     },
     category: 'classic',
     borderRadius: 'small',
     animationLevel: 'reduced',
     spacing: 'medium',
     typography: {
-      bodyFont: 'Inter',
-      headingFont: 'Inter',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
+      bodyFont: 'Source Sans 3',
+      headingFont: 'Source Sans 3',
+      baseFontSize: '16',
+      lineHeight: '1.6',
       letterSpacing: 'normal',
       headingWeight: '600',
     },
     visualEffects: {
-      effectStyle: 'flat',
-      shadowIntensity: 'none',
-      borderStyle: 'none',
-      borderWidth: '0px',
+      effectStyle: 'elevated',
+      shadowIntensity: 'subtle',
+      backdropBlur: 'none',
+      borderStyle: 'solid',
+      borderWidth: '1px',
     },
     componentStyles: {
       buttonVariant: 'filled',
-      cardStyle: 'flat',
-      cardHoverEffect: 'scale',
+      buttonSize: 'medium',
+      cardStyle: 'elevated',
+      cardHoverEffect: 'lift',
       navbarStyle: 'solid',
+      footerStyle: 'standard',
+      imageStyle: 'rounded',
+      linkStyle: 'underline-hover',
     },
   },
   {
     name: 'material',
-    label: { en: 'Material / Elevated', cs: 'Material / Vyvýšený' },
+    label: { en: 'Material / Elevated', cs: 'Material / vyvýšený' },
     description: {
-      en: 'Google Material style — cards with shadows, layered surfaces, subtle depth.',
-      cs: 'Google Material styl — karty se stíny, vrstvené povrchy, jemná hloubka.',
+      en: 'Layered surfaces with clear shadows, medium rounding and lively motion.',
+      cs: 'Vrstvené plochy s výraznými stíny, středním zaoblením a živým pohybem.',
     },
     category: 'classic',
     borderRadius: 'medium',
@@ -158,190 +267,146 @@ export const allStylePresets: StylePreset[] = [
     typography: {
       bodyFont: 'Roboto',
       headingFont: 'Roboto',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
+      baseFontSize: '16',
+      lineHeight: '1.5',
       letterSpacing: 'normal',
       headingWeight: '500',
     },
     visualEffects: {
       effectStyle: 'elevated',
       shadowIntensity: 'medium',
+      backdropBlur: 'none',
       borderStyle: 'none',
       borderWidth: '0px',
     },
     componentStyles: {
       buttonVariant: 'filled',
+      buttonSize: 'medium',
       cardStyle: 'elevated',
       cardHoverEffect: 'lift',
       navbarStyle: 'solid',
+      footerStyle: 'standard',
+      imageStyle: 'rounded',
+      linkStyle: 'underline-hover',
     },
   },
   {
     name: 'minimalism',
     label: { en: 'Minimalism', cs: 'Minimalismus' },
     description: {
-      en: 'Maximum whitespace, near-invisible borders, thin type. Only what is necessary.',
-      cs: 'Maximální bílý prostor, téměř neviditelné okraje, tenké písmo. Jen to nezbytné.',
+      en: 'Maximum whitespace, thin headings, ghost buttons. Only what is necessary.',
+      cs: 'Maximum volného prostoru, tenké nadpisy, průhledná tlačítka. Jen to nezbytné.',
     },
     category: 'classic',
     borderRadius: 'small',
     animationLevel: 'reduced',
-    spacing: 'spacious',
+    spacing: 'comfortable',
     typography: {
       bodyFont: 'DM Sans',
       headingFont: 'DM Sans',
-      baseFontSize: 'medium',
-      lineHeight: 'relaxed',
+      baseFontSize: '17',
+      lineHeight: '1.8',
       letterSpacing: 'wide',
       headingWeight: '300',
     },
     visualEffects: {
       effectStyle: 'flat',
       shadowIntensity: 'none',
+      backdropBlur: 'none',
       borderStyle: 'solid',
       borderWidth: '1px',
     },
     componentStyles: {
       buttonVariant: 'ghost',
+      buttonSize: 'small',
       cardStyle: 'flat',
       cardHoverEffect: 'none',
       navbarStyle: 'minimal',
+      footerStyle: 'minimal',
+      imageStyle: 'default',
+      linkStyle: 'underline',
     },
   },
   {
-    name: 'editorial',
-    label: { en: 'Editorial / Magazine', cs: 'Redakční / Časopis' },
+    name: 'tech',
+    label: { en: 'Tech / Product', cs: 'Tech / produkt' },
     description: {
-      en: 'Serif headings, generous line spacing, ink-on-paper feel. Bold typography as the hero.',
-      cs: 'Serifové nadpisy, velké řádkování, pocit inkoustu na papíře. Typografie jako hrdina.',
+      en: 'Geometric grotesk, tight headings, hairline borders and a glow on hover.',
+      cs: 'Geometrický grotesk, sevřené nadpisy, vlasové linky a záře při najetí.',
     },
     category: 'classic',
-    borderRadius: 'none',
-    animationLevel: 'reduced',
-    spacing: 'spacious',
+    borderRadius: 'small',
+    animationLevel: 'medium',
+    spacing: 'medium',
     typography: {
-      bodyFont: 'Lora',
-      headingFont: 'Playfair Display',
-      baseFontSize: 'large',
-      lineHeight: 'relaxed',
+      bodyFont: 'Inter',
+      headingFont: 'Space Grotesk',
+      baseFontSize: '16',
+      lineHeight: '1.6',
       letterSpacing: 'tight',
-      headingWeight: '700',
+      headingWeight: '600',
     },
     visualEffects: {
       effectStyle: 'flat',
       shadowIntensity: 'none',
-      borderStyle: 'solid',
-      borderWidth: '1px',
-    },
-    componentStyles: {
-      buttonVariant: 'outlined',
-      cardStyle: 'flat',
-      cardHoverEffect: 'none',
-      navbarStyle: 'minimal',
-    },
-  },
-  {
-    name: 'retro',
-    label: { en: 'Retro / 90s', cs: 'Retro / 90. léta' },
-    description: {
-      en: 'Chunky type, bold outlines, pixel-inspired borders. Nostalgic web aesthetic.',
-      cs: 'Tučné písmo, silné obrysy, pixelové hranice. Nostalgická webová estetika.',
-    },
-    category: 'classic',
-    borderRadius: 'none',
-    animationLevel: 'medium',
-    spacing: 'compact',
-    typography: {
-      bodyFont: 'IBM Plex Mono',
-      headingFont: 'Bebas Neue',
-      baseFontSize: 'large',
-      lineHeight: 'compact',
-      letterSpacing: 'wider',
-      headingWeight: '400',
-    },
-    visualEffects: {
-      effectStyle: 'elevated',
-      shadowIntensity: 'dramatic',
-      borderStyle: 'solid',
-      borderWidth: '2px',
-    },
-    componentStyles: {
-      buttonVariant: 'brutal',
-      cardStyle: 'bordered',
-      cardHoverEffect: 'shadow',
-      navbarStyle: 'solid',
-    },
-  },
-  {
-    name: 'art-deco',
-    label: { en: 'Art Deco', cs: 'Art Deco' },
-    description: {
-      en: 'Geometric symmetry, ornate headings, gold accents and strong vertical rhythm.',
-      cs: 'Geometrická symetrie, ozdobné nadpisy, zlaté akcenty a silný vertikální rytmus.',
-    },
-    category: 'classic',
-    borderRadius: 'none',
-    animationLevel: 'reduced',
-    spacing: 'spacious',
-    typography: {
-      bodyFont: 'Cormorant Garamond',
-      headingFont: 'Cormorant Garamond',
-      baseFontSize: 'medium',
-      lineHeight: 'relaxed',
-      letterSpacing: 'wider',
-      headingWeight: '600',
-    },
-    visualEffects: {
-      effectStyle: 'flat',
-      shadowIntensity: 'subtle',
-      borderStyle: 'double',
-      borderWidth: '3px',
-    },
-    componentStyles: {
-      buttonVariant: 'outlined',
-      cardStyle: 'bordered',
-      cardHoverEffect: 'none',
-      navbarStyle: 'solid',
-    },
-  },
-  {
-    name: 'corporate',
-    label: { en: 'Corporate / Professional', cs: 'Korporátní / Profesionální' },
-    description: {
-      en: 'Trustworthy, conservative design. Clean sans-serif, ample whitespace, minimal decoration.',
-      cs: 'Důvěryhodný, konzervativní design. Čisté sans-serif, dostatek prostoru, minimální dekorace.',
-    },
-    category: 'classic',
-    borderRadius: 'small',
-    animationLevel: 'reduced',
-    spacing: 'medium',
-    typography: {
-      bodyFont: 'Source Sans Pro',
-      headingFont: 'Source Sans Pro',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
-      letterSpacing: 'normal',
-      headingWeight: '600',
-    },
-    visualEffects: {
-      effectStyle: 'elevated',
-      shadowIntensity: 'subtle',
+      backdropBlur: 'medium',
       borderStyle: 'solid',
       borderWidth: '1px',
     },
     componentStyles: {
       buttonVariant: 'filled',
-      cardStyle: 'elevated',
+      buttonSize: 'small',
+      cardStyle: 'flat',
+      cardHoverEffect: 'glow',
+      navbarStyle: 'blur',
+      footerStyle: 'minimal',
+      imageStyle: 'rounded',
+      linkStyle: 'animated',
+    },
+  },
+  {
+    name: 'poster',
+    label: { en: 'Bold / Poster', cs: 'Výrazný / plakát' },
+    description: {
+      en: 'Huge expressive headings, extra-large buttons and a full-colour footer.',
+      cs: 'Velké výrazné nadpisy, extra velká tlačítka a patička v plné barvě.',
+    },
+    category: 'classic',
+    borderRadius: 'medium',
+    animationLevel: 'medium',
+    spacing: 'comfortable',
+    typography: {
+      bodyFont: 'Archivo',
+      headingFont: 'Syne',
+      baseFontSize: '17',
+      lineHeight: '1.6',
+      letterSpacing: 'tight',
+      headingWeight: '800',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'none',
+      borderWidth: '0px',
+    },
+    componentStyles: {
+      buttonVariant: 'filled',
+      buttonSize: 'xl',
+      cardStyle: 'flat',
       cardHoverEffect: 'lift',
       navbarStyle: 'solid',
+      footerStyle: 'full-color',
+      imageStyle: 'rounded',
+      linkStyle: 'highlight',
     },
   },
   {
     name: 'playful',
-    label: { en: 'Playful / Rounded', cs: 'Hravý / Zaoblený' },
+    label: { en: 'Playful / Rounded', cs: 'Hravý / zaoblený' },
     description: {
-      en: 'Bubbly rounded corners, bouncy animations, friendly typefaces. Fun and approachable.',
-      cs: 'Bublinkové zaoblení, skákavé animace, přátelské písmo. Zábavné a přístupné.',
+      en: 'Bubbly corners, pill buttons, a floating navbar and friendly rounded type.',
+      cs: 'Bublinkové rohy, oblá tlačítka, plovoucí navigace a přátelské zaoblené písmo.',
     },
     category: 'classic',
     borderRadius: 'xl',
@@ -350,64 +415,148 @@ export const allStylePresets: StylePreset[] = [
     typography: {
       bodyFont: 'Nunito',
       headingFont: 'Nunito',
-      baseFontSize: 'medium',
-      lineHeight: 'relaxed',
+      baseFontSize: '17',
+      lineHeight: '1.7',
       letterSpacing: 'normal',
-      headingWeight: '700',
+      headingWeight: '800',
     },
     visualEffects: {
       effectStyle: 'elevated',
       shadowIntensity: 'medium',
+      backdropBlur: 'none',
       borderStyle: 'none',
       borderWidth: '0px',
     },
     componentStyles: {
       buttonVariant: 'pill',
+      buttonSize: 'large',
       cardStyle: 'elevated',
       cardHoverEffect: 'scale',
       navbarStyle: 'floating',
+      footerStyle: 'full-color',
+      imageStyle: 'rounded',
+      linkStyle: 'highlight',
     },
   },
   {
     name: 'organic',
-    label: { en: 'Organic / Nature', cs: 'Organický / Příroda' },
+    label: { en: 'Organic / Nature', cs: 'Organický / příroda' },
     description: {
-      en: 'Soft curves, earthy tones, hand-crafted feel. Asymmetric shapes and warm spacing.',
-      cs: 'Jemné křivky, zemité tóny, ručně vyrobený pocit. Asymetrické tvary a teplé mezery.',
+      en: 'Soft serif headings, warm spacing, large rounding and a transparent navbar.',
+      cs: 'Měkké patkové nadpisy, vzdušné rozestupy, velké zaoblení a průhledná navigace.',
     },
     category: 'classic',
     borderRadius: 'large',
     animationLevel: 'medium',
-    spacing: 'spacious',
+    spacing: 'comfortable',
     typography: {
-      bodyFont: 'Crimson Pro',
-      headingFont: 'Crimson Pro',
-      baseFontSize: 'large',
-      lineHeight: 'relaxed',
+      bodyFont: 'Work Sans',
+      headingFont: 'Fraunces',
+      baseFontSize: '18',
+      lineHeight: '1.7',
       letterSpacing: 'tight',
-      headingWeight: '600',
+      headingWeight: '500',
     },
     visualEffects: {
       effectStyle: 'flat',
       shadowIntensity: 'subtle',
+      backdropBlur: 'none',
       borderStyle: 'none',
       borderWidth: '0px',
     },
     componentStyles: {
       buttonVariant: 'pill',
+      buttonSize: 'medium',
       cardStyle: 'flat',
       cardHoverEffect: 'lift',
       navbarStyle: 'transparent',
+      footerStyle: 'gradient-top',
+      imageStyle: 'rounded',
+      linkStyle: 'highlight',
+    },
+  },
+  {
+    name: 'brutalism',
+    label: { en: 'Brutalism', cs: 'Brutalismus' },
+    description: {
+      en: 'Raw and loud. Thick borders, hard offset shadows, zero rounding.',
+      cs: 'Surový a hlasitý. Silné okraje, tvrdé posunuté stíny, žádné zaoblení.',
+    },
+    category: 'classic',
+    borderRadius: 'none',
+    animationLevel: 'none',
+    spacing: 'comfortable',
+    typography: {
+      bodyFont: 'Space Grotesk',
+      headingFont: 'Archivo Black',
+      baseFontSize: '17',
+      lineHeight: '1.5',
+      letterSpacing: 'tight',
+      headingWeight: '400',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'solid',
+      borderWidth: '3px',
+    },
+    componentStyles: {
+      buttonVariant: 'brutal',
+      buttonSize: 'large',
+      cardStyle: 'bordered',
+      cardHoverEffect: 'shadow',
+      navbarStyle: 'solid',
+      footerStyle: 'dark',
+      imageStyle: 'grayscale',
+      linkStyle: 'highlight',
+    },
+  },
+  {
+    name: 'retro',
+    label: { en: 'Retro / 90s', cs: 'Retro / 90. léta' },
+    description: {
+      en: 'Condensed capital headings, typewriter text, polaroid images and chunky outlines.',
+      cs: 'Úzké nadpisy verzálkami, strojopisný text, fotky jako polaroid a silné obrysy.',
+    },
+    category: 'classic',
+    borderRadius: 'none',
+    animationLevel: 'medium',
+    spacing: 'compact',
+    typography: {
+      bodyFont: 'IBM Plex Mono',
+      headingFont: 'Bebas Neue',
+      baseFontSize: '16',
+      lineHeight: '1.6',
+      letterSpacing: 'wider',
+      headingWeight: '400',
+    },
+    visualEffects: {
+      effectStyle: 'flat',
+      shadowIntensity: 'none',
+      backdropBlur: 'none',
+      borderStyle: 'solid',
+      borderWidth: '2px',
+    },
+    componentStyles: {
+      buttonVariant: 'brutal',
+      buttonSize: 'medium',
+      cardStyle: 'bordered',
+      cardHoverEffect: 'shadow',
+      navbarStyle: 'solid',
+      footerStyle: 'full-color',
+      imageStyle: 'polaroid',
+      linkStyle: 'highlight',
     },
   },
 
   // ─── Visual effect styles ─────────────────────────────────────────────────
   {
     name: 'glassmorphism',
-    label: { en: 'Glassmorphism', cs: 'Glassmorphism' },
+    label: { en: 'Glassmorphism', cs: 'Mléčné sklo' },
     description: {
-      en: 'Frosted glass — blurred backgrounds, transparency, soft borders.',
-      cs: 'Mléčné sklo — rozmazané pozadí, průhlednost, jemné hranice.',
+      en: 'Frosted glass panels over colour — blur, translucency, soft edges. Best on a vivid background.',
+      cs: 'Panely z mléčného skla nad barvou — rozostření, průsvitnost, jemné hrany. Nejlépe na sytém pozadí.',
     },
     category: 'effect',
     borderRadius: 'large',
@@ -415,10 +564,10 @@ export const allStylePresets: StylePreset[] = [
     spacing: 'medium',
     typography: {
       bodyFont: 'Inter',
-      headingFont: 'Inter',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
-      letterSpacing: 'normal',
+      headingFont: 'Outfit',
+      baseFontSize: '16',
+      lineHeight: '1.6',
+      letterSpacing: 'tight',
       headingWeight: '600',
     },
     visualEffects: {
@@ -430,18 +579,22 @@ export const allStylePresets: StylePreset[] = [
       glassOpacity: 55,
     },
     componentStyles: {
-      buttonVariant: 'ghost',
+      buttonVariant: 'filled',
+      buttonSize: 'medium',
       cardStyle: 'glass',
       cardHoverEffect: 'glow',
       navbarStyle: 'blur',
+      footerStyle: 'minimal',
+      imageStyle: 'rounded',
+      linkStyle: 'animated',
     },
   },
   {
     name: 'neumorphism',
-    label: { en: 'Neumorphism', cs: 'Neumorphism' },
+    label: { en: 'Soft UI', cs: 'Měkké UI' },
     description: {
-      en: 'Soft UI — elements look extruded from the background using dual light/dark shadows.',
-      cs: 'Měkké UI — prvky vypadají vytlačené z pozadí díky dvojitým stínům.',
+      en: 'Elements look pressed out of the background with paired light and dark shadows.',
+      cs: 'Prvky vypadají vytlačené z pozadí díky dvojici světlého a tmavého stínu.',
     },
     category: 'effect',
     borderRadius: 'large',
@@ -450,8 +603,8 @@ export const allStylePresets: StylePreset[] = [
     typography: {
       bodyFont: 'DM Sans',
       headingFont: 'DM Sans',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
+      baseFontSize: '16',
+      lineHeight: '1.6',
       letterSpacing: 'normal',
       headingWeight: '500',
     },
@@ -464,17 +617,21 @@ export const allStylePresets: StylePreset[] = [
     },
     componentStyles: {
       buttonVariant: 'filled',
+      buttonSize: 'medium',
       cardStyle: 'neumorphic',
       cardHoverEffect: 'shadow',
       navbarStyle: 'solid',
+      footerStyle: 'standard',
+      imageStyle: 'rounded',
+      linkStyle: 'underline-hover',
     },
   },
   {
     name: 'claymorphism',
-    label: { en: 'Claymorphism', cs: 'Claymorphism' },
+    label: { en: 'Clay', cs: 'Plastelína' },
     description: {
-      en: 'Soft, colourful 3D clay-like elements with large radius and inflated look.',
-      cs: 'Měkké, barevné 3D „plastelínové" prvky s velkým zaoblením a nafouklým vzhledem.',
+      en: 'Soft, inflated 3D clay shapes with large rounding and chunky type.',
+      cs: 'Měkké nafouklé 3D tvary jako z plastelíny, velké zaoblení a tučné písmo.',
     },
     category: 'effect',
     borderRadius: 'xl',
@@ -483,8 +640,8 @@ export const allStylePresets: StylePreset[] = [
     typography: {
       bodyFont: 'Nunito',
       headingFont: 'Nunito',
-      baseFontSize: 'large',
-      lineHeight: 'relaxed',
+      baseFontSize: '18',
+      lineHeight: '1.7',
       letterSpacing: 'normal',
       headingWeight: '800',
     },
@@ -497,17 +654,21 @@ export const allStylePresets: StylePreset[] = [
     },
     componentStyles: {
       buttonVariant: 'pill',
+      buttonSize: 'large',
       cardStyle: 'elevated',
       cardHoverEffect: 'scale',
       navbarStyle: 'floating',
+      footerStyle: 'full-color',
+      imageStyle: 'rounded',
+      linkStyle: 'highlight',
     },
   },
   {
     name: 'gradient-heavy',
-    label: { en: 'Gradient', cs: 'Gradientový' },
+    label: { en: 'Gradient', cs: 'Přechodový' },
     description: {
-      en: 'Gradient borders and glow effects as the primary visual accent.',
-      cs: 'Gradientové okraje a záře jako hlavní vizuální akcent.',
+      en: 'The brand gradient leads: gradient buttons, gradient card borders and a glow.',
+      cs: 'Hlavní roli hraje brandový přechod: přechodová tlačítka, okraje karet a záře.',
     },
     category: 'effect',
     borderRadius: 'medium',
@@ -516,27 +677,32 @@ export const allStylePresets: StylePreset[] = [
     typography: {
       bodyFont: 'Inter',
       headingFont: 'Plus Jakarta Sans',
-      baseFontSize: 'medium',
-      lineHeight: 'normal',
+      baseFontSize: '16',
+      lineHeight: '1.6',
       letterSpacing: 'tight',
-      headingWeight: '700',
+      headingWeight: '800',
     },
     visualEffects: {
       effectStyle: 'elevated',
       shadowIntensity: 'medium',
+      backdropBlur: 'medium',
       borderStyle: 'none',
       borderWidth: '0px',
     },
     componentStyles: {
       buttonVariant: 'gradient',
+      buttonSize: 'medium',
       cardStyle: 'gradient-border',
       cardHoverEffect: 'glow',
       navbarStyle: 'blur',
+      footerStyle: 'gradient-top',
+      imageStyle: 'rounded',
+      linkStyle: 'animated',
     },
   },
 ]
 
 export const stylePresetCategories = [
-  { name: 'classic', label: { en: 'Classic Styles', cs: 'Klasické styly' } },
-  { name: 'effect', label: { en: 'Visual Effects', cs: 'Vizuální efekty' } },
+  { name: 'classic', label: { en: 'Styles', cs: 'Styly' } },
+  { name: 'effect', label: { en: 'Effect styles', cs: 'Styly s efekty' } },
 ] as const

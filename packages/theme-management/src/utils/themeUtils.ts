@@ -38,6 +38,7 @@ export function generateThemeCSS(config: ThemeConfiguration): string {
   cssRules.push('}')
 
   // ── Element-level effect rules (outside :root) ──────────────────────────
+  applyTypographyBaseRules(cssRules, config)
   applyEffectElementRules(cssRules, config)
 
   // ── Color mode overrides ────────────────────────────────────────────────
@@ -166,6 +167,10 @@ function applySpacingRule(rules: string[], config: ThemeConfiguration): void {
   const multiplier = spacingMultipliers[config.spacing] ?? '1'
   rules.push(`  --spacing-scale: ${multiplier};`)
   rules.push(`  --theme-spacing: ${multiplier};`)
+  // Ready-to-use rhythm tokens so the spacing choice is visible without extra math.
+  rules.push(`  --section-spacing: calc(clamp(3rem, 8vw, 6rem) * ${multiplier});`)
+  rules.push(`  --card-padding: calc(1.5rem * ${multiplier});`)
+  rules.push(`  --stack-gap: calc(1rem * ${multiplier});`)
 }
 
 function applyAnimationRule(rules: string[], config: ThemeConfiguration): void {
@@ -237,6 +242,44 @@ function applyTypographyRules(rules: string[], config: ThemeConfiguration): void
       }
     })
   }
+
+  if (typography.headingWeight) {
+    rules.push(`  --typography-headingWeight: ${typography.headingWeight};`)
+  }
+  if (typography.headingLetterSpacing) {
+    rules.push(`  --typography-headingLetterSpacing: ${typography.headingLetterSpacing};`)
+  }
+  if (typography.headingTransform) {
+    rules.push(`  --typography-headingTransform: ${typography.headingTransform};`)
+  }
+}
+
+/**
+ * Zero-specificity base rules (`:where()`), so the chosen fonts show up on a site
+ * that has no typography CSS of its own, while any rule the site does have wins.
+ */
+function applyTypographyBaseRules(rules: string[], config: ThemeConfiguration): void {
+  // Only when the editor chose typography explicitly: sites that never touched it
+  // keep rendering exactly as before.
+  if (!config.typography || !config.typographyOverridden) return
+
+  rules.push('')
+  rules.push('/* ── Typography base (zero specificity — site CSS always wins) ── */')
+  rules.push(':where(html[data-theme]) :where(body) {')
+  rules.push('  font-family: var(--typography-fontFamily, system-ui, sans-serif);')
+  rules.push(
+    '  font-size: calc(var(--typography-baseFontSize, 16px) * var(--theme-font-scale, 1));',
+  )
+  rules.push('  line-height: var(--typography-lineHeight, 1.6);')
+  rules.push('}')
+  rules.push(':where(html[data-theme]) :where(h1, h2, h3, h4, h5, h6) {')
+  rules.push(
+    '  font-family: var(--typography-headingFamily, var(--typography-fontFamily, inherit));',
+  )
+  rules.push('  font-weight: var(--typography-headingWeight, var(--typography-fontWeights-bold, 700));')
+  rules.push('  letter-spacing: var(--typography-headingLetterSpacing, normal);')
+  rules.push('  text-transform: var(--typography-headingTransform, none);')
+  rules.push('}')
 }
 
 // ─── Visual Effects ────────────────────────────────────────────────────────
@@ -373,6 +416,19 @@ function applyEffectElementRules(rules: string[], config: ThemeConfiguration): v
 
   rules.push('')
   rules.push('/* ── Effect element overrides ── */')
+
+  // ── Card border style / width (effect rules below may still replace it) ──
+  // Skipped for the field defaults (solid / 1px) so existing cards are unchanged.
+  if (
+    ve?.borderStyle &&
+    (ve.borderStyle !== 'solid' || (ve.borderWidth ?? '1px') !== '1px')
+  ) {
+    rules.push(`html[data-border-style] [data-card] {`)
+    rules.push(`  border-style: var(--border-style, solid);`)
+    rules.push(`  border-width: var(--border-width, 1px);`)
+    rules.push(`  border-color: var(--border);`)
+    rules.push(`}`)
+  }
 
   // ── Glass effect ──────────────────────────────────────────────────────
   // NOTE: All effect-style blocks are ALWAYS emitted regardless of the saved
@@ -601,12 +657,26 @@ function applyEffectElementRules(rules: string[], config: ThemeConfiguration): v
     rules.push(`}`)
   }
 
-  // ── Button variant: ghost ──────────────────────────────────────────────
+  // ── Button variants: outlined / ghost ──────────────────────────────────
   if (cs?.buttonVariant === 'outlined') {
     rules.push(`html[data-button-variant='outlined'] [data-btn] {`)
     rules.push(`  background-color: transparent !important;`)
-    rules.push(`  border: 1px solid var(--border) !important;`)
+    rules.push(`  color: var(--primary) !important;`)
+    rules.push(`  border: 1.5px solid var(--primary) !important;`)
     rules.push(`  box-shadow: none !important;`)
+    rules.push(`}`)
+    rules.push(`html[data-button-variant='outlined'] [data-btn]:hover {`)
+    rules.push(`  background-color: color-mix(in srgb, var(--primary) 10%, transparent) !important;`)
+    rules.push(`}`)
+  } else if (cs?.buttonVariant === 'ghost') {
+    rules.push(`html[data-button-variant='ghost'] [data-btn] {`)
+    rules.push(`  background-color: transparent !important;`)
+    rules.push(`  color: var(--primary) !important;`)
+    rules.push(`  border-color: transparent !important;`)
+    rules.push(`  box-shadow: none !important;`)
+    rules.push(`}`)
+    rules.push(`html[data-button-variant='ghost'] [data-btn]:hover {`)
+    rules.push(`  background-color: color-mix(in srgb, var(--primary) 10%, transparent) !important;`)
     rules.push(`}`)
   }
 

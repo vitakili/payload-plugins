@@ -35,39 +35,18 @@ export interface ThemeColorOverride {
 }
 
 export interface ThemeTypographyOverride {
-  bodyFont?:
-    | (
-        | 'preset'
-        | 'system'
-        | 'geist-sans'
-        | 'inter'
-        | 'manrope'
-        | 'urbanist'
-        | 'outfit'
-        | 'lora'
-        | 'custom'
-      )
-    | null
-  headingFont?:
-    | (
-        | 'preset'
-        | 'geist-sans'
-        | 'geist-mono'
-        | 'outfit'
-        | 'playfair'
-        | 'lora'
-        | 'serif-classic'
-        | 'custom'
-      )
-    | null
+  /** 'preset', 'custom' or a font from FONT_CATALOG (e.g. 'Inter', 'Playfair Display'). */
+  bodyFont?: string | null
+  /** 'preset', 'custom' or a font from FONT_CATALOG. */
+  headingFont?: string | null
   bodyFontCustom?: string | null
   headingFontCustom?: string | null
-  baseFontSize?: ('preset' | '14px' | '16px' | '18px' | '20px') | null
-  lineHeight?: ('preset' | '1.4' | '1.5' | '1.6' | '1.75' | '1.9') | null
-  fontWeights?: Partial<
-    Record<'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'black', string | null>
-  > | null
-  letterSpacing?: Partial<Record<'tight' | 'normal' | 'wide' | 'wider', string | null>> | null
+  /** 'preset' or a pixel number without unit ('14' … '20'). */
+  baseFontSize?: string | null
+  /** 'preset' or a unitless line height ('1.4' … '1.8'). */
+  lineHeight?: string | null
+  headingWeight?: ('preset' | '300' | '400' | '500' | '600' | '700' | '800') | null
+  letterSpacing?: ('preset' | 'tight' | 'normal' | 'wide' | 'wider') | null
 }
 
 export interface ThemeCustomization {

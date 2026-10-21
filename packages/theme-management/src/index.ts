@@ -1,4 +1,5 @@
 import type { CollectionConfig, Config, Field, GlobalConfig, Plugin, TabsField } from 'payload'
+import { themeFontEndpoints } from './endpoints/themeFonts.js'
 import { DEFAULT_LIVE_PREVIEW_BREAKPOINTS } from './constants/devicePreviews.js'
 import { createThemeConfigurationField } from './fields/themeConfigurationField.js'
 import type { ThemeTab } from './fields/themeConfigurationField.js'
@@ -824,6 +825,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
         enableLogging,
       })
       endpoints = mergeEndpoint(endpoints, cacheEndpoint)
+      themeFontEndpoints.forEach((endpoint) => {
+        endpoints = mergeEndpoint(endpoints, endpoint)
+      })
 
       return {
         ...configWithI18n,
@@ -882,6 +886,9 @@ export const themeManagementPlugin = (options: ThemeManagementPluginOptions = {}
       enableLogging,
     })
     endpoints = mergeEndpoint(endpoints, cacheEndpoint)
+      themeFontEndpoints.forEach((endpoint) => {
+        endpoints = mergeEndpoint(endpoints, endpoint)
+      })
 
     return {
       ...configWithI18n,
@@ -1030,6 +1037,13 @@ export type { StylePreset } from './style-presets.js'
 export { generateThemeColorsCss, hexToHsl } from './utils/themeColors.js'
 export { generateThemeCSS, getThemeStyles } from './utils/themeUtils.js'
 export { getThemeHtmlAttributes } from './utils/themeHtmlAttributes.js'
+export {
+  FONT_CATALOG,
+  buildThemeFontsHref,
+  getFontCatalogEntry,
+} from './constants/themeFonts.js'
+export type { FontCatalogEntry, ThemeFontLoading } from './constants/themeFonts.js'
+export { themeFontEndpoints } from './endpoints/themeFonts.js'
 
 // Dynamic theme CSS generation
 export {

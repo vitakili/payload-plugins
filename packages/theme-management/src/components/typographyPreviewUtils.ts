@@ -1,7 +1,9 @@
 import {
   BODY_FONT_OPTIONS,
-  FONT_VALUE_TO_CSS,
+  getFontCatalogEntry,
   HEADING_FONT_OPTIONS,
+  LETTER_SPACING_TO_CSS,
+  toFontSizeCss,
 } from '../constants/themeFonts.js'
 import { defaultThemePresets } from '../presets.js'
 
@@ -12,6 +14,8 @@ export interface TypographySelection {
   headingFontCustom?: string | null
   baseFontSize?: string | null
   lineHeight?: string | null
+  headingWeight?: string | null
+  letterSpacing?: string | null
 }
 
 export interface ResolvedTypographyPreview {
@@ -19,6 +23,9 @@ export interface ResolvedTypographyPreview {
   headingFont: string
   baseFontSize: string
   lineHeight: string
+  headingWeight: string
+  headingLetterSpacing: string
+  headingTransform: 'none' | 'uppercase'
   bodyLabel: string
   headingLabel: string
 }
@@ -46,14 +53,15 @@ const FONT_VAR_FALLBACK: Record<string, string> = {
 }
 
 function withFallback(fontFamily: string, fallback: string): string {
-  if (!fontFamily) return fallback
+  const value = fontFamily?.trim() || fallback
 
-  if (fontFamily.startsWith('var(')) {
-    const mappedFallback = FONT_VAR_FALLBACK[fontFamily] ?? fallback
-    return `${fontFamily}, ${mappedFallback}`
-  }
-
-  return fontFamily
+  // A `var(--font-x)` without a fallback whose variable is not defined (always the
+  // case in the admin) makes the whole font-family declaration invalid. Give every
+  // such reference a fallback stack so the preview always renders a real face.
+  return value.replace(/var\((--[\w-]+)\)/g, (match, name: string) => {
+    const mapped = FONT_VAR_FALLBACK[match] ?? 'system-ui, sans-serif'
+    return `var(${name}, ${mapped})`
+  })
 }
 
 function getPresetTypography(themeName?: string) {
@@ -77,12 +85,10 @@ function resolveFontFamily(
     return withFallback(fallback, fallbackPreset?.typography?.fontFamily ?? 'system-ui, sans-serif')
   }
 
-  const preconfigured = FONT_VALUE_TO_CSS[value]
+  // Catalog stacks are complete (variable with fallback + generic family).
+  const preconfigured = getFontCatalogEntry(value)?.fontFamily
   if (preconfigured) {
-    return withFallback(
-      preconfigured,
-      fallbackPreset?.typography?.fontFamily ?? 'system-ui, sans-serif',
-    )
+    return preconfigured
   }
 
   return withFallback(fallback, fallbackPreset?.typography?.fontFamily ?? 'system-ui, sans-serif')
@@ -122,10 +128,7 @@ export function resolveTypographyPreview(
     fallbackHeading,
   )
 
-  const baseFontSize =
-    selection?.baseFontSize && selection.baseFontSize !== 'preset'
-      ? selection.baseFontSize
-      : fallbackSize
+  const baseFontSize = toFontSizeCss(selection?.baseFontSize) ?? fallbackSize
   const lineHeight =
     selection?.lineHeight && selection.lineHeight !== 'preset'
       ? selection.lineHeight
@@ -136,6 +139,15 @@ export function resolveTypographyPreview(
     headingFont: resolvedHeadingFont,
     baseFontSize,
     lineHeight,
+    headingWeight:
+      selection?.headingWeight && selection.headingWeight !== 'preset'
+        ? selection.headingWeight
+        : (presetTypography?.headingWeight ?? '700'),
+    headingLetterSpacing:
+      (selection?.letterSpacing && LETTER_SPACING_TO_CSS[selection.letterSpacing]) ??
+      presetTypography?.headingLetterSpacing ??
+      'normal',
+    headingTransform: selection?.letterSpacing === 'wider' ? 'uppercase' : 'none',
     bodyLabel: resolveOptionLabel(BODY_FONT_OPTIONS, bodyFontValue),
     headingLabel: resolveOptionLabel(HEADING_FONT_OPTIONS, headingFontValue),
   }

@@ -1,6 +1,6 @@
 {
   "name": "@kilivi/payloadcms-theme-management",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Theme configuration plugin for Payload CMS v3 with 60+ professional themes and standalone collection support",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,6 +14,10 @@
       "react-server": "./dist/server.js",
       "import": "./dist/server.js",
       "types": "./dist/server.d.ts"
+    },
+    "./next-fonts": {
+      "import": "./dist/next-fonts.js",
+      "types": "./dist/next-fonts.d.ts"
     },
     "./components/*": {
       "import": "./dist/components/*.js",

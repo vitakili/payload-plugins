@@ -1843,14 +1843,103 @@ export interface Footer {
 export interface AppearanceSetting {
   id: number;
   /**
-   * Configure website appearance and styling
+   * Appearance and style of the whole website
    */
   themeConfiguration: {
     /**
-     * Select a theme to auto-populate color values. You can customize colors after selection.
+     * Pick a theme to fill in the colours. You can fine-tune them afterwards.
      */
     theme: string;
     stylePreset?: string | null;
+    typography?: {
+      bodyFont?:
+        | (
+            | 'preset'
+            | 'system-ui'
+            | 'helvetica'
+            | 'Inter'
+            | 'Roboto'
+            | 'Open Sans'
+            | 'Lato'
+            | 'Montserrat'
+            | 'Poppins'
+            | 'Raleway'
+            | 'DM Sans'
+            | 'Nunito'
+            | 'Plus Jakarta Sans'
+            | 'Manrope'
+            | 'Space Grotesk'
+            | 'Source Sans 3'
+            | 'Work Sans'
+            | 'Archivo'
+            | 'Outfit'
+            | 'Playfair Display'
+            | 'Merriweather'
+            | 'Lora'
+            | 'Cormorant Garamond'
+            | 'Crimson Pro'
+            | 'Fraunces'
+            | 'Libre Baskerville'
+            | 'Space Mono'
+            | 'IBM Plex Mono'
+            | 'JetBrains Mono'
+            | 'custom'
+          )
+        | null;
+      headingFont?:
+        | (
+            | 'preset'
+            | 'system-ui'
+            | 'helvetica'
+            | 'Inter'
+            | 'Roboto'
+            | 'Open Sans'
+            | 'Lato'
+            | 'Montserrat'
+            | 'Poppins'
+            | 'Raleway'
+            | 'DM Sans'
+            | 'Nunito'
+            | 'Plus Jakarta Sans'
+            | 'Manrope'
+            | 'Space Grotesk'
+            | 'Source Sans 3'
+            | 'Work Sans'
+            | 'Archivo'
+            | 'Outfit'
+            | 'Playfair Display'
+            | 'Merriweather'
+            | 'Lora'
+            | 'Cormorant Garamond'
+            | 'Crimson Pro'
+            | 'Fraunces'
+            | 'Libre Baskerville'
+            | 'DM Serif Display'
+            | 'Bebas Neue'
+            | 'Archivo Black'
+            | 'Syne'
+            | 'Space Mono'
+            | 'IBM Plex Mono'
+            | 'JetBrains Mono'
+            | 'custom'
+          )
+        | null;
+      /**
+       * Provide full CSS font-family stack when using a custom font.
+       */
+      bodyFontCustom?: string | null;
+      /**
+       * Provide full CSS font-family stack when using a custom heading font.
+       */
+      headingFontCustom?: string | null;
+      baseFontSize?: ('preset' | '14' | '15' | '16' | '17' | '18' | '20') | null;
+      lineHeight?: ('preset' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8') | null;
+      headingWeight?: ('preset' | '300' | '400' | '500' | '600' | '700' | '800') | null;
+      /**
+       * "Extra wide" also sets headings in capitals.
+       */
+      letterSpacing?: ('preset' | 'tight' | 'normal' | 'wide' | 'wider') | null;
+    };
     /**
      * Default corner rounding for UI elements
      */
@@ -1859,6 +1948,68 @@ export interface AppearanceSetting {
      * Global spacing between elements
      */
     spacing?: ('compact' | 'medium' | 'comfortable') | null;
+    visualEffects?: {
+      /**
+       * Visual style applied to cards, panels and interactive elements.
+       */
+      effectStyle?: ('flat' | 'elevated' | 'glass' | 'neumorphic' | 'clay') | null;
+      /**
+       * Global shadow depth for elevated elements.
+       */
+      shadowIntensity?: ('none' | 'subtle' | 'medium' | 'strong' | 'dramatic') | null;
+      /**
+       * Blur behind translucent glass panels.
+       */
+      backdropBlur?: ('none' | 'slight' | 'medium' | 'strong' | 'heavy') | null;
+      /**
+       * Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).
+       */
+      glassOpacity?: number | null;
+      /**
+       * Default border style for cards, inputs and dividers.
+       */
+      borderStyle?: ('none' | 'solid' | 'dashed' | 'dotted' | 'double') | null;
+      borderWidth?: ('0px' | '1px' | '2px' | '3px' | '4px') | null;
+    };
+    componentStyles?: {
+      /**
+       * Default visual style of primary action buttons.
+       */
+      buttonVariant?: ('filled' | 'outlined' | 'ghost' | 'gradient' | 'pill' | 'brutal') | null;
+      /**
+       * Default padding / font-size of buttons.
+       */
+      buttonSize?: ('small' | 'medium' | 'large' | 'xl') | null;
+      /**
+       * Default card/panel visual style across the website.
+       */
+      cardStyle?: ('elevated' | 'flat' | 'bordered' | 'glass' | 'neumorphic' | 'gradient-border') | null;
+      cardHoverEffect?: ('none' | 'lift' | 'scale' | 'shadow' | 'glow' | 'tilt') | null;
+      /**
+       * Navigation bar visual style.
+       */
+      navbarStyle?: ('solid' | 'transparent' | 'blur' | 'floating' | 'minimal') | null;
+      /**
+       * Footer visual style.
+       */
+      footerStyle?: ('standard' | 'minimal' | 'dark' | 'gradient-top' | 'full-color') | null;
+      /**
+       * Default treatment for content images (applied via [data-img] / .themed-image).
+       */
+      imageStyle?: ('default' | 'rounded' | 'circle' | 'vignette' | 'grayscale' | 'duotone' | 'polaroid') | null;
+      /**
+       * Default style for in-content links (applied via [data-link] / .themed-link).
+       */
+      linkStyle?: ('underline' | 'underline-hover' | 'none' | 'highlight' | 'animated') | null;
+      /**
+       * Reveal elements as they enter the viewport.
+       */
+      enableScrollReveal?: boolean | null;
+      /**
+       * Subtle motion on interactive elements when hovered.
+       */
+      enableHoverAnimations?: boolean | null;
+    };
     /**
      * Default color mode for visitors
      */
@@ -2047,24 +2198,6 @@ export interface AppearanceSetting {
        */
       gradientTo?: string | null;
     };
-    typography?: {
-      bodyFont?:
-        | ('preset' | 'system-ui' | 'Inter' | 'Roboto' | 'Open Sans' | 'Lato' | 'Montserrat' | 'Poppins' | 'custom')
-        | null;
-      headingFont?:
-        | ('preset' | 'system-ui' | 'Inter' | 'Playfair Display' | 'Merriweather' | 'Montserrat' | 'Raleway' | 'custom')
-        | null;
-      /**
-       * Provide full CSS font-family stack when using a custom font.
-       */
-      bodyFontCustom?: string | null;
-      /**
-       * Provide full CSS font-family stack when using a custom heading font.
-       */
-      headingFontCustom?: string | null;
-      baseFontSize?: ('preset' | '14' | '15' | '16' | '17' | '18') | null;
-      lineHeight?: ('preset' | '1.4' | '1.5' | '1.6' | '1.7' | '1.8') | null;
-    };
     /**
      * Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.
      */
@@ -2077,68 +2210,6 @@ export interface AppearanceSetting {
       | number
       | boolean
       | null;
-    visualEffects?: {
-      /**
-       * Visual style applied to cards, panels and interactive elements.
-       */
-      effectStyle?: ('flat' | 'elevated' | 'glass' | 'neumorphic' | 'clay') | null;
-      /**
-       * Global shadow depth for elevated elements.
-       */
-      shadowIntensity?: ('none' | 'subtle' | 'medium' | 'strong' | 'dramatic') | null;
-      /**
-       * Blur effect behind translucent elements (requires glass effect style).
-       */
-      backdropBlur?: ('none' | 'slight' | 'medium' | 'strong' | 'heavy') | null;
-      /**
-       * Default border style for cards, inputs and dividers.
-       */
-      borderStyle?: ('none' | 'solid' | 'dashed' | 'dotted' | 'double') | null;
-      borderWidth?: ('0px' | '1px' | '2px' | '3px' | '4px') | null;
-      /**
-       * Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).
-       */
-      glassOpacity?: number | null;
-    };
-    componentStyles?: {
-      /**
-       * Default visual style of primary action buttons.
-       */
-      buttonVariant?: ('filled' | 'outlined' | 'ghost' | 'gradient' | 'pill' | 'brutal') | null;
-      /**
-       * Default padding / font-size of buttons.
-       */
-      buttonSize?: ('small' | 'medium' | 'large' | 'xl') | null;
-      /**
-       * Default card/panel visual style across the website.
-       */
-      cardStyle?: ('elevated' | 'flat' | 'bordered' | 'glass' | 'neumorphic' | 'gradient-border') | null;
-      cardHoverEffect?: ('none' | 'lift' | 'scale' | 'shadow' | 'glow' | 'tilt') | null;
-      /**
-       * Navigation bar visual style.
-       */
-      navbarStyle?: ('solid' | 'transparent' | 'blur' | 'floating' | 'minimal') | null;
-      /**
-       * Footer visual style.
-       */
-      footerStyle?: ('standard' | 'minimal' | 'dark' | 'gradient-top' | 'full-color') | null;
-      /**
-       * Default treatment for content images (applied via [data-img] / .themed-image).
-       */
-      imageStyle?: ('default' | 'rounded' | 'circle' | 'vignette' | 'grayscale' | 'duotone' | 'polaroid') | null;
-      /**
-       * Default style for in-content links (applied via [data-link] / .themed-link).
-       */
-      linkStyle?: ('underline' | 'underline-hover' | 'none' | 'highlight' | 'animated') | null;
-      /**
-       * Reveal elements as they enter the viewport.
-       */
-      enableScrollReveal?: boolean | null;
-      /**
-       * Subtle motion on interactive elements when hovered.
-       */
-      enableHoverAnimations?: boolean | null;
-    };
     /**
      * Control website animations and transitions
      */
@@ -2208,8 +2279,44 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
     | {
         theme?: T;
         stylePreset?: T;
+        typography?:
+          | T
+          | {
+              bodyFont?: T;
+              headingFont?: T;
+              bodyFontCustom?: T;
+              headingFontCustom?: T;
+              baseFontSize?: T;
+              lineHeight?: T;
+              headingWeight?: T;
+              letterSpacing?: T;
+            };
         borderRadius?: T;
         spacing?: T;
+        visualEffects?:
+          | T
+          | {
+              effectStyle?: T;
+              shadowIntensity?: T;
+              backdropBlur?: T;
+              glassOpacity?: T;
+              borderStyle?: T;
+              borderWidth?: T;
+            };
+        componentStyles?:
+          | T
+          | {
+              buttonVariant?: T;
+              buttonSize?: T;
+              cardStyle?: T;
+              cardHoverEffect?: T;
+              navbarStyle?: T;
+              footerStyle?: T;
+              imageStyle?: T;
+              linkStyle?: T;
+              enableScrollReveal?: T;
+              enableHoverAnimations?: T;
+            };
         colorMode?: T;
         allowColorModeToggle?: T;
         lightMode?:
@@ -2264,41 +2371,7 @@ export interface AppearanceSettingsSelect<T extends boolean = true> {
               gradientVia?: T;
               gradientTo?: T;
             };
-        typography?:
-          | T
-          | {
-              bodyFont?: T;
-              headingFont?: T;
-              bodyFontCustom?: T;
-              headingFontCustom?: T;
-              baseFontSize?: T;
-              lineHeight?: T;
-            };
         customThemePresets?: T;
-        visualEffects?:
-          | T
-          | {
-              effectStyle?: T;
-              shadowIntensity?: T;
-              backdropBlur?: T;
-              borderStyle?: T;
-              borderWidth?: T;
-              glassOpacity?: T;
-            };
-        componentStyles?:
-          | T
-          | {
-              buttonVariant?: T;
-              buttonSize?: T;
-              cardStyle?: T;
-              cardHoverEffect?: T;
-              navbarStyle?: T;
-              footerStyle?: T;
-              imageStyle?: T;
-              linkStyle?: T;
-              enableScrollReveal?: T;
-              enableHoverAnimations?: T;
-            };
         animationLevel?: T;
         customCSS?: T;
       };

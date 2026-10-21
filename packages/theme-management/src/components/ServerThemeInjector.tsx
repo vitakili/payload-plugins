@@ -1,3 +1,4 @@
+import { buildThemeFontsHref, type ThemeFontLoading } from '../constants/themeFonts.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import type { ThemeDefaults } from '../providers/Theme/types.js'
@@ -20,20 +21,38 @@ interface ServerThemeInjectorProps {
    * ```
    */
   themeConfiguration?: unknown
+  /**
+   * How the body / heading fonts picked in the admin are loaded:
+   * - `'self-hosted'` (default) — served from your own origin by the plugin's
+   *   `/api/theme-fonts/*` endpoints; visitors never contact Google (GDPR-friendly).
+   * - `'google'` — straight from the Google Fonts CDN.
+   * - `'none'` — you load the faces yourself, e.g. with `next/font` exposing the
+   *   `--font-*` variables listed in `FONT_CATALOG` (they take precedence).
+   */
+  fontLoading?: ThemeFontLoading
+  /** Payload `routes.api` when it is not '/api'. */
+  apiRoute?: string
 }
 
 type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> & {
   typography?: ThemeTypographyPreset | null
 }
+
 /**
  * Server-side theme CSS injector to prevent FOUC
  * This component injects critical theme CSS directly into the HTML head during SSR
  */
 export async function ServerThemeInjector({
   themeConfiguration,
+  fontLoading = 'self-hosted',
+  apiRoute = '/api',
 }: Readonly<ServerThemeInjectorProps>) {
   // resolveThemeConfiguration accepts `unknown` — no cast needed
   const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration)
+  const fontsHref = buildThemeFontsHref(resolvedConfiguration.fontSelections ?? [], {
+    mode: fontLoading,
+    apiRoute,
+  })
   const {
     theme,
     borderRadius,
@@ -125,6 +144,14 @@ ${borderRadiusCSS}
   return (
     <>
       <InitTheme />
+      {fontsHref && fontLoading === 'google' ? (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        </>
+      ) : null}
+      {/* `precedence` lets React 19 hoist the stylesheet into <head> and de-duplicate it. */}
+      {fontsHref ? <link rel="stylesheet" href={fontsHref} precedence="theme-fonts" /> : null}
       {emitBothSchemes ? (
         <>
           {lightBg ? (

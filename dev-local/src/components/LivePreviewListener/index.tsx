@@ -12,6 +12,8 @@ export const LivePreviewListener: React.FC<LivePreviewListenerProps> = ({ initia
     <ThemeLivePreviewSync
       initialData={initialData}
       serverURL={process.env.NEXT_PUBLIC_SERVER_URL || ''}
+      // Fonts come from next/font (see app/(app)/layout.tsx).
+      fontLoading="none"
     />
   )
 }

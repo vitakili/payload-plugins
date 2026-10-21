@@ -1,5 +1,39 @@
 # Changelog
 
+## [2.3.0] - 2026-10-21
+
+### 🐛 Fixes
+
+- **Every style preset broke Save.** Style presets wrote font names, sizes, line heights and a spacing value the fields did not accept ("5 invalid fields"). All presets now write valid options, and a unit test guards it.
+- **Chosen fonts never reached the site.** Font picks are now loaded (see *Fonts* below) and applied; `baseFontSize` is emitted with a unit (`18px` instead of `18`).
+- **Spacing "Comfortable" was ignored** (resolved to *medium*). It now resolves to `spacious`.
+- `resolveThemeConfiguration` accepts an already-resolved configuration without losing the custom typography.
+- `ThemeLivePreviewSync` now also syncs the effect / component `data-*` attributes and the fonts, so Visual Effects and Component Styles update live.
+- The admin preview no longer falls back to the system font when a font variable is undefined.
+- Outlined buttons use the primary colour (as documented); ghost buttons now have rules.
+
+### ✨ Diverse looks
+
+- **17 complete style presets** (new: Luxury, Tech, Poster). Each sets fonts, size, heading weight and tracking, radius, spacing, effects and all component styles (buttons and size, cards, hover, navbar, footer, links, images).
+- **Typography:** 30 curated fonts with Czech diacritics (sans, serif, display, mono), grouped in the picker; new **Heading weight** and **Heading letter spacing** fields ("Extra wide" sets headings in capitals).
+- Live preview shows a card with text, an image (image style), spacing, heading weight and tracking; the brand gradient falls back to primary → accent like on the site. Style cards render each style's real fonts.
+- **Font selects match Payload's selects:** full column width (they ignored the row's 50% width), same height and border, faces rendered in their own font, grouped by category, one-line samples, and the list opens towards the side with room. Duplicate group headings ("Typography" under "Typografie") are gone; Visual effects rows are regrouped so glass-only fields no longer leave gaps; editor-facing descriptions no longer mention CSS selectors.
+- **Native Live Preview takes over.** When Payload Live Preview is configured, the mock preview is replaced by an *Open Live Preview* button and disappears while the panel is open (fields get the full width).
+- Sections reordered: style → typography → shape → effects → components → colour tokens → custom presets → advanced.
+
+### 🔤 Fonts (GDPR-friendly, zero setup)
+
+- **Self-hosted by default:** new `/api/theme-fonts/css` and `/api/theme-fonts/file` endpoints fetch Google Fonts on the server, cache them and serve them from your domain. Only catalog fonts and `fonts.gstatic.com` files are served (no open proxy). The admin uses them too.
+- **`next/font` option:** `@kilivi/payloadcms-theme-management/next-fonts` exports `themeFontVariables` (all catalog fonts, `preload: false`); use it with `fontLoading="none"`.
+- `ServerThemeInjector` / `ThemeLivePreviewSync`: new `fontLoading` (`'self-hosted' | 'google' | 'none'`) and `apiRoute` props. The stylesheet uses React 19 `precedence` (hoisted, de-duplicated).
+
+### ↩️ Compatibility
+
+- Stored values keep working: every previous font, size and line-height option still exists, `comfortable` stays the stored spacing value, `Source Sans Pro` / `Helvetica Neue` map to the catalog.
+- Base typography and card-border rules are emitted only when the editor chose them, so untouched sites render as before.
+- **Database:** two new optional columns (`typography.headingWeight`, `typography.letterSpacing`) and more select options. SQLite/Mongo need nothing; on Postgres create a migration (`payload migrate:create`).
+- Visible changes only where the editor had made an explicit choice that was previously ignored: *Comfortable* spacing, outlined/ghost buttons, a picked font (e.g. *Inter* no longer falls back to Geist).
+
 ## [2.2.0] - 2026-09-24
 
 ### 📦 Package name

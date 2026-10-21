@@ -1,6 +1,8 @@
+import { buildThemeFontsHref, type ThemeFontLoading } from '../constants/themeFonts.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import { resolveThemeConfiguration } from './resolveThemeConfiguration.js'
 import { generateThemeColorsCss } from './themeColors.js'
+import { getThemeHtmlAttributes } from './themeHtmlAttributes.js'
 import { generateThemeCSS } from './themeUtils.js'
 
 /**
@@ -69,7 +71,11 @@ const resolveColorMode = (mode: string): 'light' | 'dark' => {
   return 'light'
 }
 
-export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
+export const buildLivePreviewThemeRuntime = (
+  themeConfiguration: unknown,
+  apiRoute = '/api',
+  fontLoading: ThemeFontLoading = 'self-hosted',
+) => {
   const resolved = resolveThemeConfiguration(themeConfiguration)
 
   const borderRadiusConfig = getBorderRadiusConfig(resolved.borderRadius ?? 'medium')
@@ -93,9 +99,20 @@ export const buildLivePreviewThemeRuntime = (themeConfiguration: unknown) => {
 
   const customCSSBlock = typeof resolved.customCSS === 'string' ? resolved.customCSS.trim() : ''
 
+  // Every data-* attribute the generated CSS targets (effects, card / button /
+  // navbar styles …), so Visual Effects and Component Styles update live too.
+  const attributes = Object.fromEntries(
+    Object.entries(getThemeHtmlAttributes(resolved)).filter(
+      (entry): entry is [string, string] =>
+        entry[0].startsWith('data-') && typeof entry[1] === 'string',
+    ),
+  )
+
   return {
     theme: resolved.theme,
     mode: resolveColorMode(resolved.colorMode),
+    attributes,
+    fontsHref: buildThemeFontsHref(resolved.fontSelections ?? [], { apiRoute, mode: fontLoading }),
     css: [borderRadiusBlock, themeConfigurationCSS, colorModesCSS, customCSSBlock]
       .filter((block) => Boolean(block?.trim?.().length))
       .join('\n\n'),

@@ -28,7 +28,10 @@ describe('Typography Preview Utils', () => {
 
       const coolPreset = defaultThemePresets.find((p) => p.name === 'cool')
       expect(result).toBeDefined()
-      expect(result.bodyFont).toContain(coolPreset?.typography?.fontFamily || 'system-ui')
+      // The preset's font variable is kept, with a fallback stack so the declaration
+      // stays valid where the variable is not defined (the admin).
+      expect(result.bodyFont).toMatch(/^var\(--font-geist-sans, .+\)$/)
+      expect(coolPreset?.typography?.fontFamily).toContain('--font-geist-sans')
     })
 
     it('should use custom font when provided', () => {

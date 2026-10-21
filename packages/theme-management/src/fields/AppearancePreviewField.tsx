@@ -1,7 +1,16 @@
 'use client'
 
 import { useFormFields } from '@payloadcms/ui'
-import { Monitor, Moon, Smartphone, Sparkles, Sun, Tablet, type LucideIcon } from 'lucide-react'
+import {
+  ExternalLink,
+  Monitor,
+  Moon,
+  Smartphone,
+  Sparkles,
+  Sun,
+  Tablet,
+  type LucideIcon,
+} from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
   DEFAULT_DEVICE_PREVIEW_ID,
@@ -11,6 +20,8 @@ import {
 } from '../constants/devicePreviews.js'
 import { useThemeLanguage, useThemeTranslations } from '../hooks/useThemeTranslations.js'
 import { resolveTypographyPreview } from '../components/typographyPreviewUtils.js'
+import { useNativeLivePreview } from '../hooks/useNativeLivePreview.js'
+import { useThemeFonts } from '../hooks/useThemeFonts.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 
 const DEVICE_ICONS: Record<DevicePreviewId, LucideIcon> = {
@@ -92,15 +103,23 @@ interface Choices {
   footerStyle: string
   linkStyle: string
   borderRadius: string
+  /** Padding / gap multiplier from the spacing scale. */
+  space: number
 }
+
+const SPACING_SCALE: Record<string, number> = { compact: 0.75, medium: 1, comfortable: 1.5, spacious: 1.5 }
+const px = (value: number, c: Choices) => `${Math.round(value * c.space)}px`
 
 function cardSurface(c: Choices, p: Palette, radius: string): React.CSSProperties {
   const base: React.CSSProperties = {
     background: p.card,
     color: p.cardForeground,
     borderRadius: radius,
-    border: `${c.borderWidth} ${c.borderStyle === 'none' ? 'solid' : c.borderStyle} ${p.border}`,
-    padding: '16px',
+    border:
+      c.borderStyle === 'none' || c.borderWidth === '0px'
+        ? 'none'
+        : `${c.borderWidth} ${c.borderStyle} ${p.border}`,
+    padding: px(16, c),
     transition: 'transform 200ms ease, box-shadow 200ms ease',
   }
 
@@ -196,7 +215,7 @@ function navbarStyle(c: Choices, p: Palette): React.CSSProperties {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '10px 14px',
+    padding: `${px(10, c)} ${px(14, c)}`,
     background: p.background,
     color: p.foreground,
     borderBottom: `1px solid ${p.border}`,
@@ -263,6 +282,7 @@ export default function AppearancePreviewField() {
   const [mode, setMode] = useState<Mode>('light')
   const [device, setDevice] = useState<DevicePreviewId>(DEFAULT_DEVICE_PREVIEW_ID)
   const uid = useId().replace(/[:]/g, '')
+  const nativePreview = useNativeLivePreview()
 
   const activeDevice = getDevicePreview(device)
 
@@ -278,9 +298,12 @@ export default function AppearancePreviewField() {
       headingFontCustom: typographyValue('headingFontCustom'),
       baseFontSize: typographyValue('baseFontSize'),
       lineHeight: typographyValue('lineHeight'),
+      headingWeight: typographyValue('headingWeight'),
+      letterSpacing: typographyValue('letterSpacing'),
     },
     formFields?.['themeConfiguration.theme']?.value as string | undefined,
   )
+  useThemeFonts([typographyValue('bodyFont'), typographyValue('headingFont')])
 
   const str = (key: string, fallback: string): string => {
     const v = formFields?.[`themeConfiguration.${key}`]?.value
@@ -307,6 +330,7 @@ export default function AppearancePreviewField() {
     footerStyle: str('componentStyles.footerStyle', 'standard'),
     linkStyle: str('componentStyles.linkStyle', 'underline-hover'),
     borderRadius: str('borderRadius', 'medium'),
+    space: SPACING_SCALE[str('spacing', 'medium')] ?? 1,
   }
 
   const modeKey = mode === 'light' ? 'lightMode' : 'darkMode'
@@ -354,6 +378,10 @@ export default function AppearancePreviewField() {
     ;(Object.keys(fallback) as (keyof Palette)[]).forEach((key) => {
       p[key] = str(`${modeKey}.${key}`, fallback[key])
     })
+    // Same fallback as the site's --gradient-brand: primary → accent when no stops are set.
+    p.gradientFrom = str(`${modeKey}.gradientFrom`, p.primary)
+    p.gradientTo = str(`${modeKey}.gradientTo`, p.accent)
+    p.gradientVia = str(`${modeKey}.gradientVia`, p.gradientFrom)
     return p
   }, [formFields, mode])
 
@@ -388,18 +416,45 @@ export default function AppearancePreviewField() {
   // Movement-based hover effects only run for users who haven't asked for reduced motion.
   const previewCSS = `@media (prefers-reduced-motion: no-preference){${hoverCSS}${btnHoverCSS}}`
 
-  const chipLabels = t.chips
-  const chips: Array<[string, string]> = [
-    [chipLabels.effect, choices.effectStyle],
-    [chipLabels.shadow, choices.shadowIntensity],
-    [chipLabels.card, choices.cardStyle],
-    [chipLabels.hover, choices.cardHoverEffect],
-    [chipLabels.button, `${choices.buttonVariant} / ${choices.buttonSize}`],
-    [chipLabels.navbar, choices.navbarStyle],
-    [chipLabels.footer, choices.footerStyle],
-    [chipLabels.link, choices.linkStyle],
-    [chipLabels.radius, choices.borderRadius],
-  ]
+  // Content image treatment, mirroring the site's [data-img] rules.
+  const imageCss: React.CSSProperties = (() => {
+    const base: React.CSSProperties = {
+      aspectRatio: '4 / 3',
+      borderRadius: 0,
+      backgroundImage: `radial-gradient(circle at 70% 30%, ${palette.accent} 0 18%, transparent 19%), linear-gradient(160deg, ${palette.gradientFrom}, ${palette.gradientTo})`,
+    }
+    switch (choices.imageStyle) {
+      case 'rounded':
+        return { ...base, borderRadius: radius }
+      case 'circle':
+        return { ...base, aspectRatio: '1 / 1', borderRadius: '9999px' }
+      case 'grayscale':
+        return { ...base, filter: 'grayscale(1)' }
+      case 'duotone':
+        return { ...base, filter: 'grayscale(1) contrast(1.05)', mixBlendMode: 'luminosity' }
+      case 'vignette':
+        return { ...base, boxShadow: 'inset 0 0 40px rgba(0,0,0,0.45)' }
+      case 'polaroid':
+        return {
+          ...base,
+          border: '8px solid #fff',
+          borderBottomWidth: '24px',
+          boxShadow: '0 6px 16px rgba(0,0,0,0.18)',
+          borderRadius: '2px',
+        }
+      default:
+        return base
+    }
+  })()
+
+  const headingStyle: React.CSSProperties = {
+    fontFamily: typography.headingFont,
+    fontWeight: Number(typography.headingWeight) || 700,
+    letterSpacing: typography.headingLetterSpacing,
+    textTransform: typography.headingTransform,
+    lineHeight: 1.15,
+    margin: 0,
+  }
 
   const footerStyleCss: React.CSSProperties =
     choices.footerStyle === 'dark'
@@ -416,6 +471,26 @@ export default function AppearancePreviewField() {
           : choices.footerStyle === 'minimal'
             ? { background: 'transparent', color: palette.mutedForeground, borderTop: `1px solid ${palette.border}` }
             : { background: palette.muted, color: palette.mutedForeground, borderTop: `1px solid ${palette.border}` }
+
+  // With Payload's native Live Preview the real site is the preview: no mock.
+  if (nativePreview.isEnabled) {
+    if (nativePreview.isOpen) return null
+    return (
+      <div className="tm-native-preview-hint">
+        <div className="tm-native-preview-hint__text">
+          <span className="tm-native-preview-hint__title">
+            <Sparkles size={14} aria-hidden />
+            {t.nativeTitle}
+          </span>
+          <span className="tm-native-preview-hint__body">{t.nativeBody}</span>
+        </div>
+        <button type="button" className="tm-native-preview-hint__action" onClick={nativePreview.open}>
+          <ExternalLink size={14} aria-hidden />
+          {t.nativeOpen}
+        </button>
+      </div>
+    )
+  }
 
   return (
     // The slot spans the whole right column of the Appearance tab on wide admins;
@@ -559,19 +634,16 @@ export default function AppearancePreviewField() {
           </span>
         </nav>
 
-        <div style={{ padding: '20px', display: 'grid', gap: '14px' }}>
+        <div style={{ padding: px(20, choices), display: 'grid', gap: px(14, choices) }}>
           <div>
-            <div
-              style={{ fontFamily: typography.headingFont, fontSize: '22px', fontWeight: 700, lineHeight: 1.2 }}
-            >
-              {t.heading}
-            </div>
+            <div style={{ ...headingStyle, fontSize: '24px' }}>{t.heading}</div>
             <p
               style={{
-                margin: '6px 0 0',
+                margin: `${px(6, choices)} 0 0`,
                 fontSize: `calc(${typography.baseFontSize} * 0.8125)`,
                 lineHeight: typography.lineHeight,
                 color: palette.mutedForeground,
+                maxWidth: '60ch',
               }}
             >
               {t.body}
@@ -579,64 +651,59 @@ export default function AppearancePreviewField() {
             </p>
           </div>
 
-          <div className="tm-prev-card" style={card}>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <button type="button" className="tm-prev-btn" style={btn}>
-                {t.primary}
-              </button>
-              <button
-                type="button"
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: device === 'mobile' ? '1fr' : 'minmax(0, 3fr) minmax(0, 2fr)',
+              gap: px(12, choices),
+              alignItems: 'start',
+            }}
+          >
+            <div className="tm-prev-card" style={card}>
+              <div style={{ ...headingStyle, fontSize: '15px', marginBottom: px(6, choices) }}>
+                {t.cardTitle}
+              </div>
+              <p
                 style={{
-                  ...BUTTON_SIZE_MAP[choices.buttonSize] ?? BUTTON_SIZE_MAP.medium,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  borderRadius: radius,
-                  background: palette.secondary,
-                  color: palette.secondaryForeground,
-                  border: 'none',
+                  margin: `0 0 ${px(12, choices)}`,
+                  fontSize: `calc(${typography.baseFontSize} * 0.75)`,
+                  lineHeight: typography.lineHeight,
+                  color: palette.cardForeground,
+                  opacity: 0.8,
                 }}
               >
-                {t.secondary}
-              </button>
-              <span
-                aria-hidden
-                style={{
-                  marginLeft: 'auto',
-                  width: '54px',
-                  height: '22px',
-                  borderRadius: '6px',
-                  backgroundImage: `linear-gradient(135deg, ${palette.gradientFrom}, ${palette.gradientVia}, ${palette.gradientTo})`,
-                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.08)',
-                }}
-              />
+                {t.cardBody}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <button type="button" className="tm-prev-btn" style={btn}>
+                  {t.primary}
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    ...(BUTTON_SIZE_MAP[choices.buttonSize] ?? BUTTON_SIZE_MAP.medium),
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    borderRadius: choices.buttonVariant === 'pill' ? '9999px' : radius,
+                    background: palette.secondary,
+                    color: palette.secondaryForeground,
+                    border: 'none',
+                  }}
+                >
+                  {t.secondary}
+                </button>
+              </div>
             </div>
+            <div aria-hidden style={imageCss} />
           </div>
         </div>
 
-        <div style={{ padding: '12px 16px', fontSize: '11px', ...footerStyleCss }}>
+        <div style={{ padding: `${px(12, choices)} ${px(16, choices)}`, fontSize: '11px', ...footerStyleCss }}>
           © {new Date().getFullYear()} {site.siteTitle} — {t.footer}
         </div>
       </div>
       </div>
 
-      {/* Active spec chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '10px' }}>
-        {chips.map(([k, v]) => (
-          <span
-            key={k}
-            style={{
-              fontSize: '11px',
-              padding: '2px 7px',
-              borderRadius: '999px',
-              background: 'var(--theme-elevation-50)',
-              border: '1px solid var(--theme-elevation-150)',
-              color: 'var(--theme-elevation-700)',
-            }}
-          >
-            <span style={{ color: 'var(--theme-elevation-600)' }}>{k}:</span> <strong style={{ fontWeight: 600 }}>{v}</strong>
-          </span>
-        ))}
-      </div>
       </div>
     </div>
   )

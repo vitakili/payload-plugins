@@ -115,6 +115,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 ```
 
+That is all an app needs. The fonts the editor picks are served from **your own
+domain** by the plugin's `/api/theme-fonts/*` endpoints (fetched and cached on the
+server), so visitors' browsers never contact Google (GDPR-friendly), with no setup.
+
+### 3) Optional: fonts via `next/font` (Next.js best practice)
+
+For build-time self-hosting with metric-matched fallbacks (no layout shift), add
+one import. Every catalog font is declared with `preload: false`, so a page only
+downloads the face it actually uses:
+
+```tsx
+import { themeFontVariables } from '@kilivi/payloadcms-theme-management/next-fonts'
+
+<html lang="en" className={themeFontVariables}>
+  <head>
+    <ServerThemeInjector themeConfiguration={appearance?.themeConfiguration} fontLoading="none" />
+  </head>
+```
+
+If your Next.js setup does not compile packages from `node_modules`, add
+`'@kilivi/payloadcms-theme-management'` to `transpilePackages` in `next.config`.
+Pass `fontLoading="none"` to `ThemeLivePreviewSync` as well if you use it.
+
+`fontLoading` options: `'self-hosted'` (default), `'google'` (Google Fonts CDN),
+`'none'` (you load the faces, e.g. with `next/font`).
+
 ## The Appearance Settings tab
 
 The tab is ordered as a **presets first, fine-tuning second** workflow:
@@ -123,16 +149,20 @@ The tab is ordered as a **presets first, fine-tuning second** workflow:
    - *Keep my: Colours · Fonts · Style* locks
    - the palette generator
    - the collapsible theme preset list
-2. **Live preview:** one preview for colours, fonts and component styles. Once the settings group is at least 960 px wide (a container query, not the viewport width), it moves into a sticky right-hand column that stays visible while you edit anything below it.
-3. **Style preset:** visual cards that set effects, component styles, radius and typography, but never colours.
-4. **Border radius and spacing scale.**
-5. **Fine-tuning sections:** these are collapsed by default.
-   - Colour mode (all light and dark tokens, the WCAG audit and export)
-   - Typography
-   - Custom theme presets (JSON import)
+2. **Live preview:** with Payload's native Live Preview configured (`livePreview` option), the real site is the preview: the tab shows an *Open Live Preview* button instead of a mock, and nothing while the panel is open, so the fields get the full width. Without it, one mock preview covers colours, fonts and component styles. Once the settings group is at least 960 px wide (a container query, not the viewport width), it moves into a sticky right-hand column that stays visible while you edit anything below it.
+3. **Style preset:** 17 complete looks (Swiss, Editorial, Luxury, Art Deco, Tech, Poster, Brutalism, Retro, Glass …). Each sets fonts, text size, heading weight and tracking, radius, spacing, effects and every component style — but never colours. Combine any style with any colour theme.
+4. **Typography:** body and heading font (30 curated Google fonts with Czech diacritics, grouped by category), base size, line height, heading weight and heading letter spacing.
+5. **Border radius and spacing scale.**
+6. **Fine-tuning sections:** these are collapsed by default.
    - Visual effects
    - Component styles
+   - Colour mode (all light and dark tokens, the WCAG audit and export)
+   - Custom theme presets (JSON import, for developers)
    - Advanced (animation level, custom CSS)
+
+The generated CSS applies the chosen fonts to `body` and headings with
+zero-specificity `:where()` rules — only once the editor has picked typography,
+so untouched sites render as before and your own CSS always wins.
 
 ### Locks and undo
 

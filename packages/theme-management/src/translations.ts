@@ -179,10 +179,15 @@ export interface PluginTranslations {
     heading: string
     body: string
     link: string
+    cardTitle: string
+    cardBody: string
     primary: string
     secondary: string
     footer: string
     viewport: string
+    nativeTitle: string
+    nativeBody: string
+    nativeOpen: string
     chips: {
       effect: string
       shadow: string
@@ -378,10 +383,15 @@ const translations: Record<Language, PluginTranslations> = {
       heading: 'Sample heading',
       body: 'The quick brown fox jumps over the lazy dog. Here is an ',
       link: 'inline link',
+      cardTitle: 'Card title',
+      cardBody: 'A short description that shows how body text reads inside a card.',
       primary: 'Primary',
       secondary: 'Secondary',
       footer: 'Footer',
       viewport: 'Device preview',
+      nativeTitle: 'Preview on your real website',
+      nativeBody: 'Live Preview shows every change on your own pages, with your content.',
+      nativeOpen: 'Open Live Preview',
       chips: {
         effect: 'Effect',
         shadow: 'Shadow',
@@ -574,10 +584,15 @@ const translations: Record<Language, PluginTranslations> = {
       heading: 'Ukázkový nadpis',
       body: 'Příliš žluťoučký kůň úpěl ďábelské ódy. Tady je ',
       link: 'odkaz',
+      cardTitle: 'Nadpis karty',
+      cardBody: 'Krátký popis, na kterém je vidět, jak se čte text uvnitř karty.',
       primary: 'Primární',
       secondary: 'Sekundární',
       footer: 'Patička',
       viewport: 'Náhled zařízení',
+      nativeTitle: 'Náhled na vašem skutečném webu',
+      nativeBody: 'Živý náhled ukazuje každou změnu přímo na vašich stránkách s vaším obsahem.',
+      nativeOpen: 'Otevřít živý náhled',
       chips: {
         effect: 'Efekt',
         shadow: 'Stín',

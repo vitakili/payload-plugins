@@ -26,10 +26,10 @@ import { default as default_58bce6d963f55b41129662191194379a } from '@kilivi/pay
 import { default as default_8f2883114fa2e4186f7d5253bf815ddc } from '@kilivi/payloadcms-theme-management/fields/ThemePreviewField'
 import { default as default_ec977e983c757d6185686bf30205fce9 } from '@kilivi/payloadcms-theme-management/fields/AppearancePreviewField'
 import { default as default_e2abde10c4de2c0fa041710fd8f00c3b } from '@kilivi/payloadcms-theme-management/fields/StylePresetField'
+import { default as default_72023a29db4abb7a4753cdfae25e3ec4 } from '@kilivi/payloadcms-theme-management/fields/FontSelectField'
 import { default as default_48001663b65131ccddf4637eb5f6fccf } from '@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField'
 import { default as default_d816f393e71233eda8cf280a991b486b } from '@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField'
 import { default as default_4a31d3b5968252752c28cf837f7ce198 } from '@kilivi/payloadcms-theme-management/fields/ThemeExportField'
-import { default as default_72023a29db4abb7a4753cdfae25e3ec4 } from '@kilivi/payloadcms-theme-management/fields/FontSelectField'
 import { default as default_c0e58144b6360d2782757f2b62063fc5 } from '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField'
 import { BeforeDashboard as BeforeDashboard_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
 import { BeforeLogin as BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
@@ -63,10 +63,10 @@ export const importMap = {
   "@kilivi/payloadcms-theme-management/fields/ThemePreviewField#default": default_8f2883114fa2e4186f7d5253bf815ddc,
   "@kilivi/payloadcms-theme-management/fields/AppearancePreviewField#default": default_ec977e983c757d6185686bf30205fce9,
   "@kilivi/payloadcms-theme-management/fields/StylePresetField#default": default_e2abde10c4de2c0fa041710fd8f00c3b,
+  "@kilivi/payloadcms-theme-management/fields/FontSelectField#default": default_72023a29db4abb7a4753cdfae25e3ec4,
   "@kilivi/payloadcms-theme-management/fields/ThemeColorPickerField#default": default_48001663b65131ccddf4637eb5f6fccf,
   "@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField#default": default_d816f393e71233eda8cf280a991b486b,
   "@kilivi/payloadcms-theme-management/fields/ThemeExportField#default": default_4a31d3b5968252752c28cf837f7ce198,
-  "@kilivi/payloadcms-theme-management/fields/FontSelectField#default": default_72023a29db4abb7a4753cdfae25e3ec4,
   "@kilivi/payloadcms-theme-management/fields/ThemePresetImportField#default": default_c0e58144b6360d2782757f2b62063fc5,
   "@/components/BeforeDashboard#BeforeDashboard": BeforeDashboard_1a7510af427896d367a49dbf838d2de6,
   "@/components/BeforeLogin#BeforeLogin": BeforeLogin_8a7ab0eb7ab5c511aba12e68480bfe5e

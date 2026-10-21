@@ -20,6 +20,12 @@ export interface ThemeTypographyPreset {
     wide?: string
     wider?: string
   }
+  /** Heading font-weight (e.g. '700'). */
+  headingWeight?: string
+  /** Heading letter-spacing as a CSS length (e.g. '-0.025em'). */
+  headingLetterSpacing?: string
+  /** Heading text-transform ('none' | 'uppercase'). */
+  headingTransform?: string
 }
 
 export interface ThemePreset {

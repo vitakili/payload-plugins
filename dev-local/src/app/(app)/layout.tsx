@@ -11,6 +11,7 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { ensureStartsWith } from '@/utilities/ensureStartsWith'
 import './globals.css'
+import { themeFontVariables } from '@kilivi/payloadcms-theme-management/next-fonts'
 import { resolveThemeConfiguration } from '@kilivi/payloadcms-theme-management'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -72,13 +73,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   console.log('Appearance Settings Global (cached):', resolvedThemeConfiguration)
   return (
     <html
-      className={[GeistSans.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[GeistSans.variable, GeistMono.variable, themeFontVariables].filter(Boolean).join(' ')}
       lang="en"
       suppressHydrationWarning
     >
       <head>
         {/* <InitTheme /> */}
-        <ServerThemeInjector themeConfiguration={resolvedThemeConfiguration} />
+        {/* Fonts come from next/font (plugin's next-fonts module), so the injector loads none. */}
+        <ServerThemeInjector themeConfiguration={resolvedThemeConfiguration} fontLoading="none" />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>

@@ -1,4 +1,8 @@
-import { FONT_VALUE_TO_CSS } from '../constants/themeFonts.js'
+import {
+  getFontCatalogEntry,
+  LETTER_SPACING_TO_CSS,
+  toFontSizeCss,
+} from '../constants/themeFonts.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { allThemePresets } from '../presets.js'
 import type { Mode, ThemeDefaults } from '../providers/Theme/types.js'
@@ -15,6 +19,8 @@ interface ThemeTypographyOverride {
   headingFontCustom?: string | null
   baseFontSize?: string | null
   lineHeight?: string | null
+  headingWeight?: string | null
+  letterSpacing?: string | null
 }
 
 /**
@@ -51,6 +57,8 @@ interface GenericThemeConfiguration {
     info?: string | null
   } | null
   typography?: ThemeTypographyOverride | null
+  fontSelections?: string[] | null
+  typographyOverridden?: boolean | null
   visualEffects?: {
     effectStyle?: string | null
     shadowIntensity?: string | null
@@ -80,6 +88,10 @@ const LEGACY_BORDER_RADIUS_ALIASES: Record<string, (typeof BORDER_RADIUS_VALUES)
 }
 const FONT_SCALE_VALUES = ['small', 'medium', 'large'] as const
 const SPACING_VALUES = ['compact', 'medium', 'spacious'] as const
+// Earlier versions stored the roomiest spacing option as 'comfortable'.
+const LEGACY_SPACING_ALIASES: Record<string, (typeof SPACING_VALUES)[number]> = {
+  comfortable: 'spacious',
+}
 const ANIMATION_LEVEL_VALUES = ['none', 'reduced', 'medium', 'high'] as const
 const LEGACY_ANIMATION_ALIASES: Record<string, (typeof ANIMATION_LEVEL_VALUES)[number]> = {
   full: 'high',
@@ -133,6 +145,17 @@ export interface ResolvedThemeConfiguration {
   lightMode?: ThemeColorConfiguration
   darkMode?: ThemeColorConfiguration
   typography: ThemeTypographyPreset | null
+  /**
+   * The body / heading font values picked in the admin ('Inter', 'Lora' …),
+   * kept so the font files can be requested (see `ServerThemeInjector`).
+   */
+  fontSelections?: string[]
+  /**
+   * True when the editor picked something in Typography (a font, size, line
+   * height, heading weight or tracking) instead of "Use theme preset". Base
+   * typography rules are only emitted then, so untouched sites render as before.
+   */
+  typographyOverridden?: boolean
   visualEffects?: ResolvedVisualEffects | null
   componentStyles?: ResolvedComponentStyles | null
 }
@@ -235,7 +258,10 @@ export function resolveThemeConfiguration(
   const resolvedFontScale = isFontScale(fontScale)
     ? fontScale
     : DEFAULT_THEME_CONFIGURATION.fontScale
-  const resolvedSpacing = isSpacing(spacing) ? spacing : DEFAULT_THEME_CONFIGURATION.spacing
+  const resolvedSpacing = isSpacing(spacing)
+    ? spacing
+    : ((typeof spacing === 'string' && LEGACY_SPACING_ALIASES[spacing]) ||
+      DEFAULT_THEME_CONFIGURATION.spacing)
   const resolvedAnimationLevel = resolveAnimationLevel(animationLevel)
   const resolvedAllowToggle =
     typeof allowColorModeToggle === 'boolean'
@@ -247,8 +273,35 @@ export function resolveThemeConfiguration(
   const baseDarkMode = preset?.darkMode ?? DEFAULT_THEME_CONFIGURATION.darkMode
   const resolvedLightMode = mergeColorModes(baseLightMode, lightMode)
   const resolvedDarkMode = mergeColorModes(baseDarkMode, darkMode)
-  const resolvedTypography =
-    mergeTypography(preset?.typography, typography) ?? preset?.typography ?? null
+  // Accept an already-resolved configuration too (callers often resolve once and
+  // pass the result to several helpers): its typography is final, keep it as is.
+  const typographyIsResolved =
+    typography !== null &&
+    typeof typography === 'object' &&
+    typeof (typography as { fontFamily?: unknown }).fontFamily === 'string'
+  const resolvedTypography = typographyIsResolved
+    ? (typography as unknown as ThemeTypographyPreset)
+    : (mergeTypography(preset?.typography, typography) ?? preset?.typography ?? null)
+  const isSet = (value: unknown) => typeof value === 'string' && value !== '' && value !== 'preset'
+  const typographyOverridden = typographyIsResolved
+    ? cfg.typographyOverridden === true
+    : Boolean(
+        typography &&
+          [
+            typography.bodyFont,
+            typography.headingFont,
+            typography.baseFontSize,
+            typography.lineHeight,
+            typography.headingWeight,
+            typography.letterSpacing,
+          ].some(isSet),
+      )
+  const fontSelections = typographyIsResolved
+    ? (cfg.fontSelections ?? [])
+    : [typography?.bodyFont, typography?.headingFont].filter(
+        (value): value is string =>
+          typeof value === 'string' && value !== 'preset' && value !== 'custom',
+      )
 
   // Pass visualEffects and componentStyles through as-is (no normalization needed)
   const resolvedVisualEffects = visualEffects ?? null
@@ -266,6 +319,8 @@ export function resolveThemeConfiguration(
     lightMode: resolvedLightMode,
     darkMode: resolvedDarkMode,
     typography: resolvedTypography,
+    fontSelections,
+    typographyOverridden,
     visualEffects: resolvedVisualEffects,
     componentStyles: resolvedComponentStyles,
   }
@@ -311,8 +366,11 @@ function mergeTypography(
       base?.fontFamily ?? 'var(--font-inter, var(--font-geist-sans), system-ui, sans-serif)',
     headingFamily:
       base?.headingFamily ?? 'var(--font-outfit, var(--font-geist-sans), system-ui, sans-serif)',
-    baseFontSize: base?.baseFontSize ?? '16px',
+    baseFontSize: toFontSizeCss(base?.baseFontSize) ?? '16px',
     lineHeight: base?.lineHeight ?? '1.6',
+    headingWeight: base?.headingWeight,
+    headingLetterSpacing: base?.headingLetterSpacing,
+    headingTransform: base?.headingTransform,
     fontWeights: { ...(base?.fontWeights ?? {}) },
     letterSpacing: { ...(base?.letterSpacing ?? {}) },
   }
@@ -336,12 +394,23 @@ function mergeTypography(
       result.headingFamily = resolvedHeadingFont
     }
 
-    if (overrides.baseFontSize && overrides.baseFontSize !== 'preset') {
-      result.baseFontSize = overrides.baseFontSize
+    const baseFontSize = toFontSizeCss(overrides.baseFontSize)
+    if (baseFontSize) {
+      result.baseFontSize = baseFontSize
     }
 
     if (overrides.lineHeight && overrides.lineHeight !== 'preset') {
       result.lineHeight = overrides.lineHeight
+    }
+
+    if (overrides.headingWeight && overrides.headingWeight !== 'preset') {
+      result.headingWeight = overrides.headingWeight
+    }
+
+    const tracking = overrides.letterSpacing ? LETTER_SPACING_TO_CSS[overrides.letterSpacing] : undefined
+    if (tracking !== undefined) {
+      result.headingLetterSpacing = tracking
+      result.headingTransform = overrides.letterSpacing === 'wider' ? 'uppercase' : 'none'
     }
   }
 
@@ -362,6 +431,5 @@ function resolveFontSelection(
     return trimmed && trimmed.length > 0 ? trimmed : (fallback ?? null)
   }
 
-  const mapped = FONT_VALUE_TO_CSS[selection]
-  return mapped ?? fallback ?? null
+  return getFontCatalogEntry(selection)?.fontFamily ?? fallback ?? null
 }

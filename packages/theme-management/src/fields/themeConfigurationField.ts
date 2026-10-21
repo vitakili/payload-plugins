@@ -3,6 +3,8 @@ import {
   BASE_FONT_SIZE_OPTIONS,
   BODY_FONT_OPTIONS,
   HEADING_FONT_OPTIONS,
+  HEADING_WEIGHT_OPTIONS,
+  LETTER_SPACING_OPTIONS,
   LINE_HEIGHT_OPTIONS,
 } from '../constants/themeFonts.js'
 import type { ThemePreset } from '../index.js'
@@ -131,155 +133,6 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   })
 
-  // Border Radius Configuration - Always visible
-  fields.push({
-    type: 'row',
-    fields: [
-      {
-        name: 'borderRadius',
-        type: 'select',
-        label: {
-          en: 'Border Radius',
-          cs: 'Zaoblení rohů',
-        },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'None (0px)', cs: 'Žádné (0px)' }, value: 'none' },
-          { label: { en: 'Small (0.25rem)', cs: 'Malé (0.25rem)' }, value: 'small' },
-          { label: { en: 'Medium (0.5rem)', cs: 'Střední (0.5rem)' }, value: 'medium' },
-          { label: { en: 'Large (0.75rem)', cs: 'Velké (0.75rem)' }, value: 'large' },
-          { label: { en: 'XL (1rem)', cs: 'XL (1rem)' }, value: 'xl' },
-        ],
-        admin: {
-          description: {
-            en: 'Default corner rounding for UI elements',
-            cs: 'Výchozí zaoblení rohů pro UI prvky',
-          },
-          width: '50%',
-        },
-        dbName: 'border_radius',
-      },
-      {
-        name: 'spacing',
-        type: 'select',
-        label: {
-          en: 'Spacing Scale',
-          cs: 'Škála rozestupů',
-        },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'Compact', cs: 'Kompaktní' }, value: 'compact' },
-          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'Comfortable', cs: 'Pohodlné' }, value: 'comfortable' },
-        ],
-        admin: {
-          description: {
-            en: 'Global spacing between elements',
-            cs: 'Globální rozestupy mezi prvky',
-          },
-          width: '50%',
-        },
-        dbName: 'spacing',
-      },
-    ],
-  })
-
-  // Color Mode Settings
-  if (includeColorModeToggle) {
-    fields.push({
-      type: 'collapsible',
-      label: {
-        en: 'Color Mode Settings',
-        cs: 'Nastavení barevného režimu',
-      },
-      admin: {
-        // Fine-tuning: collapsed by default so presets and the preview lead the tab.
-        initCollapsed: true,
-        description: {
-          en: 'Individual light and dark mode colours. Edits here take precedence over the theme.',
-          cs: 'Jednotlivé barvy světlého a tmavého režimu. Úpravy zde mají přednost před motivem.',
-        },
-      },
-      fields: [
-        {
-          type: 'row',
-          fields: [
-            {
-              name: 'colorMode',
-              type: 'select',
-              label: {
-                en: 'Default Color Mode',
-                cs: 'Výchozí barevný režim',
-              },
-              defaultValue: 'auto',
-              options: [
-                {
-                  label: {
-                    en: 'Auto (System)',
-                    cs: 'Automaticky (Systém)',
-                  },
-                  value: 'auto',
-                },
-                {
-                  label: { en: 'Light', cs: 'Světlý' },
-                  value: 'light',
-                },
-                {
-                  label: { en: 'Dark', cs: 'Tmavý' },
-                  value: 'dark',
-                },
-              ],
-              admin: {
-                description: {
-                  en: 'Default color mode for visitors',
-                  cs: 'Výchozí barevný režim pro návštěvníky',
-                },
-                width: '50%',
-              },
-              dbName: 'color_mode',
-            },
-            {
-              name: 'allowColorModeToggle',
-              type: 'checkbox',
-              label: {
-                en: 'Enable Mode Toggle',
-                cs: 'Povolit přepínač režimu',
-              },
-              defaultValue: true,
-              admin: {
-                description: {
-                  en: 'Let visitors switch modes',
-                  cs: 'Umožnit návštěvníkům přepínat režimy',
-                },
-                width: '50%',
-              },
-            },
-          ],
-        },
-        lightModeField,
-        darkModeField,
-        {
-          name: 'accessibilityAudit',
-          type: 'ui',
-          admin: {
-            components: {
-              Field: '@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField',
-            },
-          },
-        },
-        {
-          name: 'themeExport',
-          type: 'ui',
-          admin: {
-            components: {
-              Field: '@kilivi/payloadcms-theme-management/fields/ThemeExportField',
-            },
-          },
-        },
-      ],
-    })
-  }
-
   // Typography - Always visible
   fields.push({
     type: 'collapsible',
@@ -291,14 +144,17 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       initCollapsed: true,
       className: 'tm-section-typography',
       description: {
-        en: 'Choose font families and base typography settings. Leave fields on "Use preset" to inherit the theme defaults.',
-        cs: 'Zvolte rodiny písem a základní typografické nastavení. Hodnota "Použít výchozí" zachová nastavení motivu.',
+        en: 'Fonts, text size and the character of headings. "Use theme preset" keeps the colour theme’s defaults.',
+        cs: 'Písma, velikost textu a charakter nadpisů. „Podle motivu“ ponechá výchozí nastavení barevného motivu.',
       },
     },
     fields: [
       {
         name: 'typography',
         type: 'group',
+        // The collapsible around it already carries the heading.
+        label: false,
+        admin: { hideGutter: true },
         fields: [
           {
             type: 'row',
@@ -389,10 +245,7 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   cs: 'Základní velikost písma',
                 },
                 defaultValue: 'preset',
-                options: BASE_FONT_SIZE_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
+                options: BASE_FONT_SIZE_OPTIONS,
                 admin: {
                   width: '50%',
                 },
@@ -406,14 +259,48 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   cs: 'Řádkování',
                 },
                 defaultValue: 'preset',
-                options: LINE_HEIGHT_OPTIONS.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                })),
+                options: LINE_HEIGHT_OPTIONS,
                 admin: {
                   width: '50%',
                 },
                 dbName: 'line_height',
+              },
+            ],
+          },
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'headingWeight',
+                type: 'select',
+                label: {
+                  en: 'Heading weight',
+                  cs: 'Tloušťka nadpisů',
+                },
+                defaultValue: 'preset',
+                options: HEADING_WEIGHT_OPTIONS,
+                admin: {
+                  width: '50%',
+                },
+                dbName: 'heading_weight',
+              },
+              {
+                name: 'letterSpacing',
+                type: 'select',
+                label: {
+                  en: 'Heading letter spacing',
+                  cs: 'Prostrkání nadpisů',
+                },
+                defaultValue: 'preset',
+                options: LETTER_SPACING_OPTIONS,
+                admin: {
+                  width: '50%',
+                  description: {
+                    en: '"Extra wide" also sets headings in capitals.',
+                    cs: '„Velmi široké“ zároveň převede nadpisy na verzálky.',
+                  },
+                },
+                dbName: 'letter_spacing',
               },
             ],
           },
@@ -422,42 +309,58 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   })
 
-  const customPresetsField: Field = {
-    type: 'collapsible',
-    label: {
-      en: 'Custom Theme Presets',
-      cs: 'Vlastní motivy',
-    },
-    admin: {
-      initCollapsed: true,
-      className: 'tm-section-custom-presets',
-      description: {
-        en: 'Import additional theme presets via JSON to extend or override the defaults. These presets become available instantly in the Theme Selection above.',
-        cs: 'Importujte další motivy pomocí JSONu a rozšiřte nebo přepište výchozí nabídku. Motivy budou ihned k dispozici ve výběru výše.',
-      },
-    },
+  // Shape & rhythm — corner rounding and spacing scale
+  fields.push({
+    type: 'row',
     fields: [
       {
-        name: 'customThemePresets',
-        type: 'json',
+        name: 'borderRadius',
+        type: 'select',
         label: {
-          en: 'Custom Preset JSON',
-          cs: 'JSON s vlastními motivy',
+          en: 'Border Radius',
+          cs: 'Zaoblení rohů',
         },
+        defaultValue: 'medium',
+        options: [
+          { label: { en: 'None (0px)', cs: 'Žádné (0px)' }, value: 'none' },
+          { label: { en: 'Small (0.25rem)', cs: 'Malé (0.25rem)' }, value: 'small' },
+          { label: { en: 'Medium (0.5rem)', cs: 'Střední (0.5rem)' }, value: 'medium' },
+          { label: { en: 'Large (0.75rem)', cs: 'Velké (0.75rem)' }, value: 'large' },
+          { label: { en: 'XL (1rem)', cs: 'XL (1rem)' }, value: 'xl' },
+        ],
         admin: {
           description: {
-            en: 'Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.',
-            cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světlý a tmavý režim.',
+            en: 'Default corner rounding for UI elements',
+            cs: 'Výchozí zaoblení rohů pro UI prvky',
           },
-          components: {
-            Field: '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField',
-          },
+          width: '50%',
         },
+        dbName: 'border_radius',
+      },
+      {
+        name: 'spacing',
+        type: 'select',
+        label: {
+          en: 'Spacing Scale',
+          cs: 'Škála rozestupů',
+        },
+        defaultValue: 'medium',
+        options: [
+          { label: { en: 'Compact', cs: 'Kompaktní' }, value: 'compact' },
+          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+          { label: { en: 'Comfortable', cs: 'Pohodlné' }, value: 'comfortable' },
+        ],
+        admin: {
+          description: {
+            en: 'Global spacing between elements',
+            cs: 'Globální rozestupy mezi prvky',
+          },
+          width: '50%',
+        },
+        dbName: 'spacing',
       },
     ],
-  }
-
-  fields.push(customPresetsField)
+  })
 
   // Visual Effects — glassmorphism, shadows, border style
   fields.push({
@@ -478,6 +381,9 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       {
         name: 'visualEffects',
         type: 'group',
+        // The collapsible around it already carries the heading.
+        label: false,
+        admin: { hideGutter: true },
         fields: [
           {
             type: 'row',
@@ -567,13 +473,38 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 ],
                 admin: {
                   description: {
-                    en: 'Blur effect behind translucent elements (requires glass effect style).',
-                    cs: 'Rozmazání za průhledné prvky (vyžaduje styl skla).',
+                    en: 'Blur behind translucent glass panels.',
+                    cs: 'Rozostření za průsvitnými skleněnými panely.',
                   },
                   width: '50%',
+                  condition: (_, siblingData) => siblingData?.effectStyle === 'glass',
                 },
                 dbName: 'backdrop_blur',
               },
+              {
+                name: 'glassOpacity',
+                type: 'number',
+                label: {
+                  en: 'Glass Opacity (%)',
+                  cs: 'Průhlednost skla (%)',
+                },
+                defaultValue: 60,
+                min: 0,
+                max: 100,
+                admin: {
+                  description: {
+                    en: 'Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).',
+                    cs: 'Průhlednost karet/panelů při skleněném efektu (0 = plně průhledné, 100 = neprůhledné).',
+                  },
+                  width: '50%',
+                  condition: (_, siblingData) => siblingData?.effectStyle === 'glass',
+                },
+              },
+            ],
+          },
+          {
+            type: 'row',
+            fields: [
               {
                 name: 'borderStyle',
                 type: 'select',
@@ -598,11 +529,6 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 },
                 dbName: 'border_style',
               },
-            ],
-          },
-          {
-            type: 'row',
-            fields: [
               {
                 name: 'borderWidth',
                 type: 'select',
@@ -618,27 +544,11 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                   { label: '3px', value: '3px' },
                   { label: '4px', value: '4px' },
                 ],
-                admin: { width: '50%' },
-                dbName: 'border_width',
-              },
-              {
-                name: 'glassOpacity',
-                type: 'number',
-                label: {
-                  en: 'Glass Opacity (%)',
-                  cs: 'Průhlednost skla (%)',
-                },
-                defaultValue: 60,
-                min: 0,
-                max: 100,
                 admin: {
-                  description: {
-                    en: 'Card/panel opacity when using glass effect (0 = fully transparent, 100 = opaque).',
-                    cs: 'Průhlednost karet/panelů při skleněném efektu (0 = plně průhledné, 100 = neprůhledné).',
-                  },
                   width: '50%',
-                  condition: (_, siblingData) => siblingData?.effectStyle === 'glass',
+                  condition: (_, siblingData) => siblingData?.borderStyle !== 'none',
                 },
+                dbName: 'border_width',
               },
             ],
           },
@@ -666,6 +576,9 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       {
         name: 'componentStyles',
         type: 'group',
+        // The collapsible around it already carries the heading.
+        label: false,
+        admin: { hideGutter: true },
         fields: [
           {
             type: 'row',
@@ -871,8 +784,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 ],
                 admin: {
                   description: {
-                    en: 'Default treatment for content images (applied via [data-img] / .themed-image).',
-                    cs: 'Výchozí úprava obsahových obrázků (přes [data-img] / .themed-image).',
+                    en: 'How images inside page content are shown.',
+                    cs: 'Jak se zobrazují obrázky v obsahu stránek.',
                   },
                   width: '50%',
                 },
@@ -901,8 +814,8 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
                 ],
                 admin: {
                   description: {
-                    en: 'Default style for in-content links (applied via [data-link] / .themed-link).',
-                    cs: 'Výchozí styl odkazů v obsahu (přes [data-link] / .themed-link).',
+                    en: 'How links inside text look.',
+                    cs: 'Jak vypadají odkazy v textu.',
                   },
                   width: '50%',
                 },
@@ -951,6 +864,140 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       },
     ],
   })
+
+  // Color Mode Settings
+  if (includeColorModeToggle) {
+    fields.push({
+      type: 'collapsible',
+      label: {
+        en: 'Color Mode Settings',
+        cs: 'Nastavení barevného režimu',
+      },
+      admin: {
+        className: 'tm-section-colors',
+        // Fine-tuning: collapsed by default so presets and the preview lead the tab.
+        initCollapsed: true,
+        description: {
+          en: 'Individual light and dark mode colours. Edits here take precedence over the theme.',
+          cs: 'Jednotlivé barvy světlého a tmavého režimu. Úpravy zde mají přednost před motivem.',
+        },
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'colorMode',
+              type: 'select',
+              label: {
+                en: 'Default Color Mode',
+                cs: 'Výchozí barevný režim',
+              },
+              defaultValue: 'auto',
+              options: [
+                {
+                  label: {
+                    en: 'Auto (System)',
+                    cs: 'Automaticky (Systém)',
+                  },
+                  value: 'auto',
+                },
+                {
+                  label: { en: 'Light', cs: 'Světlý' },
+                  value: 'light',
+                },
+                {
+                  label: { en: 'Dark', cs: 'Tmavý' },
+                  value: 'dark',
+                },
+              ],
+              admin: {
+                description: {
+                  en: 'Default color mode for visitors',
+                  cs: 'Výchozí barevný režim pro návštěvníky',
+                },
+                width: '50%',
+              },
+              dbName: 'color_mode',
+            },
+            {
+              name: 'allowColorModeToggle',
+              type: 'checkbox',
+              label: {
+                en: 'Enable Mode Toggle',
+                cs: 'Povolit přepínač režimu',
+              },
+              defaultValue: true,
+              admin: {
+                description: {
+                  en: 'Let visitors switch modes',
+                  cs: 'Umožnit návštěvníkům přepínat režimy',
+                },
+                width: '50%',
+              },
+            },
+          ],
+        },
+        lightModeField,
+        darkModeField,
+        {
+          name: 'accessibilityAudit',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@kilivi/payloadcms-theme-management/fields/AccessibilityAuditField',
+            },
+          },
+        },
+        {
+          name: 'themeExport',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '@kilivi/payloadcms-theme-management/fields/ThemeExportField',
+            },
+          },
+        },
+      ],
+    })
+  }
+
+  const customPresetsField: Field = {
+    type: 'collapsible',
+    label: {
+      en: 'Custom Theme Presets',
+      cs: 'Vlastní motivy',
+    },
+    admin: {
+      initCollapsed: true,
+      className: 'tm-section-custom-presets',
+      description: {
+        en: 'For developers: import extra colour themes as JSON. They appear in the theme list at the top straight away.',
+        cs: 'Pro vývojáře: import dalších barevných motivů ve formátu JSON. Hned se objeví v seznamu motivů nahoře.',
+      },
+    },
+    fields: [
+      {
+        name: 'customThemePresets',
+        type: 'json',
+        label: {
+          en: 'Custom Preset JSON',
+          cs: 'JSON s vlastními motivy',
+        },
+        admin: {
+          description: {
+            en: 'Paste or import an array (or object map) of theme presets. Each entry should include at least a unique "name" and "label" with optional lightMode/darkMode colors.',
+            cs: 'Vložte nebo importujte pole (či objekt) motivů. Každý motiv musí mít unikátní „name“ a „label“ a volitelně barvy pro světlý a tmavý režim.',
+          },
+          components: {
+            Field: '@kilivi/payloadcms-theme-management/fields/ThemePresetImportField',
+          },
+        },
+      },
+    ],
+  }
+
+  fields.push(customPresetsField)
 
   if (customThemeConfigurationFields?.length) {
     fields.push(...customThemeConfigurationFields)

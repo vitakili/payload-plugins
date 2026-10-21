@@ -2,7 +2,6 @@
 
 import './ThemePreviewField.css'
 import { useField, useForm, useFormFields } from '@payloadcms/ui'
-import * as _PayloadUI from '@payloadcms/ui'
 import { ChevronDown, ChevronRight, Moon, Palette, Sun, type LucideIcon } from 'lucide-react'
 import type { SelectFieldClientProps } from 'payload'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
@@ -21,21 +20,7 @@ import { parseThemePresetInput } from '../utils/customThemePresets.js'
 import { resolveLocalizedText } from '../utils/localizedText.js'
 import { AppearanceLocks, AppearanceUndoBar } from '../components/AppearanceSessionControls.js'
 import { createBulkWriter, getAppearanceSession } from '../hooks/useAppearanceSession.js'
-
-// useLivePreviewContext is exported from @payloadcms/ui at runtime but TypeScript fails to resolve
-// the re-export chain (context.js → context.d.ts) in pnpm symlinked node_modules.
-// Fall back to a no-op so the component never crashes when the export is absent.
-//
-// Context fields (from packages/ui/src/providers/LivePreview/context.ts):
-//   isLivePreviewEnabled – whether livePreview is configured for this document in Payload config
-//   isLivePreviewing     – whether the user has actively clicked Preview (iframe/popup is open)
-type _LivePreviewCtxResult = { isLivePreviewEnabled?: boolean; isLivePreviewing?: boolean }
-const _useLivePreviewContext: () => _LivePreviewCtxResult =
-  (_PayloadUI as unknown as { useLivePreviewContext?: () => _LivePreviewCtxResult })
-    .useLivePreviewContext ??
-  function useLivePreviewContextFallback() {
-    return {}
-  }
+import { useNativeLivePreview } from '../hooks/useNativeLivePreview.js'
 
 interface ColorModeColors {
   background?: string
@@ -294,7 +279,7 @@ export default function ThemePreviewField(props: SelectFieldClientProps) {
   // isLivePreviewing: true only when the user actively clicked Preview and the iframe/popup is open.
   // While editing (before clicking Preview), the panel is always shown regardless of livePreview config.
   // Default context value is false, so the panel shows by default even without LivePreview provider.
-  const { isLivePreviewing } = _useLivePreviewContext()
+  const { isOpen: isLivePreviewing } = useNativeLivePreview()
   const showPreviewPanel = configuredShowPreview && !isLivePreviewing
   // If the plugin provided theme presets via admin config, prefer those;
   // support both `field.admin.themePresets` (legacy) and `field.admin.custom.themePresets`

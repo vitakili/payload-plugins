@@ -1,0 +1,155 @@
+/* Font select, styled like Payload's own select (react-select `.rs__control`). */
+
+.tm-font-select {
+  position: relative;
+  min-width: 0;
+  margin-bottom: var(--spacing-field, 1rem);
+}
+
+.tm-font-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 12px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  background: var(--theme-input-bg);
+  color: var(--theme-elevation-800);
+  box-shadow: 0 2px 2px -1px #0000001a;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 100ms ease;
+}
+
+.tm-font-select__trigger:hover {
+  border-color: var(--theme-elevation-250);
+}
+
+.tm-font-select__trigger:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-elevation-800));
+  outline-offset: var(--accessibility-outline-offset, 1px);
+}
+
+.tm-font-select__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tm-font-select__chevron {
+  flex-shrink: 0;
+  color: var(--theme-elevation-500);
+  transition: transform 150ms ease;
+}
+
+.tm-font-select__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.tm-font-select__listbox {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  /* Wide enough for the sample line even when the field sits in a half-width column. */
+  width: max(100%, 300px);
+  max-width: calc(100vw - 32px);
+  max-height: 340px;
+  margin-top: 4px;
+  padding: 4px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m, 6px);
+  background: var(--theme-elevation-0);
+  box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.22);
+}
+
+.tm-font-select__listbox:focus-visible {
+  outline: none;
+}
+
+.tm-font-select__group {
+  padding: 10px 12px 4px 36px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--theme-elevation-500);
+}
+
+.tm-font-select__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 12px;
+  color: var(--theme-elevation-800);
+  cursor: pointer;
+}
+
+.tm-font-select__option.is-active {
+  background: var(--theme-elevation-100);
+  /* The keyboard position never relies on the fill alone. */
+  box-shadow: inset 2px 0 0 var(--theme-elevation-800);
+}
+
+.tm-font-select__check {
+  display: inline-flex;
+  flex: 0 0 16px;
+  justify-content: center;
+  padding-top: 3px;
+  color: var(--theme-elevation-800);
+}
+
+.tm-font-select__text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tm-font-select__name {
+  font-size: 15px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tm-font-select__option.is-selected .tm-font-select__name {
+  font-weight: 600;
+}
+
+.tm-font-select__sample {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--theme-elevation-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tm-font-select__sample.is-hint {
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-font-select__chevron,
+  .tm-font-select__trigger {
+    transition: none;
+  }
+}
+
+.tm-font-select__listbox.is-align-end {
+  left: auto;
+  right: 0;
+}

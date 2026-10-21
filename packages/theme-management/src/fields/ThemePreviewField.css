@@ -430,8 +430,70 @@
   margin-bottom: 20px;
 }
 
+/* Shown instead of the mock preview when Payload's native Live Preview is available. */
+.tm-native-preview-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: var(--style-radius-m, 8px);
+  background: var(--theme-elevation-50);
+}
+
+.tm-native-preview-hint__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 240px;
+}
+
+.tm-native-preview-hint__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--theme-elevation-800);
+}
+
+.tm-native-preview-hint__body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--theme-elevation-650, var(--theme-elevation-600));
+}
+
+.tm-native-preview-hint__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid var(--theme-elevation-800);
+  border-radius: var(--style-radius-s, 6px);
+  background: var(--theme-elevation-800);
+  color: var(--theme-elevation-0);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tm-native-preview-hint__action:hover {
+  background: var(--theme-elevation-900);
+}
+
+.tm-native-preview-hint__action:focus-visible {
+  outline: var(--accessibility-outline, 2px solid var(--theme-elevation-800));
+  outline-offset: 2px;
+}
+
+/* Two columns only while the mock preview is actually rendered; with native Live
+   Preview the controls take the full width. */
 @container tm-appearance (min-width: 960px) {
-  .tm-appearance > .group-field__wrap > .render-fields {
+  .tm-appearance > .group-field__wrap > .render-fields:has(> .tm-live-preview-slot) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(340px, 42%);
     column-gap: 28px;
