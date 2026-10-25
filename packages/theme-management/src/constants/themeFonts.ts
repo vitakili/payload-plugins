@@ -16,6 +16,8 @@ export interface FontCatalogEntry {
   fontFamily: string
   /** Weights requested from Google Fonts (`null` for system stacks). */
   googleWeights: string | null
+  /** The `--font-*` variable a site may define to supply the face itself (Google fonts only). */
+  cssVariable?: string
   /** Display faces only make sense for headings. */
   headingOnly?: boolean
 }
@@ -33,6 +35,7 @@ const google = (
   fontFamily: `var(${cssVar}, "${value}"), ${fallback}`,
   googleWeights,
   headingOnly,
+  cssVariable: cssVar,
 })
 
 const SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif'
@@ -226,12 +229,77 @@ export type ThemeFontLoading = 'self-hosted' | 'google' | 'none'
  */
 export function buildThemeFontsHref(
   values: Array<string | null | undefined>,
-  options: { mode?: ThemeFontLoading; apiRoute?: string } = {},
+  options: {
+    mode?: ThemeFontLoading
+    apiRoute?: string
+    /**
+     * Catalog fonts the site already loads itself (e.g. next/font with the
+     * catalog's `--font-*` variable): left out of the request, so the page
+     * neither downloads them twice nor waits on a stylesheet it does not need.
+     */
+    exclude?: Iterable<string>
+  } = {},
 ): string | null {
-  const { mode = 'self-hosted', apiRoute = '/api' } = options
+  const { mode = 'self-hosted', apiRoute = '/api', exclude } = options
   if (mode === 'none') return null
-  const families = parseFontFamilies(values.filter(Boolean).join(','))
+  const excluded = new Set(exclude ?? [])
+  const families = parseFontFamilies(values.filter(Boolean).join(',')).filter(
+    (family) => !excluded.has(family),
+  )
   if (families.length === 0) return null
   if (mode === 'google') return buildGoogleFontsHref(families)
   return `${apiRoute}${THEME_FONTS_CSS_PATH}?f=${families.map(encodeURIComponent).join(',')}`
+}
+
+/**
+ * Variables older presets and the Next.js starter use for fonts nobody
+ * defines in this plugin; read as the catalog font they stood for.
+ */
+const LEGACY_FONT_VARIABLES: Record<string, string> = {
+  '--font-geist-sans': 'Inter',
+  '--font-geist-mono': 'JetBrains Mono',
+}
+
+const VARIABLE_PATTERN = /var\(\s*(--[\w-]+)/g
+
+/** Catalog fonts a CSS font stack refers to, by `--font-*` variable or quoted family name, in order. */
+export function catalogFontsInStack(stack?: string | null): string[] {
+  if (!stack) return []
+  const found: string[] = []
+  const add = (value: string | undefined) => {
+    if (value && !found.includes(value)) found.push(value)
+  }
+  for (const match of stack.matchAll(VARIABLE_PATTERN)) {
+    const variable = match[1]
+    add(LEGACY_FONT_VARIABLES[variable] ?? FONT_CATALOG.find((e) => e.cssVariable === variable)?.value)
+  }
+  for (const entry of FONT_CATALOG) {
+    if (entry.cssVariable && (stack.includes(`"${entry.value}"`) || stack.includes(`'${entry.value}'`))) {
+      add(entry.value)
+    }
+  }
+  return found
+}
+
+/**
+ * A font stack that works without any `--font-*` variable defined by the site.
+ *
+ * Presets name fonts by variable only (`var(--font-outfit)`), which renders the
+ * font only when the site happens to define that variable itself. When a stack
+ * leads with a catalog font but never names its family, it is replaced by the
+ * catalog stack (`var(--font-outfit, "Outfit"), system-ui, …`): a site's own
+ * copy still wins, and otherwise the face the plugin loads is used.
+ */
+export function normalizeFontStack(stack?: string | null): string | undefined {
+  if (!stack) return stack ?? undefined
+  const [first] = catalogFontsInStack(stack)
+  const entry = getFontCatalogEntry(first)
+  if (!entry?.cssVariable) return stack
+  if (stack.includes(`"${entry.value}"`) || stack.includes(`'${entry.value}'`)) return stack
+  return entry.fontFamily
+}
+
+/** The CSS font-family stack of a catalog font, e.g. for a page that picks its own font. */
+export function fontFamilyFor(value?: string | null): string | undefined {
+  return getFontCatalogEntry(value)?.fontFamily
 }

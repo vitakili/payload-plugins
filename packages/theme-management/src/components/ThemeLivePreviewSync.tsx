@@ -17,6 +17,8 @@ interface ThemeLivePreviewSyncProps {
   styleElementId?: string
   /** Same as ServerThemeInjector's `fontLoading`; use 'none' with next/font. */
   fontLoading?: ThemeFontLoading
+  /** Same as ServerThemeInjector's `selfHostedFonts`: fonts the site loads itself. */
+  selfHostedFonts?: readonly string[]
 }
 
 export const ThemeLivePreviewSync: React.FC<ThemeLivePreviewSyncProps> = ({
@@ -27,6 +29,7 @@ export const ThemeLivePreviewSync: React.FC<ThemeLivePreviewSyncProps> = ({
   themeConfigurationKey = 'themeConfiguration',
   styleElementId = 'theme-live-preview-css',
   fontLoading = 'self-hosted',
+  selfHostedFonts,
 }) => {
   const { data } = useLivePreview<Record<string, unknown>>({
     apiRoute,
@@ -47,7 +50,12 @@ export const ThemeLivePreviewSync: React.FC<ThemeLivePreviewSyncProps> = ({
       return
     }
 
-    const runtime = buildLivePreviewThemeRuntime(themeConfiguration, apiRoute, fontLoading)
+    const runtime = buildLivePreviewThemeRuntime(
+      themeConfiguration,
+      apiRoute,
+      fontLoading,
+      selfHostedFonts,
+    )
 
     let styleElement = document.getElementById(styleElementId) as HTMLStyleElement | null
     if (!styleElement) {
@@ -90,7 +98,9 @@ export const ThemeLivePreviewSync: React.FC<ThemeLivePreviewSyncProps> = ({
     document.documentElement.dataset.themeMode = runtime.mode
     document.documentElement.classList.remove('light', 'dark', 'auto')
     document.documentElement.classList.add(runtime.mode)
-  }, [themeConfiguration, styleElementId, apiRoute, fontLoading])
+    // Joined: a new array from the caller on every render must not re-run this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeConfiguration, styleElementId, apiRoute, fontLoading, selfHostedFonts?.join(',')])
 
   return null
 }

@@ -1,6 +1,9 @@
 import {
+  catalogFontsInStack,
+  fontFamilyFor,
   getFontCatalogEntry,
   LETTER_SPACING_TO_CSS,
+  normalizeFontStack,
   toFontSizeCss,
 } from '../constants/themeFonts.js'
 import type { ThemeTypographyPreset } from '../presets.js'
@@ -150,6 +153,11 @@ export interface ResolvedThemeConfiguration {
    * kept so the font files can be requested (see `ServerThemeInjector`).
    */
   fontSelections?: string[]
+  /**
+   * Catalog fonts the site renders with — the body and heading font, whether a
+   * preset or the editor chose them. This is what `ServerThemeInjector` loads.
+   */
+  fontsInUse?: string[]
   /**
    * True when the editor picked something in Typography (a font, size, line
    * height, heading weight or tracking) instead of "Use theme preset". Base
@@ -303,6 +311,25 @@ export function resolveThemeConfiguration(
           typeof value === 'string' && value !== 'preset' && value !== 'custom',
       )
 
+  // Every stack names its family, so the font renders without the site
+  // defining a `--font-*` variable (see `normalizeFontStack`).
+  const typographyWithFonts: ThemeTypographyPreset | null = resolvedTypography
+    ? {
+        ...resolvedTypography,
+        fontFamily: normalizeFontStack(resolvedTypography.fontFamily) ?? resolvedTypography.fontFamily,
+        headingFamily:
+          normalizeFontStack(resolvedTypography.headingFamily) ?? resolvedTypography.headingFamily,
+      }
+    : null
+  // The face each stack renders with: its first catalog font, not its fallbacks.
+  const fontsInUse = [
+    ...new Set(
+      [typographyWithFonts?.fontFamily, typographyWithFonts?.headingFamily]
+        .map((stack) => catalogFontsInStack(stack)[0])
+        .filter((value): value is string => Boolean(value)),
+    ),
+  ]
+
   // Pass visualEffects and componentStyles through as-is (no normalization needed)
   const resolvedVisualEffects = visualEffects ?? null
   const resolvedComponentStyles = componentStyles ?? null
@@ -318,8 +345,9 @@ export function resolveThemeConfiguration(
     customCSS: resolvedCustomCSS,
     lightMode: resolvedLightMode,
     darkMode: resolvedDarkMode,
-    typography: resolvedTypography,
+    typography: typographyWithFonts,
     fontSelections,
+    fontsInUse,
     typographyOverridden,
     visualEffects: resolvedVisualEffects,
     componentStyles: resolvedComponentStyles,
@@ -363,9 +391,8 @@ function mergeTypography(
 
   const result: ThemeTypographyPreset = {
     fontFamily:
-      base?.fontFamily ?? 'var(--font-inter, var(--font-geist-sans), system-ui, sans-serif)',
-    headingFamily:
-      base?.headingFamily ?? 'var(--font-outfit, var(--font-geist-sans), system-ui, sans-serif)',
+      base?.fontFamily ?? fontFamilyFor('Inter')!,
+    headingFamily: base?.headingFamily ?? fontFamilyFor('Outfit')!,
     baseFontSize: toFontSizeCss(base?.baseFontSize) ?? '16px',
     lineHeight: base?.lineHeight ?? '1.6',
     headingWeight: base?.headingWeight,

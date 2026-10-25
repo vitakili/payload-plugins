@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### ✨ Fonts — zero setup, light, no build cost
+
+- **Fonts work out of the box, presets included.** Presets named fonts by variable only (`var(--font-outfit)`, even the Next.js starter's `var(--font-geist-sans)`), so they rendered only if the site happened to define that variable — and the plugin never loaded a preset's fonts. Stacks are now normalised to the catalog form (`var(--font-outfit, "Outfit"), …`) and `resolveThemeConfiguration` reports `fontsInUse` (body + heading font, preset or picked), which is what gets loaded.
+- **Inlined and trimmed.** `ServerThemeInjector` (default `'self-hosted'`) inlines the `@font-face` rules instead of linking a stylesheet: Latin + Latin Extended only (`fontSubsets` to change), a variable font's per-weight rules folded into one (`font-weight: 300 800`). Two fonts: ~18 KiB / 50 rules → ~4 KiB / 10, with no render-blocking request. The body font's file is preloaded (`preloadFonts`).
+- **No memory spent on font files.** The file endpoint caches on disk (OS temp dir) instead of keeping up to 300 files in memory; files stay `immutable` for a year.
+- **`ThemeFontFaces`** (server) + **`fontFamilyFor()`** for pages with their own fonts.
+- **Lato draws Czech háčky in Lato.** Google still serves Lato 1, whose Latin Extended file lacks ě š č ř ž ů ť ď ň, so they fell back to a system font. That subset is now Lato 2.0 shipped with the plugin, cut to Central European letters (~9 KiB per weight, loaded lazily by the file endpoint, nothing at build time). Every other catalog font passes the same coverage check.
+
+- **`selfHostedFonts` on `ServerThemeInjector` and `ThemeLivePreviewSync`** (and `exclude` on `buildThemeFontsHref`): name the catalog fonts your app already hosts (e.g. `next/font/local` with the catalog's `--font-*` variable) and the injector requests only the rest. A theme that uses only hosted fonts links no font stylesheet at all — before, the stylesheet (~23 KiB, one `@font-face` per subset) blocked the first paint even though every face in it went unused.
+
 ## [2.3.0] - 2026-10-21
 
 ### 🐛 Fixes

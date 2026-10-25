@@ -7,6 +7,13 @@ import {
 } from './utils/resolveThemeConfiguration.js'
 
 export { ServerThemeInjector } from './components/ServerThemeInjector.js'
+export { ThemeFontFaces } from './components/ThemeFontFaces.js'
+export {
+  DEFAULT_FONT_SUBSETS,
+  loadThemeFontFaces,
+  type LoadThemeFontFacesOptions,
+  type ThemeFontFaces as ThemeFontFacesResult,
+} from './utils/themeFontFaces.js'
 
 export {
   createFallbackCriticalCSS,

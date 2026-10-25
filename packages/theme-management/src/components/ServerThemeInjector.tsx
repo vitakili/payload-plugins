@@ -1,4 +1,5 @@
 import { buildThemeFontsHref, type ThemeFontLoading } from '../constants/themeFonts.js'
+import { loadThemeFontFaces } from '../utils/themeFontFaces.js'
 import type { ThemeTypographyPreset } from '../presets.js'
 import { getBorderRadiusConfig } from '../providers/Theme/themeConfig.js'
 import type { ThemeDefaults } from '../providers/Theme/types.js'
@@ -22,14 +23,42 @@ interface ServerThemeInjectorProps {
    */
   themeConfiguration?: unknown
   /**
-   * How the body / heading fonts picked in the admin are loaded:
-   * - `'self-hosted'` (default) — served from your own origin by the plugin's
-   *   `/api/theme-fonts/*` endpoints; visitors never contact Google (GDPR-friendly).
-   * - `'google'` — straight from the Google Fonts CDN.
+   * How the theme's fonts (the body and heading font, from the preset or the
+   * editor's choice) are loaded:
+   * - `'self-hosted'` (default) — nothing to set up. The `@font-face` rules are
+   *   inlined into the page (Latin + Latin Extended only, ~1–2 KiB, no
+   *   stylesheet request to wait on) and the files are served from your own
+   *   origin by the plugin's `/api/theme-fonts/file` endpoint; visitors never
+   *   contact Google (GDPR-friendly) and nothing happens at build time.
+   * - `'google'` — a stylesheet straight from the Google Fonts CDN.
    * - `'none'` — you load the faces yourself, e.g. with `next/font` exposing the
    *   `--font-*` variables listed in `FONT_CATALOG` (they take precedence).
    */
   fontLoading?: ThemeFontLoading
+  /**
+   * Google Fonts subsets (scripts) to load with `'self-hosted'`. Default
+   * `['latin', 'latin-ext']` — enough for Czech, Slovak, Polish, German, French…
+   * Add e.g. `'cyrillic'` for a site that renders it.
+   */
+  fontSubsets?: readonly string[]
+  /**
+   * Preload the body font's first-subset file (`'self-hosted'` only). Default
+   * true: the font arrives with the page's CSS instead of after it.
+   */
+  preloadFonts?: boolean
+  /**
+   * Catalog fonts (`FONT_CATALOG` values, e.g. `['Inter', 'Lora']`) your app
+   * already self-hosts with next/font, exposing the catalog's `--font-*`
+   * variable. They are left out of the font stylesheet, so a theme that uses
+   * only those links none at all (no render-blocking request), and one that
+   * also uses another font loads just that one. Ignored with `fontLoading: 'none'`.
+   *
+   * @example
+   * ```tsx
+   * <ServerThemeInjector themeConfiguration={…} selfHostedFonts={['Inter', 'Lora']} />
+   * ```
+   */
+  selfHostedFonts?: readonly string[]
   /** Payload `routes.api` when it is not '/api'. */
   apiRoute?: string
 }
@@ -45,14 +74,30 @@ type RuntimeThemeConfiguration = Omit<ResolvedThemeConfiguration, 'typography'> 
 export async function ServerThemeInjector({
   themeConfiguration,
   fontLoading = 'self-hosted',
+  fontSubsets,
+  preloadFonts = true,
+  selfHostedFonts,
   apiRoute = '/api',
 }: Readonly<ServerThemeInjectorProps>) {
   // resolveThemeConfiguration accepts `unknown` — no cast needed
   const resolvedConfiguration = resolveThemeConfiguration(themeConfiguration)
-  const fontsHref = buildThemeFontsHref(resolvedConfiguration.fontSelections ?? [], {
-    mode: fontLoading,
-    apiRoute,
-  })
+  const fontsInUse = resolvedConfiguration.fontsInUse ?? resolvedConfiguration.fontSelections ?? []
+  // Google mode links Google's stylesheet; self-hosted inlines trimmed rules.
+  const fontsHref =
+    fontLoading === 'google'
+      ? buildThemeFontsHref(fontsInUse, { mode: 'google', exclude: selfHostedFonts })
+      : null
+  const fontFaces =
+    fontLoading === 'self-hosted'
+      ? await loadThemeFontFaces(fontsInUse, {
+          apiRoute,
+          subsets: fontSubsets,
+          exclude: selfHostedFonts,
+        })
+      : null
+  const [bodyFont] = fontsInUse
+  const preloadHref =
+    preloadFonts && fontFaces && bodyFont ? fontFaces.primaryFiles[bodyFont] : undefined
   const {
     theme,
     borderRadius,
@@ -152,6 +197,12 @@ ${borderRadiusCSS}
       ) : null}
       {/* `precedence` lets React 19 hoist the stylesheet into <head> and de-duplicate it. */}
       {fontsHref ? <link rel="stylesheet" href={fontsHref} precedence="theme-fonts" /> : null}
+      {preloadHref ? (
+        <link rel="preload" href={preloadHref} as="font" type="font/woff2" crossOrigin="anonymous" />
+      ) : null}
+      {fontFaces?.css ? (
+        <style id="theme-font-faces" dangerouslySetInnerHTML={{ __html: fontFaces.css }} />
+      ) : null}
       {emitBothSchemes ? (
         <>
           {lightBg ? (

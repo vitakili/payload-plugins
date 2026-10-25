@@ -75,6 +75,8 @@ export const buildLivePreviewThemeRuntime = (
   themeConfiguration: unknown,
   apiRoute = '/api',
   fontLoading: ThemeFontLoading = 'self-hosted',
+  /** Same as ServerThemeInjector's `selfHostedFonts`. */
+  selfHostedFonts?: readonly string[],
 ) => {
   const resolved = resolveThemeConfiguration(themeConfiguration)
 
@@ -112,7 +114,11 @@ export const buildLivePreviewThemeRuntime = (
     theme: resolved.theme,
     mode: resolveColorMode(resolved.colorMode),
     attributes,
-    fontsHref: buildThemeFontsHref(resolved.fontSelections ?? [], { apiRoute, mode: fontLoading }),
+    fontsHref: buildThemeFontsHref(resolved.fontsInUse ?? resolved.fontSelections ?? [], {
+      apiRoute,
+      mode: fontLoading,
+      exclude: selfHostedFonts,
+    }),
     css: [borderRadiusBlock, themeConfigurationCSS, colorModesCSS, customCSSBlock]
       .filter((block) => Boolean(block?.trim?.().length))
       .join('\n\n'),

@@ -115,15 +115,41 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 ```
 
-That is all an app needs. The fonts the editor picks are served from **your own
-domain** by the plugin's `/api/theme-fonts/*` endpoints (fetched and cached on the
-server), so visitors' browsers never contact Google (GDPR-friendly), with no setup.
+That is all an app needs — fonts included. `ServerThemeInjector` loads the
+theme's fonts (the body and heading font, whether a preset or the editor chose
+them) with no setup and no build step:
 
-### 3) Optional: fonts via `next/font` (Next.js best practice)
+- the `@font-face` rules are **inlined** into the page, trimmed to Latin + Latin
+  Extended (~1–4 KiB instead of Google's ~20 KiB), so there is no stylesheet
+  request for the first paint to wait on;
+- the body font's file is preloaded;
+- the files are served from **your own domain** by `/api/theme-fonts/file`
+  (fetched once from Google on the server, cached on disk, `immutable` for a
+  year) — visitors never contact Google (GDPR-friendly);
+- nothing runs at build time, so the fonts cost your build no memory.
 
-For build-time self-hosting with metric-matched fallbacks (no layout shift), add
-one import. Every catalog font is declared with `preload: false`, so a page only
-downloads the face it actually uses:
+Options: `fontSubsets` (e.g. add `'cyrillic'`), `preloadFonts={false}`,
+`fontLoading` (`'self-hosted'` default, `'google'` for the Google CDN, `'none'`
+when you load faces yourself).
+
+### Fonts outside the theme
+
+A page with its own typography (a menu, a landing page) loads any catalog font
+the same way:
+
+```tsx
+import { ThemeFontFaces } from '@kilivi/payloadcms-theme-management/server'
+import { fontFamilyFor } from '@kilivi/payloadcms-theme-management'
+
+<ThemeFontFaces fonts={['Outfit']} />
+<h1 style={{ fontFamily: fontFamilyFor('Outfit') }}>Menu</h1>
+```
+
+### Optional: fonts via `next/font`
+
+If you prefer build-time fonts, `@kilivi/payloadcms-theme-management/next-fonts`
+declares every catalog font with `next/font/google` (`preload: false`). This
+downloads fonts during `next build` and adds to its time and memory:
 
 ```tsx
 import { themeFontVariables } from '@kilivi/payloadcms-theme-management/next-fonts'
@@ -138,8 +164,10 @@ If your Next.js setup does not compile packages from `node_modules`, add
 `'@kilivi/payloadcms-theme-management'` to `transpilePackages` in `next.config`.
 Pass `fontLoading="none"` to `ThemeLivePreviewSync` as well if you use it.
 
-`fontLoading` options: `'self-hosted'` (default), `'google'` (Google Fonts CDN),
-`'none'` (you load the faces, e.g. with `next/font`).
+To host only *some* catalog fonts yourself, declare them with the catalog's CSS
+variable (`variable: '--font-lora'` for Lora) and name them in
+`selfHostedFonts={['Lora']}` (also on `ThemeLivePreviewSync`); the plugin loads
+the rest.
 
 ## The Appearance Settings tab
 

@@ -140,6 +140,16 @@ describe('self-hosted fonts', () => {
     expect(parseFontFamilies('Source Sans Pro, Lora, Lora')).toEqual(['Lora', 'Source Sans 3'])
   })
 
+  it('leaves out the fonts the site already self-hosts', () => {
+    expect(buildThemeFontsHref(['Inter', 'Lora', 'Fraunces'], { exclude: ['Inter', 'Lora'] })).toBe(
+      '/api/theme-fonts/css?f=Fraunces',
+    )
+    // Everything hosted already: no stylesheet at all, so nothing blocks the first paint.
+    expect(buildThemeFontsHref(['Inter', 'Lora'], { exclude: ['Inter', 'Lora'] })).toBeNull()
+    // Legacy names resolve before excluding.
+    expect(buildThemeFontsHref(['Source Sans Pro'], { exclude: ['Source Sans 3'] })).toBeNull()
+  })
+
   it('rewrites gstatic font URLs and leaves anything else alone', () => {
     const css =
       'src: url(https://fonts.gstatic.com/s/lora/v35/abc-DEF_1.woff2) format("woff2");' +

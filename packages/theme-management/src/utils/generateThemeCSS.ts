@@ -1,4 +1,5 @@
 import type { ThemePreset } from '../presets.js'
+import { fontFamilyFor } from '../constants/themeFonts.js'
 import { borderRadiusPresets } from '../providers/Theme/themeConfig.js'
 import { hexToHsl } from './themeColors.js'
 
@@ -271,8 +272,8 @@ function toKebab(token: string): string {
 
 function getDefaultTypography(): NonNullable<ThemePreset['typography']> {
   return {
-    fontFamily: 'var(--font-inter, var(--font-geist-sans), system-ui, sans-serif)',
-    headingFamily: 'var(--font-outfit)',
+    fontFamily: fontFamilyFor('Inter')!,
+    headingFamily: fontFamilyFor('Outfit')!,
     baseFontSize: '16px',
     lineHeight: '1.75',
     fontWeights: {

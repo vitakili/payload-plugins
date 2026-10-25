@@ -1041,6 +1041,9 @@ export {
   FONT_CATALOG,
   buildThemeFontsHref,
   getFontCatalogEntry,
+  catalogFontsInStack,
+  fontFamilyFor,
+  normalizeFontStack,
 } from './constants/themeFonts.js'
 export type { FontCatalogEntry, ThemeFontLoading } from './constants/themeFonts.js'
 export { themeFontEndpoints } from './endpoints/themeFonts.js'

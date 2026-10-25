@@ -24,6 +24,17 @@ describe('live preview theme runtime helpers', () => {
     expect(extractThemeConfigurationFromLiveData(input)).toEqual(input)
   })
 
+  it('requests only the fonts the site does not host itself', () => {
+    const config = { theme: 'cool', typography: { bodyFont: 'Inter', headingFont: 'Lora' } }
+    expect(buildLivePreviewThemeRuntime(config).fontsHref).toBe('/api/theme-fonts/css?f=Inter,Lora')
+    expect(buildLivePreviewThemeRuntime(config, '/api', 'self-hosted', ['Inter']).fontsHref).toBe(
+      '/api/theme-fonts/css?f=Lora',
+    )
+    expect(
+      buildLivePreviewThemeRuntime(config, '/api', 'self-hosted', ['Inter', 'Lora']).fontsHref,
+    ).toBeNull()
+  })
+
   it('builds runtime css and resolved attributes from theme configuration', () => {
     const runtime = buildLivePreviewThemeRuntime({
       theme: 'neon',
