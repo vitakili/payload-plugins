@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### 🐛 Fixes
+
+- **The site's colour mode was ignored on the client.** With no stored visitor preference, `ThemeProvider` applied the plugin default (`auto`) on mount instead of the `initialMode` it was given, so a site configured as `dark` rendered light for every visitor whose system prefers light. It now applies `initialMode` first; a visitor's stored choice still wins, and `auto` still follows the system.
+
 ### ✨ Fonts — zero setup, light, no build cost
 
 - **Fonts work out of the box, presets included.** Presets named fonts by variable only (`var(--font-outfit)`, even the Next.js starter's `var(--font-geist-sans)`), so they rendered only if the site happened to define that variable — and the plugin never loaded a preset's fonts. Stacks are now normalised to the catalog form (`var(--font-outfit, "Outfit"), …`) and `resolveThemeConfiguration` reports `fontsInUse` (body + heading font, preset or picked), which is what gets loaded.

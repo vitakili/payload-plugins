@@ -123,11 +123,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         setMode(storedMode)
         applyMode(storedMode)
       } else {
-        // Fall back to the default mode
-        applyMode(defaultMode)
+        // No visitor preference: the site's configured mode, then the plugin
+        // default. Falling straight to `defaultMode` ('auto') ignored the
+        // `colorMode` a site had chosen, so a site set to dark rendered light
+        // for every visitor whose system prefers light.
+        applyMode(initialMode || defaultMode)
       }
     }
-  }, [applyMode])
+  }, [applyMode, initialMode])
 
   // Listen for system color-scheme changes (only relevant when mode === 'auto')
   useEffect(() => {
