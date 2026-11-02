@@ -191,6 +191,12 @@ describe('Field Configuration', () => {
             const nested = findField((f as any).fields, name)
             if (nested) return nested
           }
+          if (Array.isArray((f as any).tabs)) {
+            for (const tab of (f as any).tabs) {
+              const nested = findField(tab.fields, name)
+              if (nested) return nested
+            }
+          }
         }
         return undefined
       }

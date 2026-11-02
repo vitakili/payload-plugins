@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### 🗂️ The appearance tab is split into sub-tabs
+
+- **Colours · Typography · Style & effects · Components · Advanced** instead of one column of collapsibles. The tabs are unnamed, so they are presentational only: every value keeps its `themeConfiguration.*` path and no stored document changes shape (no migration).
+- **The live preview stays put.** It sits outside the sub-tabs, so on wide admins it remains the sticky right-hand column whichever tab is open; on narrow ones it comes first.
+- **Advanced is for developers**: custom CSS, custom sections and the JSON preset import. Motion (`animationLevel`) moved to *Style & effects*, and so do loose `customThemeConfigurationFields` — they are appearance options of the consumer's site, not developer settings.
+- The colour-mode collapsible is now *Fine-tune colours* under the theme picker; *Visual effects* opens by default.
+- **No more untranslated "Theme Configuration"** heading above the controls — the group is `label: false`, the tab names it.
+- **Layout no longer depends on the admin theme.** Admin themes that make every `.render-fields` a two-column grid (payload-theme) squeezed the controls into half the width beside an empty column; the group now opts out with selectors that outrank them.
+
 ### 🐛 Fixes
 
 - **The site's colour mode was ignored on the client.** With no stored visitor preference, `ThemeProvider` applied the plugin default (`auto`) on mount instead of the `initialMode` it was given, so a site configured as `dark` rendered light for every visitor whose system prefers light. It now applies `initialMode` first; a visitor's stored choice still wins, and `auto` still follows the system.

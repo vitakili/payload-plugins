@@ -1,6 +1,21 @@
 import { describe, expect, it } from '@jest/globals'
 import { themeManagementPlugin } from '../src/index.js'
 
+
+/** The theme picker now sits in the group's first sub-tab; walk tabs too. */
+function findThemeField(fields: any[] | undefined): any {
+  for (const f of fields ?? []) {
+    if (f?.name === 'theme') return f
+    if (f?.type === 'tabs') {
+      for (const tab of f.tabs ?? []) {
+        const found = findThemeField(tab.fields)
+        if (found) return found
+      }
+    }
+  }
+  return undefined
+}
+
 describe('Theme Management Plugin - Standalone Global', () => {
   const mockConfig: any = {
     collections: [
@@ -258,7 +273,7 @@ describe('Theme Management Plugin - Standalone Global', () => {
 
     const result = plugin(mockConfig) as any
     const appearanceGlobal = result.globals.find((g: any) => g.slug === 'appearance-settings')
-    const themeField = appearanceGlobal?.fields?.[0]?.fields?.find((f: any) => f?.name === 'theme')
+    const themeField = findThemeField(appearanceGlobal?.fields?.[0]?.fields)
 
     expect(themeField).toBeDefined()
     expect(themeField?.admin?.components?.Field).toBe(
@@ -275,7 +290,7 @@ describe('Theme Management Plugin - Standalone Global', () => {
 
     const result = plugin(mockConfig) as any
     const appearanceGlobal = result.globals.find((g: any) => g.slug === 'appearance-settings')
-    const themeField = appearanceGlobal?.fields?.[0]?.fields?.find((f: any) => f?.name === 'theme')
+    const themeField = findThemeField(appearanceGlobal?.fields?.[0]?.fields)
 
     expect(themeField).toBeDefined()
     expect(themeField?.admin?.components?.Field).toBe(

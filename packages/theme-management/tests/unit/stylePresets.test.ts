@@ -11,7 +11,14 @@ type SelectLike = { name?: string; type?: string; options?: Array<{ value: strin
 /** Collect every select field's allowed values, keyed by its path inside themeConfiguration. */
 function collectSelectOptions(fields: Field[], prefix = ''): Map<string, Set<string>> {
   const result = new Map<string, Set<string>>()
-  for (const field of fields as Array<SelectLike & { fields?: Field[] }>) {
+  for (const field of fields as Array<SelectLike & { fields?: Field[]; tabs?: Array<{ fields: Field[] }> }>) {
+    // Unnamed tabs are presentational: their fields keep the parent's path.
+    if (field.type === 'tabs' && field.tabs) {
+      for (const tab of field.tabs) {
+        collectSelectOptions(tab.fields, prefix).forEach((value, key) => result.set(key, value))
+      }
+      continue
+    }
     const path = field.name ? `${prefix}${field.name}` : prefix.replace(/\.$/, '')
     if (field.type === 'select' && field.name) {
       result.set(

@@ -425,6 +425,21 @@
   container-name: tm-appearance;
 }
 
+/* The group runs its own layout. Admin themes (payload-theme, for one) turn
+   every `.render-fields` into a two-column grid, which squeezed the sub-tabs
+   into a half-width column beside an empty one whenever the mock preview was
+   not rendered. The repeated classes outrank those theme selectors (five
+   classes) without `!important`. */
+.tm-appearance.tm-appearance > .group-field__wrap > .render-fields.render-fields.render-fields,
+.tm-appearance.tm-appearance.tm-appearance .render-fields.render-fields:not(.row__fields) {
+  display: block;
+}
+
+/* …and puts back the field spacing those themes hand to their grid gap. */
+.tm-appearance.tm-appearance.tm-appearance .render-fields.render-fields:not(.row__fields) > .field-type {
+  margin-bottom: var(--spacing-field, 1.5rem);
+}
+
 .tm-live-preview-slot {
   min-width: 0;
   margin-bottom: 20px;
@@ -493,7 +508,9 @@
 /* Two columns only while the mock preview is actually rendered; with native Live
    Preview the controls take the full width. */
 @container tm-appearance (min-width: 960px) {
-  .tm-appearance > .group-field__wrap > .render-fields:has(> .tm-live-preview-slot) {
+  .tm-appearance.tm-appearance
+    > .group-field__wrap
+    > .render-fields.render-fields.render-fields:has(> .tm-live-preview-slot) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(340px, 42%);
     column-gap: 28px;

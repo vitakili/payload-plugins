@@ -53,7 +53,11 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     customThemeConfigurationSections,
   } = options
 
-  const fields: Field[] = [
+  // The tab is split into sub-tabs (Colours · Typography · Style & effects ·
+  // Components · Advanced) instead of one long column of collapsibles. The tabs
+  // are *unnamed*, so they are purely presentational: every value keeps its
+  // `themeConfiguration.*` path and no stored document changes shape.
+  const colorsTab: Field[] = [
     // NOTE: the palette generator is rendered *inside* ThemePreviewField (in the
     // preset column, above the preset list) — it is not a separate UI field.
     {
@@ -87,10 +91,11 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     },
   ]
 
-  // Live preview: colours, fonts and component styles in one place. On wide admins
-  // it occupies a sticky right-hand column spanning the whole tab (see
-  // ThemePreviewField.css, `.tm-appearance`); on narrow ones it follows the theme picker.
-  fields.push({
+  // Live preview: colours, fonts and component styles in one place. It sits
+  // *outside* the sub-tabs, so on wide admins it stays in a sticky right-hand
+  // column whichever tab is open (see ThemePreviewField.css, `.tm-appearance`);
+  // on narrow ones it comes first, above the tabs.
+  const previewField: Field = {
     name: 'appearancePreview',
     type: 'ui',
     admin: {
@@ -98,61 +103,32 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
         Field: '@kilivi/payloadcms-theme-management/fields/AppearancePreviewField',
       },
     },
-  })
+  }
 
-  // Style Preset - visual style selection independent of colors
-  fields.push({
-    type: 'collapsible',
-    label: {
-      en: 'Style Preset',
-      cs: 'Styl vzhledu',
-    },
-    admin: {
-      initCollapsed: true,
-      className: 'tm-section-style-preset',
-      description: {
-        en: 'Choose a visual style (Brutalism, Swiss, Glassmorphism …) without changing the colour palette.',
-        cs: 'Zvolte vizuální styl (Brutalismus, Švýcarský, Glassmorphism …) bez změny barevné palety.',
+  // Style & effects tab: a whole-site style preset first, then the shape and
+  // effect knobs it sets.
+  const styleTab: Field[] = [
+    {
+      name: 'stylePreset',
+      type: 'text',
+      label: {
+        en: 'Style preset',
+        cs: 'Styl vzhledu',
       },
-    },
-    fields: [
-      {
-        name: 'stylePreset',
-        type: 'text',
-        label: {
-          en: 'Active Style Preset',
-          cs: 'Aktivní styl vzhledu',
-        },
-        defaultValue: '',
-        admin: {
-          components: {
-            Field: '@kilivi/payloadcms-theme-management/fields/StylePresetField',
-          },
+      defaultValue: '',
+      admin: {
+        components: {
+          Field: '@kilivi/payloadcms-theme-management/fields/StylePresetField',
         },
       },
-    ],
-  })
+    },
+  ]
 
-  // Typography - Always visible
-  fields.push({
-    type: 'collapsible',
-    label: {
-      en: 'Typography',
-      cs: 'Typografie',
-    },
-    admin: {
-      initCollapsed: true,
-      className: 'tm-section-typography',
-      description: {
-        en: 'Fonts, text size and the character of headings. "Use theme preset" keeps the colour theme’s defaults.',
-        cs: 'Písma, velikost textu a charakter nadpisů. „Podle motivu“ ponechá výchozí nastavení barevného motivu.',
-      },
-    },
-    fields: [
+  const typographyTab: Field[] = [
       {
         name: 'typography',
         type: 'group',
-        // The collapsible around it already carries the heading.
+        // The tab already carries the heading.
         label: false,
         admin: { hideGutter: true },
         fields: [
@@ -306,11 +282,10 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
         ],
       },
-    ],
-  })
+  ]
 
   // Shape & rhythm — corner rounding and spacing scale
-  fields.push({
+  styleTab.push({
     type: 'row',
     fields: [
       {
@@ -362,15 +337,16 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   })
 
-  // Visual Effects — glassmorphism, shadows, border style
-  fields.push({
+  // Visual Effects — glassmorphism, shadows, border style. Open by default: it
+  // shares its tab with only the style preset and the shape row.
+  styleTab.push({
     type: 'collapsible',
     label: {
       en: 'Visual Effects',
       cs: 'Vizuální efekty',
     },
     admin: {
-      initCollapsed: true,
+      initCollapsed: false,
       className: 'tm-section-effects',
       description: {
         en: 'Configure UI effect style, shadow intensity and border appearance.',
@@ -558,25 +534,11 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
   })
 
   // Component Styles — buttons, cards, images, icons
-  fields.push({
-    type: 'collapsible',
-    label: {
-      en: 'Component Styles',
-      cs: 'Styly komponent',
-    },
-    admin: {
-      initCollapsed: true,
-      className: 'tm-section-components',
-      description: {
-        en: 'Customize button variant, card style and navbar appearance.',
-        cs: 'Přizpůsobte styl tlačítek, karet a navigační lišty.',
-      },
-    },
-    fields: [
+  const componentsTab: Field[] = [
       {
         name: 'componentStyles',
         type: 'group',
-        // The collapsible around it already carries the heading.
+        // The tab already carries the heading.
         label: false,
         admin: { hideGutter: true },
         fields: [
@@ -862,16 +824,15 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
           },
         ],
       },
-    ],
-  })
+  ]
 
-  // Color Mode Settings
+  // Color Mode Settings — fine-tuning under the theme picker in the Colours tab.
   if (includeColorModeToggle) {
-    fields.push({
+    colorsTab.push({
       type: 'collapsible',
       label: {
-        en: 'Color Mode Settings',
-        cs: 'Nastavení barevného režimu',
+        en: 'Fine-tune colours',
+        cs: 'Doladit barvy',
       },
       admin: {
         className: 'tm-section-colors',
@@ -997,15 +958,14 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     ],
   }
 
-  fields.push(customPresetsField)
-
-  if (customThemeConfigurationFields?.length) {
-    fields.push(...customThemeConfigurationFields)
-  }
+  // Advanced tab: the developer-facing knobs — consumer-supplied sections,
+  // custom CSS and the JSON preset import — kept away from the editor's
+  // everyday path.
+  const advancedTab: Field[] = []
 
   if (customThemeConfigurationSections?.length) {
     customThemeConfigurationSections.forEach((section) => {
-      fields.push({
+      advancedTab.push({
         type: 'collapsible',
         label: section.label,
         admin: {
@@ -1017,36 +977,40 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
     })
   }
 
-  // Advanced Settings (when using extended theme configuration)
   if (enableAdvancedFeatures) {
-    const advancedFields: Field[] = [
-      {
-        name: 'animationLevel',
-        type: 'select',
-        label: {
-          en: 'Animation Level',
-          cs: 'Úroveň animací',
-        },
-        defaultValue: 'medium',
-        options: [
-          { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
-          { label: { en: 'Reduced', cs: 'Snížené' }, value: 'reduced' },
-          { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
-          { label: { en: 'High', cs: 'Vysoké' }, value: 'high' },
-        ],
-        admin: {
-          description: {
-            en: 'Control website animations and transitions',
-            cs: 'Kontrola animací a přechodů na webu',
+    // Motion is part of how the site *feels*, so it sits with the other style
+    // choices rather than behind the developer tab.
+    styleTab.push({
+      type: 'row',
+      fields: [
+        {
+          name: 'animationLevel',
+          type: 'select',
+          label: {
+            en: 'Animation Level',
+            cs: 'Úroveň animací',
           },
-          width: '50%',
+          defaultValue: 'medium',
+          options: [
+            { label: { en: 'None', cs: 'Žádné' }, value: 'none' },
+            { label: { en: 'Reduced', cs: 'Snížené' }, value: 'reduced' },
+            { label: { en: 'Medium', cs: 'Střední' }, value: 'medium' },
+            { label: { en: 'High', cs: 'Vysoké' }, value: 'high' },
+          ],
+          admin: {
+            description: {
+              en: 'Control website animations and transitions',
+              cs: 'Kontrola animací a přechodů na webu',
+            },
+            width: '50%',
+          },
+          dbName: 'animation_level',
         },
-        dbName: 'animation_level',
-      },
-    ]
+      ],
+    })
 
     if (includeCustomCSS) {
-      advancedFields.push({
+      advancedTab.push({
         name: 'customCSS',
         type: 'code',
         label: {
@@ -1059,26 +1023,52 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
             en: 'Add custom CSS to override default styles',
             cs: 'Přidejte vlastní CSS pro přepsání výchozích stylů',
           },
-          // placeholder:
-          //   ':root {\n  --primary: #your-color;\n  --border-radius: 8px;\n  --font-family: "Your Font";\n}\n\n.custom-class {\n  /* Your custom styles */\n}',
-          // rows: 8,
         },
       })
     }
-
-    fields.push({
-      type: 'collapsible',
-      label: {
-        en: 'Advanced Settings',
-        cs: 'Pokročilé nastavení',
-      },
-      admin: {
-        initCollapsed: true,
-        className: 'tm-section-advanced',
-      },
-      fields: advancedFields,
-    })
   }
+
+  advancedTab.push(customPresetsField)
+
+  // Consumer-supplied loose fields are appearance options of the consumer's own
+  // site (a gradient background, say), so they close the Style & effects tab
+  // rather than hiding among the developer settings.
+  if (customThemeConfigurationFields?.length) {
+    styleTab.push(...customThemeConfigurationFields)
+  }
+
+  const tabs: NonNullable<TabsField['tabs']> = [
+    {
+      // No tab description: the theme picker right below says it in its own words.
+      label: { en: 'Colours', cs: 'Barvy' },
+      fields: colorsTab,
+    },
+    {
+      label: { en: 'Typography', cs: 'Písmo' },
+      description: {
+        en: 'Fonts, text size and the character of headings. "Use theme preset" keeps the colour theme’s defaults.',
+        cs: 'Písma, velikost textu a charakter nadpisů. „Podle motivu“ ponechá výchozí nastavení barevného motivu.',
+      },
+      fields: typographyTab,
+    },
+    {
+      // No tab description: the style preset picker opens with its own.
+      label: { en: 'Style & effects', cs: 'Styl a efekty' },
+      fields: styleTab,
+    },
+    {
+      label: { en: 'Components', cs: 'Komponenty' },
+      description: {
+        en: 'How buttons, cards, the navigation bar, images and links look.',
+        cs: 'Jak vypadají tlačítka, karty, navigační lišta, obrázky a odkazy.',
+      },
+      fields: componentsTab,
+    },
+    {
+      label: { en: 'Advanced', cs: 'Pokročilé' },
+      fields: advancedTab,
+    },
+  ]
 
   // Return as tab configuration to be injected into tabs structure
   return {
@@ -1090,14 +1080,14 @@ export function createThemeConfigurationField(options: ThemeConfigurationFieldOp
       {
         name: 'themeConfiguration',
         type: 'group',
+        // The surrounding tab already names it; Payload would otherwise print
+        // the untranslated "Theme Configuration" above the controls.
+        label: false,
         admin: {
           className: 'tm-appearance',
-          description: {
-            en: 'Appearance and style of the whole website',
-            cs: 'Vzhled a styl celého webu',
-          },
+          hideGutter: true,
         },
-        fields,
+        fields: [previewField, { type: 'tabs', tabs }],
       },
     ],
   }
