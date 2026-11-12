@@ -40,5 +40,8 @@ jobs:
       - name: Check types
         run: pnpm exec tsc --noEmit
 
+      - name: Check package types
+        run: pnpm -r --if-present typecheck
+
       - name: Run workspace tests
         run: pnpm -r test
