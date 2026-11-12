@@ -1,0 +1,147 @@
+import type { Message } from "../../translations/types";
+import type { Visualization } from "./visualization";
+
+export type Status = "good" | "warn" | "bad";
+
+export type TotalStatus = Status | "idle";
+
+export interface CheckResult {
+  id: string;
+  status: Status;
+  score: number;
+  /** What to do about it; absent when the check passes. */
+  recommendation?: Message;
+  data?: Record<string, unknown>;
+  viz?: Visualization;
+}
+
+export interface InclusiveFlag {
+  term: string;
+  suggestion: string;
+  location: string;
+}
+/** Yoast's inclusive-language categories; the UI names them (`inclusive.category.<id>`). */
+export type InclusiveCategoryId =
+  | "age"
+  | "appearance"
+  | "culture"
+  | "disability"
+  | "gender"
+  | "sexualOrientation"
+  | "ses"
+  | "other";
+
+export interface InclusiveCategory {
+  id: InclusiveCategoryId;
+  flags: InclusiveFlag[];
+}
+
+export interface ProminentWord {
+  word: string;
+  count: number;
+  isKeyphrase: boolean;
+}
+
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+export type HeadingDocIssue =
+  | {
+      type: "missing-h1";
+    }
+  | {
+      type: "multiple-h1";
+      count: number;
+    };
+
+export interface HeadingNodeIssue {
+  type: "skipped-level";
+  skipped: HeadingLevel[];
+}
+
+export interface HeadingNode {
+  id: string;
+  level: HeadingLevel;
+  text: string;
+  children: HeadingNode[];
+  issue?: HeadingNodeIssue;
+}
+
+export interface HeadingLevelCount {
+  level: HeadingLevel;
+  count: number;
+}
+
+export interface HeadingStructure {
+  total: number;
+  levels: HeadingLevelCount[];
+  tree: HeadingNode[];
+  issues: HeadingDocIssue[];
+}
+
+export interface VitalsResult {
+  words: number;
+  sentences: number;
+  paragraphs: number;
+  images: number;
+  videos: number;
+  readingTimeMinutes: number;
+  prominentWords: ProminentWord[];
+  headings: HeadingStructure;
+}
+
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  siteName: string;
+}
+
+export interface CategoryResult {
+  ringScore: number;
+  status: Status;
+  checks: CheckResult[];
+}
+
+export interface KeyphraseInput {
+  text: string;
+  synonyms: string[];
+}
+
+export interface RelatedKeyphraseResult {
+  text: string;
+  result: CategoryResult;
+}
+
+export interface AnalysisResult {
+  overall: { seoScore: number; status: Status };
+  keyphraseText: string;
+  keyphrase: CategoryResult;
+  relatedKeyphrases: RelatedKeyphraseResult[];
+  onPage: CategoryResult;
+  readability: CategoryResult;
+  inclusive: {
+    ringScore: number;
+    status: Status;
+    categories: InclusiveCategory[];
+    cleanCategories: InclusiveCategoryId[];
+  };
+  vitals: VitalsResult;
+  serp: SerpResult;
+}
+
+export interface AnalysisInput {
+  title: string;
+  slug: string;
+  description: string;
+  contentHtml: string;
+  keyphrase: string;
+  keyphrases: KeyphraseInput[];
+  locale: string;
+  site: { name: string; baseUrl: string };
+  has: {
+    seoTitle: boolean;
+    metaDescription: boolean;
+    slug: boolean;
+    content: boolean;
+  };
+}

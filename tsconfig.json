@@ -16,5 +16,5 @@
     "sourceMap": true,
     "jsx": "react-jsx"
   },
-  "exclude": ["node_modules", "**/dist/**", "**/build/**", "**/scripts/**", "dev-local/**"]
+  "exclude": ["node_modules", "**/dist/**", "**/build/**", "**/scripts/**", "dev-local/**", "packages/payload-plugin-seo/**"]
 }

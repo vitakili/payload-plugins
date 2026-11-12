@@ -1,0 +1,132 @@
+{
+  "name": "@kilivi/payload-plugin-seo",
+  "version": "1.10.2",
+  "license": "MIT",
+  "description": "Live Yoast-powered SEO analysis drawer for Payload CMS v3 (fork of @focus-reactive/payload-plugin-seo)",
+  "author": "Kilián Vít",
+  "contributors": [
+    "FocusReactive <ship@focusreactive.com> (original author, https://github.com/focusreactive/payload-plugins)"
+  ],
+  "keywords": [
+    "payload",
+    "payloadcms",
+    "payload-plugin",
+    "seo",
+    "yoast",
+    "cms",
+    "plugin",
+    "react",
+    "nextjs",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitakili/payload-plugins.git",
+    "directory": "packages/payload-plugin-seo"
+  },
+  "bugs": {
+    "url": "https://github.com/vitakili/payload-plugins/issues"
+  },
+  "homepage": "https://github.com/vitakili/payload-plugins/tree/main/packages/payload-plugin-seo#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./content": {
+      "import": "./dist/content/index.js",
+      "types": "./dist/content/index.d.ts"
+    },
+    "./admin.css": "./dist/admin.css",
+    "./components/SeoButton": {
+      "import": "./dist/components/SeoButton/index.js",
+      "types": "./dist/components/SeoButton/index.d.ts"
+    },
+    "./fields": {
+      "import": "./dist/fields/index.js",
+      "types": "./dist/fields/index.d.ts"
+    },
+    "./components/SeoField": {
+      "import": "./dist/components/SeoField/index.js",
+      "types": "./dist/components/SeoField/index.d.ts"
+    },
+    "./providers/SeoClientConfigProvider": {
+      "import": "./dist/providers/SeoClientConfigProvider.js",
+      "types": "./dist/providers/SeoClientConfigProvider.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup && tsc -p tsconfig.build.json --emitDeclarationOnly --declarationMap",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@payloadcms/next": "^3.0.0",
+    "@payloadcms/richtext-lexical": "^3.0.0",
+    "@payloadcms/ui": "^3.0.0",
+    "lucide-react": "^0.469.0",
+    "next": "^14.0.0 || ^15.0.0",
+    "payload": "^3.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@yoast/search-metadata-previews": "^3.0.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "yoastseo": "^3.6.0"
+  },
+  "devDependencies": {
+    "@payloadcms/next": "3.90.1",
+    "@payloadcms/richtext-lexical": "3.90.1",
+    "@payloadcms/ui": "3.90.1",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@types/node": "^26.1.0",
+    "@types/react": "19.2.9",
+    "@types/react-dom": "19.2.3",
+    "jsdom": "26.1.0",
+    "lucide-react": "^0.469.0",
+    "next": "15.4.10",
+    "payload": "3.90.1",
+    "postcss": "^8.5.1",
+    "postcss-cli": "^11.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "tsup": "8.0.0",
+    "typescript": "5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

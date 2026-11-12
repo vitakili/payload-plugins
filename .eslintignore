@@ -9,3 +9,6 @@ build
 dev-local/*
 # Ignore generated skill templates and test files under .github
 .github/skills/**
+
+# Fork of @focus-reactive/payload-plugin-seo: keeps its own type-check (`pnpm --filter @kilivi/payload-plugin-seo typecheck`)
+packages/payload-plugin-seo/**
