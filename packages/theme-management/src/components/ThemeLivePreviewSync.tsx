@@ -99,6 +99,7 @@ export const ThemeLivePreviewSync: React.FC<ThemeLivePreviewSyncProps> = ({
     document.documentElement.classList.remove('light', 'dark', 'auto')
     document.documentElement.classList.add(runtime.mode)
     // Joined: a new array from the caller on every render must not re-run this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeConfiguration, styleElementId, apiRoute, fontLoading, selfHostedFonts?.join(',')])
 
   return null
