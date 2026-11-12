@@ -7,12 +7,13 @@
 
 ### Features
 
-* translate the admin UI and ship a Czech translation (focusreactive/payload-plugins#227 / #228)
+* translate the admin UI and ship a Czech translation (focusreactive/payload-plugins#227)
 * type the `translations` option; bundled languages fall back to English
 
 ### Bug Fixes
 
-* analyse non-English locales with their own Yoast researcher
+* analyse non-English locales with their own Yoast researcher (focusreactive/payload-plugins#228)
+* emit keyphrase density text length/count and an empty subheading proportion (focusreactive/payload-plugins#231)
 * keep the inclusive subtitle grammatical for any count
 
 ## @focus-reactive/payload-plugin-seo [1.10.2](https://github.com/focusreactive/payload-plugins/compare/@focus-reactive/payload-plugin-seo@1.10.1...@focus-reactive/payload-plugin-seo@1.10.2) (2026-10-23)

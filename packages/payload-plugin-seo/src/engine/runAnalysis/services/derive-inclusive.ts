@@ -44,15 +44,8 @@ interface YoastInclusiveAssessor {
   getAssessment: (identifier: string) => YoastInclusiveAssessment | undefined;
 }
 
-export function deriveInclusive(paper: InstanceType<typeof Paper>): InclusiveResult {
-  const assessor: YoastInclusiveAssessor = new InclusiveLanguageAssessor(makeResearcher(paper));
-  assessor.assess(paper);
-
-  return scoreInclusive(extractInclusiveFlags(assessor), INCLUSIVE_CATEGORIES);
-}
-
 function stripTags(html: string): string {
-  return html.replace(/<[^>]+>/g, "").trim();
+  return html.replace(/<[^>]+>/gu, "").trim();
 }
 
 function extractInclusiveFlags(assessor: YoastInclusiveAssessor): RawInclusiveFlag[] {
@@ -79,4 +72,11 @@ function extractInclusiveFlags(assessor: YoastInclusiveAssessor): RawInclusiveFl
       location: found.sentence,
     }));
   });
+}
+
+export function deriveInclusive(paper: InstanceType<typeof Paper>): InclusiveResult {
+  const assessor: YoastInclusiveAssessor = new InclusiveLanguageAssessor(makeResearcher(paper));
+  assessor.assess(paper);
+
+  return scoreInclusive(extractInclusiveFlags(assessor), INCLUSIVE_CATEGORIES);
 }

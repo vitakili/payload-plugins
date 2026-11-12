@@ -17,10 +17,13 @@ FocusReactive package, and FocusReactive does not endorse or support it.
 - Includes changes proposed upstream by Kilián Vít that were not yet merged there:
   - [focusreactive/payload-plugins#227](https://github.com/focusreactive/payload-plugins/pull/227)
   - [focusreactive/payload-plugins#228](https://github.com/focusreactive/payload-plugins/pull/228)
+  - [focusreactive/payload-plugins#231](https://github.com/focusreactive/payload-plugins/pull/231)
+    (only its `packages/payload-plugin-seo` changes)
 
-  These cover a translated admin UI with a bundled Czech translation
-  (`feat/seo-i18n`) and analysis of non-English locales with their own Yoast
-  researcher (`fix/seo-locale-researcher`).
+  These cover a translated admin UI with a bundled Czech translation (#227),
+  analysis of non-English locales with their own Yoast researcher (#228), and
+  keyphrase-density / subheading data fixes, realigned stale tests and lint
+  cleanup (#231).
 
 ## Third-party runtime dependencies
 
