@@ -73,6 +73,15 @@ function extractSlugData(
     } else if (typeof fullPathValue === 'string') {
       fullPath = fullPathValue
     }
+
+    // A collection without its own fullPath field (categories, posts, …) used to
+    // produce `fullPath: undefined`. `localizedSlugs` is a group and a Payload
+    // update merges groups, so the undefined was skipped and the fullPath of the
+    // document's *first* slug survived every later rename. Derive it from the
+    // slug instead, exactly as the generateFromTitle branch does.
+    if (!fullPath && slug) {
+      fullPath = `/${slug}`
+    }
   }
 
   return { slug, fullPath }
